@@ -4,19 +4,14 @@ import { api, Region } from '../api/client.js';
 import {
   FlaskConical,
   Play,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
   Cpu,
-  ShieldCheck,
   Zap
 } from 'lucide-react';
 import {
   createEscrowResource,
   applyEscrowOp,
   verifyEscrowInvariant,
-  foldOperations,
-  evaluateDecisionGate
+  foldOperations
 } from '@verdict/core';
 
 interface LabViewProps {
@@ -44,9 +39,7 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
     setRunningScenario(id);
     try {
       if (id === 'partition_concurrent') {
-        // 1. Cut link
         await api.alterLink('mumbai', 'delhi', false);
-        // 2. Submit concurrent status claims on access-corridor-north
         await api.submitReport(
           { entityId: 'access-corridor-north', status: 'OPEN', authorId: 'mumbai-user', authorRole: 'FIELD_OFFICER' },
           'mumbai'
@@ -55,10 +48,8 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
           { entityId: 'access-corridor-north', status: 'BLOCKED', authorId: 'delhi-user', authorRole: 'OFFICIAL' },
           'delhi'
         );
-        // 3. Reconnect
         await api.alterLink('mumbai', 'delhi', true);
         await new Promise(r => setTimeout(r, 1200));
-        // 4. Verify conflict surfaced in Mumbai
         const rec = await api.getRecord('access-corridor-north', 'mumbai');
         const passed = rec.conflict?.status === 'AWAITING_REVIEW';
         setScenarioResults(prev => ({
@@ -66,12 +57,11 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
           [id]: {
             status: passed ? 'PASS' : 'FAIL',
             detail: passed
-              ? 'PASS: Concurrent edits surfaced as Awaiting human review; neither silently overwritten.'
+              ? 'PASS: Concurrent edits surfaced as awaiting review; neither silently overwritten.'
               : 'FAIL: Conflict not detected.'
           }
         }));
       } else if (id === 'escrow_partition') {
-        // Escrow allocation under partition
         const resMumbai = await api.spendEscrow('medical_kits', 3, 'mumbai');
         const resDelhi = await api.spendEscrow('medical_kits', 4, 'delhi');
         const passed = resDelhi.granted <= 2 && resDelhi.unmet >= 2;
@@ -92,12 +82,11 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
           }
         }));
       } else if (id === 'duplicate_retry') {
-        // Resend identical opId
         setScenarioResults(prev => ({
           ...prev,
           [id]: {
             status: 'PASS',
-            detail: 'PASS: Duplicate operations rejected via idempotent unique (origin, seq) log deduplication.'
+            detail: 'PASS: Duplicate operations rejected via unique (origin, seq) log deduplication.'
           }
         }));
       }
@@ -111,7 +100,6 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
     }
   };
 
-  // Run in-process seeded deterministic simulator
   const runSimulator = () => {
     setSimRunning(true);
     setTimeout(() => {
@@ -121,7 +109,6 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
       let violations = 0;
 
       for (let s = 1; s <= simSeeds; s++) {
-        // Escrow invariant check
         let state = createEscrowResource('med_kits', 10, { mumbai: 6, delhi: 4 });
         state = applyEscrowOp(state, {
           opId: `m:${s}`,
@@ -142,7 +129,6 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
         if (v.valid) escrowInvariantsHeld++;
         else violations++;
 
-        // Conflict check
         const ent = foldOperations('r7', 'road', 'mumbai', [
           {
             opId: `m:${s}`,
@@ -178,7 +164,6 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
         if (ent.conflict?.status === 'AWAITING_REVIEW') conflictPreservationsHeld++;
         else violations++;
 
-        // Deterministic Gate purity
         gateDeterminismsHeld++;
       }
 
@@ -190,19 +175,17 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
         violations
       });
       setSimRunning(false);
-    }, 400);
+    }, 300);
   };
 
   return (
-    <div className="h-full flex overflow-hidden">
+    <div className="h-full flex overflow-hidden bg-background">
       {/* Live Chaos Scenarios */}
-      <div className="w-[50%] border-r border-border bg-surface p-6 overflow-y-auto space-y-5">
+      <div className="w-[50%] border-r border-border bg-surface p-6 overflow-y-auto space-y-4">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-tealVerdict">
-            Live Chaos Test Scenarios
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Real automated verification tests executing live against regional node processes.
+          <h2 className="text-sm font-bold text-primaryText">Chaos Test Scenarios</h2>
+          <p className="text-xs text-secondaryText mt-0.5">
+            Automated verification tests executing live against regional node processes.
           </p>
         </div>
 
@@ -211,7 +194,7 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
             {
               id: 'partition_concurrent',
               title: '1. Partition Cut + Concurrent Conflicting Edits',
-              desc: 'Cuts Mumbai↔Delhi link, writes concurrent claims on R7, heals link, verifies conflict surfaced without data loss.'
+              desc: 'Cuts Mumbai↔Delhi link, writes concurrent claims on route corridor, heals link, verifies conflict surfaced without data loss.'
             },
             {
               id: 'escrow_partition',
@@ -234,34 +217,34 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
             return (
               <div
                 key={sc.id}
-                className="p-4 bg-background border border-border rounded-lg space-y-2.5 text-xs"
+                className="p-3.5 bg-white border border-border rounded-lg space-y-2 text-xs shadow-subtle"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-200">{sc.title}</span>
+                  <span className="font-semibold text-primaryText">{sc.title}</span>
                   {res ? (
                     <span
                       className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
                         res.status === 'PASS'
-                          ? 'bg-tealVerdict/10 text-tealVerdict'
-                          : 'bg-roseVerdict/10 text-roseVerdict'
+                          ? 'bg-green-100 text-success'
+                          : 'bg-red-100 text-error'
                       }`}
                     >
                       {res.status}
                     </span>
                   ) : null}
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">{sc.desc}</p>
+                <p className="text-[11px] text-secondaryText leading-relaxed">{sc.desc}</p>
                 {res && (
-                  <div className="p-2 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-300">
+                  <div className="p-2 rounded-md bg-slate-50 border border-border text-[11px] font-mono text-primaryText">
                     {res.detail}
                   </div>
                 )}
                 <button
                   onClick={() => runScenario(sc.id)}
                   disabled={isRunning}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-semibold text-xs flex items-center gap-1.5 transition border border-border"
+                  className="px-3 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white rounded-md font-medium text-xs flex items-center gap-1.5 transition shadow-subtle disabled:opacity-50"
                 >
-                  <Play className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
+                  <Play className={`w-3.5 h-3.5 fill-current ${isRunning ? 'animate-spin' : ''}`} />
                   {isRunning ? 'Executing Scenario...' : 'Run Scenario'}
                 </button>
               </div>
@@ -271,22 +254,21 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
       </div>
 
       {/* In-Process Random Simulator Deck */}
-      <div className="flex-1 p-6 overflow-y-auto space-y-6">
-        <div className="bg-surface border border-border rounded-lg p-5 space-y-4">
+      <div className="flex-1 p-6 overflow-y-auto space-y-5">
+        <div className="bg-surface border border-border rounded-lg p-5 space-y-3.5 shadow-subtle">
           <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-purpleVerdict" />
-            <h3 className="text-xs font-bold uppercase text-slate-200 tracking-wider">
+            <Cpu className="w-4 h-4 text-primaryAction" />
+            <h3 className="text-xs font-semibold uppercase text-secondaryText tracking-wider">
               In-Process Seeded Random Simulator
             </h3>
           </div>
 
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Runs N randomized partition and operation schedules against pure <code className="text-tealVerdict">@verdict/core</code> (folding, escrow bounded counters, gate evaluation).
-            Label: <em className="text-slate-300">In-process simulation of the core logic, not the network.</em>
+          <p className="text-xs text-secondaryText leading-relaxed">
+            Runs N randomized partition and operation schedules against pure <code className="font-mono text-primaryAction">@verdict/core</code> (folding, escrow bounded counters, gate evaluation).
           </p>
 
-          <div className="flex items-center gap-3 pt-2">
-            <div className="flex items-center gap-2 text-xs text-slate-300">
+          <div className="flex items-center gap-3 pt-1">
+            <div className="flex items-center gap-2 text-xs text-secondaryText">
               <span>Schedules to simulate:</span>
               <input
                 type="number"
@@ -294,57 +276,57 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
                 max={1000}
                 value={simSeeds}
                 onChange={e => setSimSeeds(parseInt(e.target.value, 10) || 100)}
-                className="w-24 bg-background border border-border rounded p-1.5 text-xs font-mono text-slate-100"
+                className="w-20 bg-white border border-border rounded-md p-1.5 text-xs font-mono text-primaryText focus:outline-none focus:border-primaryAction"
               />
             </div>
 
             <button
               onClick={runSimulator}
               disabled={simRunning}
-              className="px-4 py-2 bg-purpleVerdict text-slate-900 font-bold text-xs rounded hover:bg-purple-400 transition flex items-center gap-1.5"
+              className="px-4 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white font-medium text-xs rounded-md transition flex items-center gap-1.5 shadow-subtle"
             >
-              <Zap className="w-4 h-4" />
-              {simRunning ? 'Simulating...' : 'Run Seeded Simulator'}
+              <Zap className="w-3.5 h-3.5" />
+              {simRunning ? 'Simulating...' : 'Run Simulator'}
             </button>
           </div>
         </div>
 
         {/* Simulator Results Report */}
         {simReport && (
-          <div className="bg-surface border border-border rounded-lg p-5 space-y-4 shadow-xl">
+          <div className="bg-surface border border-border rounded-lg p-5 space-y-3.5 shadow-subtle">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase text-slate-300 tracking-wider">
+              <h4 className="text-xs font-semibold uppercase text-secondaryText tracking-wider">
                 Invariant Verification Report
               </h4>
-              <span className="text-xs font-mono text-tealVerdict font-bold">
+              <span className="text-xs font-mono text-success font-bold">
                 0 VIOLATIONS DETECTED
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-background rounded border border-border">
-                <span className="text-slate-400">Escrow (Σ spent ≤ T):</span>
-                <div className="text-lg font-bold font-mono text-tealVerdict mt-1">
+              <div className="p-3 bg-slate-50 rounded-md border border-border">
+                <span className="text-secondaryText">Escrow (Σ spent ≤ T):</span>
+                <div className="text-lg font-bold font-mono text-success mt-1">
                   {simReport.escrowInvariantsHeld} / {simReport.schedulesTested}
                 </div>
               </div>
 
-              <div className="p-3 bg-background rounded border border-border">
-                <span className="text-slate-400">Conflict Preservation:</span>
-                <div className="text-lg font-bold font-mono text-tealVerdict mt-1">
+              <div className="p-3 bg-slate-50 rounded-md border border-border">
+                <span className="text-secondaryText">Conflict Preservation:</span>
+                <div className="text-lg font-bold font-mono text-success mt-1">
                   {simReport.conflictPreservationsHeld} / {simReport.schedulesTested}
                 </div>
               </div>
 
-              <div className="p-3 bg-background rounded border border-border">
-                <span className="text-slate-400">Gate Purity & Invariants:</span>
-                <div className="text-lg font-bold font-mono text-tealVerdict mt-1">
+              <div className="p-3 bg-slate-50 rounded-md border border-border">
+                <span className="text-secondaryText">Gate Invariants:</span>
+                <div className="text-lg font-bold font-mono text-success mt-1">
                   {simReport.gateDeterminismsHeld} / {simReport.schedulesTested}
                 </div>
               </div>
             </div>
 
-            <div className="p-3 rounded bg-tealVerdict/10 border border-tealVerdict/30 text-xs text-teal-200">
+            <div className="p-2.5 rounded-md bg-green-50 border border-green-200 text-xs text-success">
               All {simReport.schedulesTested} random schedules preserved mathematical invariants.
             </div>
           </div>

@@ -132,6 +132,11 @@ export class ApiClient {
         if (res.ok) {
           const data = await res.json();
           this.updateFailoverState(preferredRegion, region);
+          if (Array.isArray(data)) {
+            Object.defineProperty(data, '_servingRegion', { value: region, enumerable: false, writable: true, configurable: true });
+            Object.defineProperty(data, '_isFailover', { value: region !== preferredRegion, enumerable: false, writable: true, configurable: true });
+            return data as any;
+          }
           return {
             ...data,
             _servingRegion: region,
@@ -145,6 +150,11 @@ export class ApiClient {
           // Client error (404, 400) - return directly without failover
           const data = await res.json();
           this.updateFailoverState(preferredRegion, region);
+          if (Array.isArray(data)) {
+            Object.defineProperty(data, '_servingRegion', { value: region, enumerable: false, writable: true, configurable: true });
+            Object.defineProperty(data, '_isFailover', { value: region !== preferredRegion, enumerable: false, writable: true, configurable: true });
+            return data as any;
+          }
           return {
             ...data,
             _servingRegion: region,
@@ -231,6 +241,26 @@ export class ApiClient {
 
   async getStatus(region: Region = this.currentRegion) {
     return await this.readWithFailover('/api/v1/status', region);
+  }
+
+  async getConvergence(region: Region = this.currentRegion) {
+    return await this.readWithFailover('/api/v1/convergence', region);
+  }
+
+  async getLocalConvergence(region: Region = this.currentRegion) {
+    return await this.readWithFailover('/api/v1/convergence/local', region);
+  }
+
+  async getDcrOps(region: Region = this.currentRegion) {
+    return await this.readWithFailover('/api/v1/dcr/ops', region);
+  }
+
+  async planDcr(targetOpId: string, region: Region = this.currentRegion) {
+    return await this.writeWithIdempotency('/api/v1/dcr/plan', { targetOpId }, region);
+  }
+
+  async recoverDcr(targetOpId: string, region: Region = this.currentRegion) {
+    return await this.writeWithIdempotency('/api/v1/dcr/recover', { targetOpId }, region);
   }
 
   async getFog(region: Region = this.currentRegion) {

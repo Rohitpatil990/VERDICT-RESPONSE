@@ -26,7 +26,7 @@ export const GateView: React.FC<GateViewProps> = ({
   const { t } = useTranslation();
 
   const [decisionType, setDecisionType] = useState<'DISPATCH' | 'ALLOCATE_SUPPLY' | 'CLOSE_INCIDENT'>('DISPATCH');
-  const [targetEntityId, setTargetEntityId] = useState(selectedEntityId || 'incident-101');
+  const [targetEntityId, setTargetEntityId] = useState(selectedEntityId || 'access-corridor-north');
   const [routeRoads, setRouteRoads] = useState<string[]>(['access-corridor-north', 'route-nh48']);
   const [supplyQty, setSupplyQty] = useState(2);
   const [resourceName, setResourceName] = useState('medical_kits');
@@ -106,44 +106,42 @@ export const GateView: React.FC<GateViewProps> = ({
   };
 
   return (
-    <div className="h-full flex overflow-hidden">
+    <div className="h-full flex overflow-hidden bg-background">
       {/* Left Composer Form */}
-      <div className="w-96 border-r border-border bg-surface p-6 flex flex-col gap-5 overflow-y-auto">
+      <div className="w-80 border-r border-border bg-surface p-5 flex flex-col gap-4 overflow-y-auto">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-tealVerdict">
-            Decision Composer
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Turn multi-region consistency state into an operational verdict.
+          <h2 className="text-sm font-bold text-primaryText">Decision Composer</h2>
+          <p className="text-xs text-secondaryText mt-0.5">
+            Evaluate operational safety before committing resources.
           </p>
         </div>
 
         {/* Viewing Region Badge */}
-        <div className="p-3 bg-background border border-border rounded text-xs space-y-1">
-          <div className="text-slate-400">Evaluating Region View:</div>
-          <div className="font-semibold text-slate-200 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-tealVerdict animate-pulse" />
-            {viewingRegion.toUpperCase()} Regional Replica
+        <div className="p-2.5 bg-slate-50 border border-border rounded-md text-xs space-y-0.5">
+          <div className="text-secondaryText text-[11px]">Evaluating Replica:</div>
+          <div className="font-semibold text-primaryText flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-tealVerdict" />
+            {viewingRegion.toUpperCase()} Regional View
           </div>
         </div>
 
         {/* Decision Type */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-300">Decision Type</label>
-          <div className="grid grid-cols-1 gap-1.5">
+          <label className="text-xs font-semibold text-secondaryText">Decision Action</label>
+          <div className="grid grid-cols-1 gap-1">
             {[
-              { id: 'DISPATCH', label: 'DISPATCH Team along Route' },
-              { id: 'ALLOCATE_SUPPLY', label: 'ALLOCATE Scarce Supply' },
-              { id: 'CLOSE_INCIDENT', label: 'CLOSE Incident' }
+              { id: 'DISPATCH', label: 'Dispatch Team along Route' },
+              { id: 'ALLOCATE_SUPPLY', label: 'Allocate Scarce Supplies' },
+              { id: 'CLOSE_INCIDENT', label: 'Close Active Incident' }
             ].map(dt => (
               <button
                 key={dt.id}
                 type="button"
                 onClick={() => setDecisionType(dt.id as any)}
-                className={`py-2 px-3 rounded text-xs text-left font-medium border transition ${
+                className={`py-2 px-3 rounded-md text-xs text-left font-medium border transition ${
                   decisionType === dt.id
-                    ? 'bg-tealVerdict/15 border-tealVerdict text-tealVerdict'
-                    : 'bg-background border-border text-slate-400 hover:text-slate-200'
+                    ? 'bg-blue-50 border-primaryAction text-primaryAction font-semibold shadow-subtle'
+                    : 'bg-white border-border text-secondaryText hover:text-primaryText hover:bg-slate-50'
                 }`}
               >
                 {dt.label}
@@ -156,20 +154,20 @@ export const GateView: React.FC<GateViewProps> = ({
         {decisionType === 'DISPATCH' && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Incident Target</label>
+              <label className="text-xs font-semibold text-secondaryText">Target Entity</label>
               <input
                 type="text"
                 value={targetEntityId}
                 onChange={e => setTargetEntityId(e.target.value)}
-                className="w-full bg-background border border-border rounded p-2 text-xs font-mono text-slate-200"
+                className="w-full bg-white border border-border rounded-md p-2 text-xs font-mono text-primaryText focus:outline-none focus:border-primaryAction"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Route Segments (Roads)</label>
-              <div className="space-y-1 bg-background p-2 rounded border border-border">
-                {['access-corridor-north', 'route-nh48', 'road-segment-1', 'bypass-corridor-2'].map(r => (
-                  <label key={r} className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+              <label className="text-xs font-semibold text-secondaryText">Transit Corridor Segments</label>
+              <div className="space-y-1 bg-slate-50 p-2.5 rounded-md border border-border">
+                {['access-corridor-north', 'transit-artery-east', 'evacuation-route-1'].map(r => (
+                  <label key={r} className="flex items-center gap-2 text-xs text-primaryText cursor-pointer">
                     <input
                       type="checkbox"
                       checked={routeRoads.includes(r)}
@@ -177,9 +175,9 @@ export const GateView: React.FC<GateViewProps> = ({
                         if (e.target.checked) setRouteRoads([...routeRoads, r]);
                         else setRouteRoads(routeRoads.filter(x => x !== r));
                       }}
-                      className="accent-tealVerdict"
+                      className="accent-primaryAction"
                     />
-                    <span className="font-mono">{r}</span>
+                    <span className="font-mono text-[11px]">{r}</span>
                   </label>
                 ))}
               </div>
@@ -190,26 +188,25 @@ export const GateView: React.FC<GateViewProps> = ({
         {decisionType === 'ALLOCATE_SUPPLY' && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Resource</label>
+              <label className="text-xs font-semibold text-secondaryText">Resource Name</label>
               <select
                 value={resourceName}
                 onChange={e => setResourceName(e.target.value)}
-                className="w-full bg-background border border-border rounded p-2 text-xs text-slate-200"
+                className="w-full bg-white border border-border rounded-md p-2 text-xs text-primaryText focus:outline-none focus:border-primaryAction"
               >
                 <option value="medical_kits">medical_kits (Stock: 5)</option>
                 <option value="emergency_rations">emergency_rations (Stock: 10)</option>
-                <option value="portable_generators">portable_generators (Stock: 3)</option>
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Requested Quantity</label>
+              <label className="text-xs font-semibold text-secondaryText">Requested Quantity</label>
               <input
                 type="number"
                 min={1}
                 max={10}
                 value={supplyQty}
                 onChange={e => setSupplyQty(parseInt(e.target.value, 10) || 1)}
-                className="w-full bg-background border border-border rounded p-2 text-xs font-mono text-slate-200"
+                className="w-full bg-white border border-border rounded-md p-2 text-xs font-mono text-primaryText focus:outline-none focus:border-primaryAction"
               />
             </div>
           </div>
@@ -218,20 +215,20 @@ export const GateView: React.FC<GateViewProps> = ({
         {decisionType === 'CLOSE_INCIDENT' && (
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Incident ID</label>
+              <label className="text-xs font-semibold text-secondaryText">Incident Target</label>
               <input
                 type="text"
                 value={targetEntityId}
                 onChange={e => setTargetEntityId(e.target.value)}
-                className="w-full bg-background border border-border rounded p-2 text-xs font-mono text-slate-200"
+                className="w-full bg-white border border-border rounded-md p-2 text-xs font-mono text-primaryText focus:outline-none focus:border-primaryAction"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Actor Role</label>
+              <label className="text-xs font-semibold text-secondaryText">Actor Authorization</label>
               <select
                 value={actorRole}
                 onChange={e => setActorRole(e.target.value as any)}
-                className="w-full bg-background border border-border rounded p-2 text-xs text-slate-200"
+                className="w-full bg-white border border-border rounded-md p-2 text-xs text-primaryText focus:outline-none focus:border-primaryAction"
               >
                 <option value="FIELD_OFFICER">FIELD_OFFICER (Non-Reviewer)</option>
                 <option value="OFFICIAL">OFFICIAL</option>
@@ -244,49 +241,49 @@ export const GateView: React.FC<GateViewProps> = ({
         <button
           onClick={handleEvaluate}
           disabled={evaluating}
-          className="mt-auto py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-2 border border-border"
+          className="mt-auto py-2 bg-slate-100 hover:bg-slate-200 text-primaryText rounded-md text-xs font-semibold flex items-center justify-center gap-2 border border-border transition"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin text-primaryAction' : ''}`} />
           Re-evaluate Gate
         </button>
       </div>
 
       {/* Right Gate Verdict Display */}
-      <div className="flex-1 p-8 overflow-y-auto space-y-6">
+      <div className="flex-1 p-6 overflow-y-auto space-y-5">
         {evaluation ? (
           <>
             {/* Prominent Verdict Card */}
             <div
-              className={`p-6 rounded-lg border flex flex-col gap-3 transition shadow-xl ${
+              className={`p-5 rounded-lg border transition shadow-subtle ${
                 evaluation.verdict === 'GO'
-                  ? 'bg-tealVerdict/10 border-tealVerdict'
+                  ? 'bg-green-50/70 border-green-200'
                   : evaluation.verdict === 'CAUTION'
-                  ? 'bg-amberVerdict/10 border-amberVerdict'
-                  : 'bg-roseVerdict/10 border-roseVerdict'
+                  ? 'bg-amber-50/70 border-amber-200'
+                  : 'bg-red-50/70 border-red-200'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {evaluation.verdict === 'GO' && (
-                    <CheckCircle2 className="w-8 h-8 text-tealVerdict" />
+                    <CheckCircle2 className="w-8 h-8 text-success" />
                   )}
                   {evaluation.verdict === 'CAUTION' && (
-                    <AlertTriangle className="w-8 h-8 text-amberVerdict" />
+                    <AlertTriangle className="w-8 h-8 text-warning" />
                   )}
                   {evaluation.verdict === 'HOLD' && (
-                    <XCircle className="w-8 h-8 text-roseVerdict" />
+                    <XCircle className="w-8 h-8 text-error" />
                   )}
                   <div>
-                    <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                      Operational Gate Result
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-secondaryText">
+                      Operational Gate Evaluation
                     </span>
                     <h1
-                      className={`text-2xl font-black tracking-tight ${
+                      className={`text-2xl font-bold tracking-tight ${
                         evaluation.verdict === 'GO'
-                          ? 'text-tealVerdict'
+                          ? 'text-success'
                           : evaluation.verdict === 'CAUTION'
-                          ? 'text-amberVerdict'
-                          : 'text-roseVerdict'
+                          ? 'text-warning'
+                          : 'text-error'
                       }`}
                     >
                       {evaluation.verdict}
@@ -294,51 +291,51 @@ export const GateView: React.FC<GateViewProps> = ({
                   </div>
                 </div>
 
-                <div className="text-right text-xs text-slate-400 font-mono">
+                <div className="text-right text-xs text-secondaryText font-mono">
                   Evaluated at: {new Date(evaluation.evaluatedAt).toLocaleTimeString()}
                 </div>
               </div>
 
-              {/* Not-a-prediction honest rule */}
-              <div className="p-3 bg-background/80 rounded border border-border text-xs text-slate-300 leading-relaxed flex items-start gap-2.5">
-                <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+              {/* Honest Rule Disclaimer */}
+              <div className="mt-3 p-2.5 bg-white/80 rounded-md border border-border text-xs text-secondaryText leading-relaxed flex items-start gap-2">
+                <Info className="w-4 h-4 text-secondaryText shrink-0 mt-0.5" />
                 <span>{evaluation.disclaimer}</span>
               </div>
             </div>
 
             {/* Explanation Tree */}
-            <div className="bg-surface border border-border rounded-lg p-5 space-y-4 shadow-md">
-              <h3 className="text-xs font-bold uppercase text-slate-300 tracking-wider">
-                Invariant Checks Tree ({evaluation.checks.length} Evaluated)
-              </h3>
+            <div className="bg-surface border border-border rounded-lg p-5 space-y-3 shadow-subtle">
+              <h2 className="text-xs font-semibold uppercase text-secondaryText tracking-wider">
+                Safety & Consistency Checks ({evaluation.checks.length} Evaluated)
+              </h2>
               <div className="space-y-2">
                 {evaluation.checks.map((chk: any, idx: number) => (
                   <div
                     key={idx}
-                    className="p-3 bg-background rounded border border-border flex items-start justify-between gap-4"
+                    className="p-3 bg-slate-50/70 rounded-md border border-border flex items-start justify-between gap-4"
                   >
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
                         <span
                           className={`w-2 h-2 rounded-full ${
                             chk.severity === 'pass'
-                              ? 'bg-tealVerdict'
+                              ? 'bg-success'
                               : chk.severity === 'warn'
-                              ? 'bg-amberVerdict'
-                              : 'bg-roseVerdict'
+                              ? 'bg-warning'
+                              : 'bg-error'
                           }`}
                         />
-                        <span className="text-xs font-semibold text-slate-200">{chk.name}</span>
+                        <span className="text-xs font-semibold text-primaryText">{chk.name}</span>
                       </div>
-                      <p className="text-xs text-slate-400 pl-4">{chk.reason}</p>
+                      <p className="text-xs text-secondaryText pl-4">{chk.reason}</p>
                     </div>
                     <span
-                      className={`text-[11px] font-mono px-2 py-0.5 rounded font-semibold uppercase ${
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase ${
                         chk.severity === 'pass'
-                          ? 'bg-tealVerdict/10 text-tealVerdict'
+                          ? 'bg-green-100 text-success'
                           : chk.severity === 'warn'
-                          ? 'bg-amberVerdict/10 text-amberVerdict'
-                          : 'bg-roseVerdict/10 text-roseVerdict'
+                          ? 'bg-amber-100 text-warning'
+                          : 'bg-red-100 text-error'
                       }`}
                     >
                       {chk.severity}
@@ -349,15 +346,15 @@ export const GateView: React.FC<GateViewProps> = ({
             </div>
 
             {/* What Would Change This Verdict */}
-            {evaluation.whatWouldChange.length > 0 && (
-              <div className="bg-surface border border-border rounded-lg p-5 space-y-3 shadow-md">
-                <h3 className="text-xs font-bold uppercase text-amberVerdict tracking-wider">
+            {evaluation.whatWouldChange?.length > 0 && (
+              <div className="bg-surface border border-border rounded-lg p-5 space-y-2.5 shadow-subtle">
+                <h2 className="text-xs font-semibold uppercase text-warning tracking-wider">
                   What Would Change This Verdict
-                </h3>
-                <ul className="space-y-1.5 text-xs text-slate-300">
+                </h2>
+                <ul className="space-y-1.5 text-xs text-primaryText">
                   {evaluation.whatWouldChange.map((item: string, i: number) => (
                     <li key={i} className="flex items-center gap-2">
-                      <ArrowRight className="w-3.5 h-3.5 text-amberVerdict" />
+                      <ArrowRight className="w-3.5 h-3.5 text-warning shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -366,29 +363,28 @@ export const GateView: React.FC<GateViewProps> = ({
             )}
 
             {/* Commitment Controls */}
-            <div className="bg-surface border border-border rounded-lg p-5 space-y-4 shadow-md">
-              <h3 className="text-xs font-bold uppercase text-slate-300 tracking-wider">
+            <div className="bg-surface border border-border rounded-lg p-5 space-y-3.5 shadow-subtle">
+              <h2 className="text-xs font-semibold uppercase text-secondaryText tracking-wider">
                 Commitment Action
-              </h3>
+              </h2>
 
               {evaluation.verdict === 'CAUTION' && (
-                <label className="flex items-start gap-2 p-3 bg-amberVerdict/10 border border-amberVerdict/30 rounded cursor-pointer text-xs text-amber-200">
+                <label className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md cursor-pointer text-xs text-amber-900">
                   <input
                     type="checkbox"
                     checked={acknowledged}
                     onChange={e => setAcknowledged(e.target.checked)}
-                    className="mt-0.5 accent-amberVerdict"
+                    className="mt-0.5 accent-warning"
                   />
                   <span>
-                    I acknowledge these operational consistency risks (e.g. unreachable authority
-                    blind-spot, possible concurrent updates in other partition).
+                    I acknowledge remote authority blind-spots and accept potential downstream re-evaluation risk.
                   </span>
                 </label>
               )}
 
               {evaluation.verdict === 'HOLD' && (
-                <div className="p-3 bg-roseVerdict/10 border border-roseVerdict/30 rounded text-xs text-rose-200">
-                  HOLD decisions cannot be committed. Remedy the failing invariant checks first.
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-error font-medium">
+                  HOLD decisions cannot be committed. Remedy the failing safety checks first.
                 </div>
               )}
 
@@ -400,11 +396,11 @@ export const GateView: React.FC<GateViewProps> = ({
                     (evaluation.verdict === 'CAUTION' && !acknowledged)
                   }
                   onClick={handleCommit}
-                  className={`px-5 py-2.5 rounded text-xs font-bold transition flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-md text-xs font-semibold transition flex items-center gap-1.5 shadow-subtle ${
                     evaluation.verdict === 'HOLD' ||
                     (evaluation.verdict === 'CAUTION' && !acknowledged)
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-border'
-                      : 'bg-tealVerdict text-slate-900 hover:bg-teal-400'
+                      ? 'bg-slate-100 text-tertiaryText cursor-not-allowed border border-border'
+                      : 'bg-primaryAction hover:bg-primaryActionHover text-white'
                   }`}
                 >
                   <Shield className="w-4 h-4" />
@@ -412,13 +408,13 @@ export const GateView: React.FC<GateViewProps> = ({
                 </button>
 
                 {commitSuccess && (
-                  <span className="text-xs text-tealVerdict font-mono flex items-center gap-1.5">
+                  <span className="text-xs text-success font-mono flex items-center gap-1">
                     <CheckSquare className="w-4 h-4" />
                     Receipt Committed: {commitSuccess}
                   </span>
                 )}
                 {commitError && (
-                  <span className="text-xs text-roseVerdict font-mono">
+                  <span className="text-xs text-error font-mono">
                     Error: {commitError}
                   </span>
                 )}
@@ -426,7 +422,7 @@ export const GateView: React.FC<GateViewProps> = ({
             </div>
           </>
         ) : (
-          <div className="text-center py-24 text-slate-500 font-mono text-xs">
+          <div className="text-center py-20 text-secondaryText font-mono text-xs">
             Evaluating decision invariants...
           </div>
         )}

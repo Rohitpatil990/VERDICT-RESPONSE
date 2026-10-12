@@ -44,11 +44,10 @@ export const MapView: React.FC<MapViewProps> = ({
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // OpenStreetMap dark styled tile layer
+    // Clean Light tile layer (OpenStreetMap standard light)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '© OpenStreetMap contributors | VERDICT Simulation',
-      className: 'dark-tiles'
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | VERDICT Response'
     }).addTo(map);
 
     fogLayersRef.current = L.layerGroup().addTo(map);
@@ -68,8 +67,8 @@ export const MapView: React.FC<MapViewProps> = ({
         api.getMap(viewingRegion),
         api.getFog(viewingRegion)
       ]);
-      setEntities(mapRes.entities || []);
-      setFogData(fogRes.fog || []);
+      setEntities(mapRes?.entities || []);
+      setFogData(fogRes?.fog || []);
     } catch (err) {
       console.error('Failed loading map data:', err);
     }
@@ -98,42 +97,40 @@ export const MapView: React.FC<MapViewProps> = ({
 
       const isConflict = ent.conflict?.status === 'AWAITING_REVIEW';
       const isRoad = ent.type === 'road';
-      const isIncident = ent.type === 'incident';
       const isBlocked = ent.status === 'BLOCKED';
 
-      const color = isConflict
-        ? '#F87171' // Rose
+      const bgColor = isConflict
+        ? '#B45309' // Warning amber
         : isBlocked
-        ? '#F87171'
-        : ent.status === 'OPEN' || ent.status === 'Resolved'
-        ? '#4FD1B5' // Teal
-        : '#F6C26B'; // Amber
+        ? '#B91C1C' // Error red
+        : '#15803D'; // Green
 
       const iconHtml = `
         <div style="
-          background-color: ${color};
-          width: 28px;
-          height: 28px;
+          background-color: ${bgColor};
+          width: 26px;
+          height: 26px;
           border-radius: ${isRoad ? '6px' : '50%'};
-          border: 2px solid ${isConflict ? '#FFF' : '#111A2E'};
+          border: 2px solid #FFFFFF;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #0B1220;
-          font-weight: bold;
+          color: #FFFFFF;
+          font-weight: 600;
           font-size: 11px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-          ${isConflict ? 'outline: 2px solid #F87171; outline-offset: 2px;' : ''}
+          box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+          cursor: pointer;
+          ${isConflict ? 'box-shadow: 0 0 0 2px #FDE68A, 0 2px 4px rgba(0,0,0,0.2);' : ''}
         ">
-          ${isRoad ? 'R' : isIncident ? '!' : 'S'}
+          ${isRoad ? 'R' : isConflict ? '!' : 'S'}
         </div>
       `;
 
       const customIcon = L.divIcon({
         html: iconHtml,
         className: 'verdict-marker',
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
       });
 
       const marker = L.marker([lat, lng], { icon: customIcon }).addTo(mapRef.current);
@@ -170,9 +167,9 @@ export const MapView: React.FC<MapViewProps> = ({
         }).addTo(fogLayersRef.current);
 
         fogCircle.bindTooltip(
-          `<div class="p-2 bg-slate-900 border border-slate-700 text-xs text-slate-200">
+          `<div class="p-2 bg-white border border-slate-200 text-xs text-slate-800 shadow-sm rounded">
             <strong>${fog.legendText}</strong><br/>
-            <span class="text-[11px] text-slate-400">No updates accepted from here during partition.</span>
+            <span class="text-[11px] text-slate-500">No updates accepted from here during partition.</span>
           </div>`,
           { sticky: true }
         );
@@ -186,8 +183,8 @@ export const MapView: React.FC<MapViewProps> = ({
       const selectedGaz = gazetteerData.gazetteer.find(g => g.id === simLocation);
       const lat = selectedGaz ? selectedGaz.lat : 19.076;
       const lng = selectedGaz ? selectedGaz.lng : 72.877;
-      const res = await fetch(`http://127.0.0.1:4001/api/v1/nearby?lat=${lat}&lng=${lng}`);
-      const list = await res.json();
+      const res = await api.readWithFailover(`/api/v1/nearby?lat=${lat}&lng=${lng}`, viewingRegion);
+      const list = Array.isArray(res) ? res : [];
       setNearbyList(list.slice(0, 10));
       setNearbyOpen(true);
     } catch (err) {
@@ -232,23 +229,23 @@ export const MapView: React.FC<MapViewProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full flex overflow-hidden">
+    <div className="relative w-full h-full flex overflow-hidden bg-slate-100">
       {/* Map Canvas */}
       <div ref={mapContainerRef} className="flex-1 w-full h-full" />
 
       {/* Top Controls Overlay */}
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
         {/* Simulated Location Selector */}
-        <div className="bg-surface/90 backdrop-blur border border-border px-3 py-1.5 rounded flex items-center gap-2 shadow-lg text-xs">
-          <Navigation className="w-4 h-4 text-tealVerdict" />
-          <span className="text-slate-400">Location:</span>
+        <div className="bg-surface border border-border px-3 py-1.5 rounded-md flex items-center gap-2 shadow-card text-xs">
+          <Navigation className="w-3.5 h-3.5 text-primaryAction" />
+          <span className="text-secondaryText text-[11px] font-medium">Location:</span>
           <select
             value={simLocation}
             onChange={e => handleSimLocationChange(e.target.value)}
-            className="bg-transparent text-slate-100 font-medium focus:outline-none cursor-pointer"
+            className="bg-transparent text-primaryText font-semibold focus:outline-none cursor-pointer"
           >
             {gazetteerData.gazetteer.map(g => (
-              <option key={g.id} value={g.id} className="bg-slate-900 text-slate-100">
+              <option key={g.id} value={g.id}>
                 {g.name} ({g.region.toUpperCase()})
               </option>
             ))}
@@ -258,50 +255,50 @@ export const MapView: React.FC<MapViewProps> = ({
         {/* Nearby Action */}
         <button
           onClick={handleNearby}
-          className="bg-surface/90 backdrop-blur border border-border hover:border-tealVerdict px-3 py-1.5 rounded flex items-center gap-1.5 shadow-lg text-xs font-semibold text-slate-200 transition"
+          className="bg-surface border border-border hover:border-slate-300 px-3 py-1.5 rounded-md flex items-center gap-1.5 shadow-card text-xs font-medium text-primaryText transition"
         >
-          <MapPin className="w-3.5 h-3.5 text-tealVerdict" />
+          <MapPin className="w-3.5 h-3.5 text-secondaryText" />
           Nearby
         </button>
 
         {/* Report Here Action */}
         <button
           onClick={() => setReportModalOpen(true)}
-          className="bg-tealVerdict text-slate-900 px-3 py-1.5 rounded flex items-center gap-1.5 shadow-lg text-xs font-bold hover:bg-teal-400 transition"
+          className="bg-primaryAction hover:bg-primaryActionHover text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 shadow-card text-xs font-medium transition"
         >
-          <Plus className="w-3.5 h-3.5 stroke-[3]" />
-          Report Here
+          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+          Submit Report
         </button>
       </div>
 
       {/* Fog Status Chip (if any unreachable region) */}
       {fogData.some(f => f.unreachable) && (
-        <div className="absolute top-4 right-4 z-10 bg-slate-900/90 border border-slate-700 px-3 py-2 rounded shadow-xl text-xs max-w-sm">
-          <div className="flex items-center gap-2 text-slate-300 font-semibold mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-400 animate-pulse" />
+        <div className="absolute top-4 right-4 z-10 bg-surface border border-border px-3 py-2 rounded-md shadow-card text-xs max-w-sm">
+          <div className="flex items-center gap-2 text-primaryText font-semibold mb-0.5">
+            <span className="w-2 h-2 rounded-full bg-slate-400" />
             {fogData.find(f => f.unreachable)?.legendText}
           </div>
-          <p className="text-[11px] text-slate-400 leading-snug">
-            Fog = no recent updates from this region. It does not mean nothing is happening there.
+          <p className="text-[11px] text-secondaryText leading-snug">
+            Fog = no recent updates from partitioned region.
           </p>
         </div>
       )}
 
       {/* Nearby Drawer */}
       {nearbyOpen && (
-        <div className="absolute top-16 left-4 z-10 w-80 bg-surface border border-border rounded shadow-2xl p-4 max-h-[70vh] flex flex-col">
+        <div className="absolute top-16 left-4 z-10 w-80 bg-surface border border-border rounded-md shadow-panel p-4 max-h-[70vh] flex flex-col">
           <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
-            <span className="text-xs font-bold uppercase text-slate-300">
+            <span className="text-xs font-semibold uppercase tracking-wider text-secondaryText">
               Nearby Entities (True Haversine)
             </span>
             <button
               onClick={() => setNearbyOpen(false)}
-              className="text-xs text-slate-400 hover:text-slate-100"
+              className="text-xs text-secondaryText hover:text-primaryText font-bold"
             >
               ✕
             </button>
           </div>
-          <div className="overflow-y-auto space-y-2 flex-1">
+          <div className="overflow-y-auto space-y-1.5 flex-1">
             {nearbyList.map(item => (
               <div
                 key={item.entityId}
@@ -309,14 +306,14 @@ export const MapView: React.FC<MapViewProps> = ({
                   onSelectEntity(item.entityId);
                   setNearbyOpen(false);
                 }}
-                className="p-2 rounded bg-background hover:border-tealVerdict border border-border cursor-pointer transition text-xs space-y-0.5"
+                className="p-2.5 rounded-md hover:bg-slate-50 border border-border cursor-pointer transition text-xs space-y-0.5"
               >
-                <div className="flex justify-between font-medium text-slate-200">
+                <div className="flex justify-between font-medium text-primaryText">
                   <span>{item.attributes?.reports?.[0]?.name || item.entityId}</span>
-                  <span className="font-mono text-tealVerdict">{item.distanceKm} km</span>
+                  <span className="font-mono text-tealVerdict font-semibold">{item.distanceKm} km</span>
                 </div>
-                <div className="text-[11px] text-slate-400">
-                  Status: <span className="font-semibold text-slate-300">{item.status}</span>
+                <div className="text-[11px] text-secondaryText">
+                  Status: <span className="font-semibold text-primaryText">{item.status}</span>
                 </div>
               </div>
             ))}
@@ -326,32 +323,34 @@ export const MapView: React.FC<MapViewProps> = ({
 
       {/* New Report Modal */}
       {reportModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-surface border border-border rounded-lg p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-sm font-bold text-slate-100">
-              Submit Observation Report ({viewingRegion.toUpperCase()})
-            </h3>
-            <p className="text-xs text-slate-400">
-              Signed with local Ed25519 key. Replicated via outbox to connected peers.
-            </p>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface border border-border rounded-lg p-6 max-w-md w-full shadow-panel space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-primaryText">
+                Submit Observation Report ({viewingRegion.toUpperCase()})
+              </h3>
+              <p className="text-xs text-secondaryText mt-0.5">
+                Signed with local Ed25519 key. Replicated via durable outbox.
+              </p>
+            </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-300">Target Entity</label>
-              <div className="text-xs font-mono bg-background p-2 rounded border border-border text-slate-200">
+              <label className="text-xs text-secondaryText font-medium">Target Entity</label>
+              <div className="text-xs font-mono bg-slate-50 p-2 rounded-md border border-border text-primaryText">
                 access-corridor-north (Primary Supply Route)
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-300">Claimed Road Status</label>
+              <label className="text-xs text-secondaryText font-medium">Observed Status</label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setNewReportStatus('OPEN')}
-                  className={`flex-1 py-1.5 rounded text-xs font-semibold border ${
+                  className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
                     newReportStatus === 'OPEN'
-                      ? 'bg-tealVerdict/20 text-tealVerdict border-tealVerdict'
-                      : 'bg-background text-slate-400 border-border'
+                      ? 'bg-green-50 text-success border-green-300'
+                      : 'bg-white text-secondaryText border-border hover:bg-slate-50'
                   }`}
                 >
                   OPEN
@@ -359,10 +358,10 @@ export const MapView: React.FC<MapViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setNewReportStatus('BLOCKED')}
-                  className={`flex-1 py-1.5 rounded text-xs font-semibold border ${
+                  className={`flex-1 py-1.5 rounded-md text-xs font-semibold border transition ${
                     newReportStatus === 'BLOCKED'
-                      ? 'bg-roseVerdict/20 text-roseVerdict border-roseVerdict'
-                      : 'bg-background text-slate-400 border-border'
+                      ? 'bg-red-50 text-error border-red-300'
+                      : 'bg-white text-secondaryText border-border hover:bg-slate-50'
                   }`}
                 >
                   BLOCKED
@@ -371,30 +370,30 @@ export const MapView: React.FC<MapViewProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-slate-300">Observation Notes</label>
-              <textarea
+              <label className="text-xs text-secondaryText font-medium">Field Observation Note</label>
+              <input
+                type="text"
+                placeholder="e.g. Route inspected, passable with light escort"
                 value={newReportText}
                 onChange={e => setNewReportText(e.target.value)}
-                placeholder="Field observations, flood water depth, obstacle status..."
-                rows={3}
-                className="w-full bg-background border border-border rounded p-2 text-xs text-slate-100 focus:outline-none focus:border-tealVerdict"
+                className="w-full text-xs p-2.5 rounded-md bg-white border border-border text-primaryText focus:outline-none focus:border-primaryAction"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
+            <div className="flex justify-end gap-2 pt-2 border-t border-border">
               <button
                 type="button"
                 onClick={() => setReportModalOpen(false)}
-                className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200"
+                className="px-3 py-1.5 border border-border rounded-md text-xs font-medium text-secondaryText hover:text-primaryText"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSubmitNewReport}
-                className="px-4 py-1.5 bg-tealVerdict text-slate-900 rounded text-xs font-bold hover:bg-teal-400 transition"
+                className="px-4 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white rounded-md text-xs font-semibold shadow-subtle"
               >
-                Sign & Submit Op
+                Sign & Submit
               </button>
             </div>
           </div>

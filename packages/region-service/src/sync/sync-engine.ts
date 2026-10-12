@@ -229,9 +229,9 @@ export class SyncEngine {
     const ops = await this.store.getOpsForEntity(entityId);
     if (ops.length === 0) return null;
 
-    // Determine type and authority
+    // Determine type and authority deterministically
     let entityType = 'road';
-    let authorityRegion = this.localRegion;
+    let authorityRegion = ops[0]?.region || this.localRegion;
     for (const o of ops) {
       if (o.type === 'REPORT') {
         const incType = o.payload.incidentType;

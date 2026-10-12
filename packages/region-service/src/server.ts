@@ -15,7 +15,17 @@ import {
   DecisionReceipt,
   DecisionRequest,
   RegionId,
-  Entity
+  Entity,
+  computeCanonicalStateHash,
+  computeOperationLogHash,
+  evaluateConvergencePair,
+  ConvergenceStatus,
+  PeerConvergenceComparison,
+  RegionConvergenceReport,
+  planDependencyConeRecovery,
+  DependencyConePlan,
+  DcrStatus,
+  validateOperationIntegrity
 } from '@verdict/core';
 import { Store } from './store/store.js';
 import { SyncEngine, PeerConfig } from './sync/sync-engine.js';
@@ -61,11 +71,14 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     const vector = opts.syncEngine.getLocalVector();
     const peers = await opts.store.getAllPeers();
     const entities = await opts.store.getAllEntities();
+    const escrow = await opts.store.getAllEscrow();
     const outbox = await opts.store.getOutbox();
 
     const conflicts = entities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').length;
     const anyPeerDown = peers.some(p => !p.reachable);
     const allPeersDown = peers.length > 0 && peers.every(p => !p.reachable);
+
+    const stateHashResult = computeCanonicalStateHash(entities, escrow);
 
     let degradationLevel = 'L0_FULL';
     if (allPeersDown) degradationLevel = 'L2_ISOLATED';
@@ -76,12 +89,173 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       port: opts.port,
       degradationLevel,
       versionVector: vector,
+      stateHash: stateHashResult.hash,
+      canonicalStateHash: stateHashResult.hash,
       peers,
       outboxPending: outbox.length,
       tentativeCount: conflicts,
       conflictCount: conflicts,
+      unresolvedConflicts: conflicts,
       entitiesCount: entities.length,
-      converged: !anyPeerDown && outbox.length === 0,
+      escrowCount: escrow.length,
+      converged: !anyPeerDown && outbox.length === 0 && conflicts === 0,
+      timestamp: Date.now()
+    };
+  });
+
+  // 1b. GET /api/v1/convergence/local (Lightweight local canonical hash & metrics)
+  app.get('/api/v1/convergence/local', async () => {
+    const vector = opts.syncEngine.getLocalVector();
+    const entities = await opts.store.getAllEntities();
+    const escrow = await opts.store.getAllEscrow();
+    const ops = await opts.store.getOps();
+    const outbox = await opts.store.getOutbox();
+
+    const stateHashResult = computeCanonicalStateHash(entities, escrow);
+    const opLogResult = computeOperationLogHash(ops);
+    const unresolvedConflicts = entities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').length;
+
+    return {
+      region: opts.regionId,
+      stateHash: stateHashResult.hash,
+      canonicalStateHash: stateHashResult.hash,
+      entitiesHash: stateHashResult.entitiesHash,
+      escrowHash: stateHashResult.escrowHash,
+      opLogHash: opLogResult.hash,
+      scope: stateHashResult.scope,
+      versionVector: vector,
+      opCount: ops.length,
+      entityCount: entities.length,
+      escrowCount: escrow.length,
+      outboxPending: outbox.length,
+      unresolvedConflicts,
+      timestamp: Date.now()
+    };
+  });
+
+  // 1c. GET /api/v1/convergence (Full peer hash comparison & convergence status)
+  app.get('/api/v1/convergence', async (): Promise<RegionConvergenceReport> => {
+    const vector = opts.syncEngine.getLocalVector();
+    const entities = await opts.store.getAllEntities();
+    const escrow = await opts.store.getAllEscrow();
+    const ops = await opts.store.getOps();
+    const outbox = await opts.store.getOutbox();
+
+    const stateHashResult = computeCanonicalStateHash(entities, escrow);
+    const opLogResult = computeOperationLogHash(ops);
+    const unresolvedConflicts = entities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').length;
+
+    const peerReports: Record<string, PeerConvergenceComparison> = {};
+
+    for (const peerCfg of opts.peers) {
+      if (peerCfg.id === opts.regionId) continue;
+
+      const isLinkUp = opts.linkController.isLinkUp(opts.regionId, peerCfg.id);
+      if (!isLinkUp) {
+        peerReports[peerCfg.id] = {
+          region: peerCfg.id,
+          reachable: false,
+          status: 'UNAVAILABLE',
+          reason: `Network partition: link between ${opts.regionId.toUpperCase()} and ${peerCfg.id.toUpperCase()} is disconnected`
+        };
+        continue;
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1500);
+        const res = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/convergence/local`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          peerReports[peerCfg.id] = {
+            region: peerCfg.id,
+            reachable: false,
+            status: 'UNAVAILABLE',
+            reason: `Peer returned HTTP error ${res.status}`
+          };
+          continue;
+        }
+
+        const peerData = await res.json() as any;
+        const evaluation = evaluateConvergencePair(
+          {
+            region: opts.regionId,
+            stateHash: stateHashResult.hash,
+            outboxPending: outbox.length,
+            unresolvedConflicts,
+            versionVector: vector
+          },
+          {
+            region: peerCfg.id,
+            reachable: true,
+            stateHash: peerData.stateHash,
+            outboxPending: peerData.outboxPending,
+            unresolvedConflicts: peerData.unresolvedConflicts,
+            versionVector: peerData.versionVector
+          }
+        );
+
+        peerReports[peerCfg.id] = {
+          region: peerCfg.id,
+          reachable: true,
+          status: evaluation.status,
+          stateHash: peerData.stateHash,
+          opLogHash: peerData.opLogHash,
+          scope: peerData.scope,
+          outboxPending: peerData.outboxPending,
+          unresolvedConflicts: peerData.unresolvedConflicts,
+          versionVector: peerData.versionVector,
+          reason: evaluation.reason,
+          hashMatch: evaluation.hashMatch
+        };
+      } catch (err: any) {
+        peerReports[peerCfg.id] = {
+          region: peerCfg.id,
+          reachable: false,
+          status: 'UNAVAILABLE',
+          reason: `Peer connection failed on port ${peerCfg.port}`
+        };
+      }
+    }
+
+    const peerStatuses = Object.values(peerReports).map(p => p.status);
+    let overallStatus: ConvergenceStatus = 'CONVERGED';
+    let summary = 'All reachable replicas have converged with matching canonical state hashes.';
+
+    if (peerStatuses.length === 0) {
+      overallStatus = 'CONVERGED';
+      summary = 'Single region node operating independently with verified internal integrity.';
+    } else if (peerStatuses.some(s => s === 'UNAVAILABLE')) {
+      overallStatus = 'UNAVAILABLE';
+      summary = 'One or more regional replicas are partitioned or unreachable; complete convergence cannot be verified.';
+    } else if (peerStatuses.some(s => s === 'CONFLICT_PENDING') || unresolvedConflicts > 0) {
+      overallStatus = 'CONFLICT_PENDING';
+      summary = 'Concurrent conflicts remain unresolved awaiting reviewer adjudication; convergence verification is held.';
+    } else if (peerStatuses.some(s => s === 'SYNCING') || outbox.length > 0) {
+      overallStatus = 'SYNCING';
+      summary = 'Operations are actively in transit across outbox queues; replicas are synchronizing.';
+    } else if (peerStatuses.some(s => s === 'DIVERGED')) {
+      overallStatus = 'DIVERGED';
+      summary = 'State divergence detected: canonical state hashes differ between operational replicas.';
+    }
+
+    return {
+      region: opts.regionId,
+      canonicalStateHash: stateHashResult.hash,
+      operationLogHash: opLogResult.hash,
+      scope: stateHashResult.scope,
+      versionVector: vector,
+      opCount: ops.length,
+      entityCount: entities.length,
+      escrowCount: escrow.length,
+      outboxPending: outbox.length,
+      unresolvedConflicts,
+      peers: peerReports,
+      overallStatus,
+      summary,
       timestamp: Date.now()
     };
   });
@@ -187,6 +361,192 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   app.post('/api/v1/ops', async (req: any) => {
     const op = req.body;
     return await opts.syncEngine.applyIncomingOp(op);
+  });
+
+  // 6b. GET /api/v1/ops/:opId (Single operation fetch for DCR)
+  app.get('/api/v1/ops/:opId', async (req: any, reply: any) => {
+    const op = await opts.store.getOp(req.params.opId);
+    if (!op) return reply.status(404).send({ error: `Operation ${req.params.opId} not found` });
+    return op;
+  });
+
+  // 6c. GET /api/v1/dcr/ops (Targetable operations list)
+  app.get('/api/v1/dcr/ops', async () => {
+    const ops = await opts.store.getOps(0, 100);
+    return {
+      region: opts.regionId,
+      operations: ops.map(o => ({
+        opId: o.opId,
+        type: o.type,
+        entityId: o.entityId,
+        region: o.region,
+        seq: o.seq,
+        createdAt: o.createdAt
+      }))
+    };
+  });
+
+  // 6d. POST /api/v1/dcr/plan (Plan Dependency-Cone Recovery)
+  app.post('/api/v1/dcr/plan', async (req: any, reply: any) => {
+    const { targetOpId } = req.body;
+    if (!targetOpId) return reply.status(400).send({ error: 'targetOpId is required' });
+
+    const localOps = await opts.store.getOps();
+    const entities = await opts.store.getAllEntities();
+    const outbox = await opts.store.getOutbox();
+    const conflictedEntities = new Set(
+      entities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').map(e => e.entityId)
+    );
+
+    const allOpsMap = new Map(localOps.map(o => [o.opId, o]));
+
+    for (const peerCfg of opts.peers) {
+      if (peerCfg.id === opts.regionId) continue;
+      if (!opts.linkController.isLinkUp(opts.regionId, peerCfg.id)) continue;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1200);
+        const res = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/dcr/ops`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const peerOpsList = await res.json() as any;
+          if (Array.isArray(peerOpsList?.operations)) {
+            for (const item of peerOpsList.operations) {
+              if (!allOpsMap.has(item.opId)) {
+                try {
+                  const opRes = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/ops/${item.opId}`);
+                  if (opRes.ok) {
+                    const fullOp = await opRes.json();
+                    allOpsMap.set(fullOp.opId, fullOp);
+                  }
+                } catch {}
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
+    const plan = await planDependencyConeRecovery(
+      targetOpId,
+      localOps,
+      Array.from(allOpsMap.values()),
+      conflictedEntities,
+      outbox.length
+    );
+
+    return plan;
+  });
+
+  // 6e. POST /api/v1/dcr/recover (Execute expedited DCR recovery)
+  app.post('/api/v1/dcr/recover', async (req: any, reply: any) => {
+    const { targetOpId } = req.body;
+    if (!targetOpId) return reply.status(400).send({ error: 'targetOpId is required' });
+
+    const localOps = await opts.store.getOps();
+    const entities = await opts.store.getAllEntities();
+    const outbox = await opts.store.getOutbox();
+    const conflictedEntities = new Set(
+      entities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').map(e => e.entityId)
+    );
+
+    const allOpsMap = new Map(localOps.map(o => [o.opId, o]));
+
+    for (const peerCfg of opts.peers) {
+      if (peerCfg.id === opts.regionId) continue;
+      if (!opts.linkController.isLinkUp(opts.regionId, peerCfg.id)) continue;
+
+      try {
+        const res = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/dcr/ops`);
+        if (res.ok) {
+          const peerOpsList = await res.json() as any;
+          if (Array.isArray(peerOpsList?.operations)) {
+            for (const item of peerOpsList.operations) {
+              if (!allOpsMap.has(item.opId)) {
+                try {
+                  const opRes = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/ops/${item.opId}`);
+                  if (opRes.ok) {
+                    const fullOp = await opRes.json();
+                    allOpsMap.set(fullOp.opId, fullOp);
+                  }
+                } catch {}
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
+    const initialPlan = await planDependencyConeRecovery(
+      targetOpId,
+      localOps,
+      Array.from(allOpsMap.values()),
+      conflictedEntities,
+      outbox.length
+    );
+
+    if (initialPlan.status === 'FAILED' || initialPlan.status === 'READY_TO_RESUME') {
+      return initialPlan;
+    }
+
+    const recoveredOpIds: string[] = [];
+
+    for (const opId of initialPlan.recoveryOrder) {
+      const isAlreadyLocal = (await opts.store.getOps()).some(o => o.opId === opId);
+      if (isAlreadyLocal) continue;
+
+      const opToApply = allOpsMap.get(opId);
+      if (!opToApply) {
+        return {
+          ...initialPlan,
+          status: 'BLOCKED_MISSING_DEPENDENCY',
+          summary: `Prerequisite operation ${opId} could not be retrieved from any reachable peer.`
+        };
+      }
+
+      const valid = await validateOperationIntegrity(opToApply);
+      if (!valid.valid) {
+        return {
+          ...initialPlan,
+          status: 'BLOCKED_INTEGRITY',
+          summary: `Prerequisite operation ${opId} failed cryptographic integrity: ${valid.error}`
+        };
+      }
+
+      if (conflictedEntities.has(opToApply.entityId)) {
+        return {
+          ...initialPlan,
+          status: 'BLOCKED_CONFLICT',
+          summary: `Prerequisite ${opId} modifies entity ${opToApply.entityId} with unresolved conflict awaiting review.`
+        };
+      }
+
+      await opts.syncEngine.applyIncomingOp(opToApply);
+      recoveredOpIds.push(opId);
+    }
+
+    const updatedLocalOps = await opts.store.getOps();
+    const updatedEntities = await opts.store.getAllEntities();
+    const updatedOutbox = await opts.store.getOutbox();
+    const updatedConflicts = new Set(
+      updatedEntities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').map(e => e.entityId)
+    );
+
+    const postPlan = await planDependencyConeRecovery(
+      targetOpId,
+      updatedLocalOps,
+      Array.from(allOpsMap.values()),
+      updatedConflicts,
+      updatedOutbox.length
+    );
+
+    return {
+      ...postPlan,
+      recoveredOpIds
+    };
   });
 
   // 7. POST /api/v1/reports

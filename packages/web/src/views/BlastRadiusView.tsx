@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, Region } from '../api/client.js';
 import {
-  GitCommit,
   CheckCircle,
   AlertTriangle,
   XCircle,
   RefreshCw,
-  ArrowRight,
   ShieldCheck,
-  Activity
+  Activity,
+  ArrowRight
 } from 'lucide-react';
 
 interface BlastRadiusViewProps {
@@ -30,12 +29,16 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
   const loadDecisions = async () => {
     try {
       const list = await api.getDecisions(viewingRegion);
-      setDecisions(list);
-      if (list.length > 0 && !selectedDecision) {
-        setSelectedDecision(list[0]);
+      const safeList = Array.isArray(list)
+        ? list
+        : Object.values(list || {}).filter((x: any) => x && typeof x === 'object' && x.decisionId);
+      setDecisions(safeList);
+      if (safeList.length > 0 && !selectedDecision) {
+        setSelectedDecision(safeList[0]);
       }
     } catch (err) {
       console.error(err);
+      setDecisions([]);
     }
   };
 
@@ -44,73 +47,88 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
   }, [viewingRegion]);
 
   useEffect(() => {
-    if (!selectedDecision) return;
+    if (!selectedDecision?.decisionId) return;
     setLoading(true);
     api
       .getReevaluation(selectedDecision.decisionId, viewingRegion)
       .then(res => setReevalData(res))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        setReevalData(null);
+      })
       .finally(() => setLoading(false));
   }, [selectedDecision, viewingRegion]);
 
+  const safeDecisions = Array.isArray(decisions) ? decisions : [];
+
   return (
-    <div className="h-full flex overflow-hidden">
+    <div className="h-full flex overflow-hidden bg-background">
       {/* Decisions List Table */}
-      <div className="w-[45%] border-r border-border bg-surface flex flex-col">
-        <div className="p-4 border-b border-border flex items-center justify-between">
+      <div className="w-80 border-r border-border bg-surface flex flex-col">
+        <div className="p-4 border-b border-border flex items-center justify-between bg-white">
           <div>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-tealVerdict">
-              Decision Receipts & Blast Radius
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Re-evaluates past commitments against merged multi-region state.
+            <h2 className="text-sm font-bold text-primaryText">Decision Receipts</h2>
+            <p className="text-xs text-secondaryText mt-0.5">
+              Re-evaluates past commitments against merged state.
             </p>
           </div>
           <button
             onClick={loadDecisions}
-            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded transition"
+            className="p-1.5 text-secondaryText hover:text-primaryText hover:bg-slate-100 rounded-md transition"
+            title="Refresh receipts"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto divide-y divide-border">
-          {decisions.length === 0 ? (
-            <div className="text-center py-16 text-slate-500 text-xs font-mono">
-              No decisions recorded yet. Commit a decision from the Decision Gate.
+          {safeDecisions.length === 0 ? (
+            <div className="text-center py-16 px-6 text-secondaryText text-xs flex flex-col items-center gap-3">
+              <ShieldCheck className="w-8 h-8 text-slate-400" />
+              <p className="font-semibold text-primaryText">No decision receipts yet</p>
+              <p className="text-[11px] text-secondaryText max-w-xs">
+                Commit a decision from the <strong>Decision Gate</strong> tab to generate an immutable cryptographic receipt.
+              </p>
+              {onOpenGateWithEntity && (
+                <button
+                  onClick={() => onOpenGateWithEntity('access-corridor-north')}
+                  className="px-3 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white font-medium rounded-md text-xs transition mt-2 shadow-subtle"
+                >
+                  Open Decision Gate
+                </button>
+              )}
             </div>
           ) : (
-            decisions.map(d => (
+            safeDecisions.map(d => (
               <div
                 key={d.decisionId}
                 onClick={() => setSelectedDecision(d)}
-                className={`p-4 cursor-pointer transition ${
+                className={`p-3.5 cursor-pointer transition ${
                   selectedDecision?.decisionId === d.decisionId
-                    ? 'bg-slate-800/80 border-l-2 border-tealVerdict'
-                    : 'bg-background/40 hover:bg-slate-800/40'
+                    ? 'bg-blue-50/70 border-l-2 border-primaryAction'
+                    : 'bg-white hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-mono font-semibold text-slate-200">
+                  <span className="text-xs font-mono font-semibold text-primaryText">
                     {d.decisionId}
                   </span>
                   <span
                     className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
                       d.verdictAtTime === 'GO'
-                        ? 'bg-tealVerdict/10 text-tealVerdict'
+                        ? 'bg-green-100 text-success'
                         : d.verdictAtTime === 'CAUTION'
-                        ? 'bg-amberVerdict/10 text-amberVerdict'
-                        : 'bg-roseVerdict/10 text-roseVerdict'
+                        ? 'bg-amber-100 text-warning'
+                        : 'bg-red-100 text-error'
                     }`}
                   >
                     {d.verdictAtTime}
                   </span>
                 </div>
-                <div className="text-xs text-slate-400">
-                  Type: <span className="font-semibold text-slate-300">{d.type}</span> · Region:{' '}
-                  {d.region?.toUpperCase()}
+                <div className="text-xs text-secondaryText">
+                  Type: <span className="font-medium text-primaryText">{d.type}</span> · {d.region?.toUpperCase()}
                 </div>
-                <div className="text-[11px] text-slate-500 font-mono mt-1">
+                <div className="text-[11px] text-tertiaryText font-mono mt-0.5">
                   Actor: {d.actor} · {new Date(d.timestamp).toLocaleTimeString()}
                 </div>
               </div>
@@ -120,33 +138,37 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
       </div>
 
       {/* Decision Detail & Then-vs-Now Diff */}
-      <div className="flex-1 p-6 overflow-y-auto space-y-6">
+      <div className="flex-1 p-6 overflow-y-auto space-y-5">
         {selectedDecision ? (
           <>
             {/* Status Header */}
-            <div className="bg-surface border border-border rounded-lg p-5 space-y-3">
+            <div className="bg-surface border border-border rounded-lg p-5 space-y-3 shadow-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-mono text-slate-400">Selected Decision Receipt</span>
-                  <h1 className="text-base font-bold text-slate-100">{selectedDecision.decisionId}</h1>
+                  <span className="text-[11px] font-mono text-secondaryText uppercase tracking-wider">
+                    Immutable Decision Receipt
+                  </span>
+                  <h1 className="text-base font-bold text-primaryText mt-0.5">
+                    {selectedDecision.decisionId}
+                  </h1>
                 </div>
 
                 {reevalData && (
                   <div className="flex items-center gap-2">
                     {reevalData.status === 'STILL_VALID' && (
-                      <span className="px-3 py-1 rounded bg-tealVerdict/15 border border-tealVerdict text-tealVerdict font-bold text-xs flex items-center gap-1.5">
+                      <span className="px-3 py-1 rounded-md bg-green-50 border border-green-200 text-success font-semibold text-xs flex items-center gap-1.5">
                         <CheckCircle className="w-4 h-4" />
                         STILL VALID
                       </span>
                     )}
                     {reevalData.status === 'NEEDS_RECHECK' && (
-                      <span className="px-3 py-1 rounded bg-amberVerdict/15 border border-amberVerdict text-amberVerdict font-bold text-xs flex items-center gap-1.5">
+                      <span className="px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-warning font-semibold text-xs flex items-center gap-1.5">
                         <AlertTriangle className="w-4 h-4" />
                         NEEDS RE-CHECK
                       </span>
                     )}
                     {reevalData.status === 'INVALIDATED' && (
-                      <span className="px-3 py-1 rounded bg-roseVerdict/15 border border-roseVerdict text-roseVerdict font-bold text-xs flex items-center gap-1.5">
+                      <span className="px-3 py-1 rounded-md bg-red-50 border border-red-200 text-error font-semibold text-xs flex items-center gap-1.5">
                         <XCircle className="w-4 h-4" />
                         INVALIDATED
                       </span>
@@ -156,60 +178,60 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
               </div>
 
               {reevalData && (
-                <div className="p-3 bg-background rounded border border-border text-xs text-slate-300">
-                  <span className="font-semibold">Re-evaluation Basis:</span> {reevalData.summary}
+                <div className="p-3 bg-slate-50 rounded-md border border-border text-xs text-secondaryText">
+                  <strong className="text-primaryText">Re-evaluation Basis:</strong> {reevalData.summary}
                 </div>
               )}
             </div>
 
             {/* Then vs Now Diff */}
-            <div className="bg-surface border border-border rounded-lg p-5 space-y-4">
-              <h3 className="text-xs font-bold uppercase text-slate-300 tracking-wider flex items-center gap-2">
-                <Activity className="w-4 h-4 text-purpleVerdict" />
+            <div className="bg-surface border border-border rounded-lg p-5 space-y-3.5 shadow-subtle">
+              <h2 className="text-xs font-semibold uppercase text-secondaryText tracking-wider flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primaryAction" />
                 Then vs Now Dependency Diff (Conflict Blast Radius)
-              </h3>
+              </h2>
 
               {loading ? (
-                <div className="text-xs font-mono text-slate-500 py-6 text-center animate-pulse">
+                <div className="text-xs font-mono text-secondaryText py-6 text-center">
                   Comparing dependency vectors against current merged truth...
                 </div>
               ) : reevalData?.diffs?.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {reevalData.diffs.map((diff: any, idx: number) => (
                     <div
                       key={idx}
-                      className={`p-4 rounded border text-xs space-y-2 ${
+                      className={`p-3.5 rounded-md border text-xs space-y-2 ${
                         diff.statusChanged
-                          ? 'bg-roseVerdict/5 border-roseVerdict/40'
-                          : 'bg-background border-border'
+                          ? 'bg-red-50/50 border-red-200'
+                          : 'bg-slate-50/70 border-border'
                       }`}
                     >
                       <div className="flex items-center justify-between font-mono">
-                        <span className="font-bold text-slate-200">Entity: {diff.entityId}</span>
+                        <span className="font-semibold text-primaryText">Entity: {diff.entityId}</span>
                         {diff.statusChanged && (
-                          <span className="text-[10px] uppercase font-bold text-roseVerdict bg-roseVerdict/10 px-2 py-0.5 rounded">
+                          <span className="text-[10px] uppercase font-bold text-error bg-red-100 px-2 py-0.5 rounded">
                             Basis Changed
                           </span>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 pt-1">
-                        <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
-                          <div className="text-[10px] uppercase text-slate-400 font-semibold mb-0.5">
+                      <div className="grid grid-cols-2 gap-3 pt-1">
+                        <div className="p-2.5 rounded bg-white border border-border">
+                          <div className="text-[10px] uppercase text-secondaryText font-medium mb-0.5">
                             What It Saw Then
                           </div>
-                          <div className="font-mono text-slate-300 font-bold">
+                          <div className="font-mono text-primaryText font-bold">
                             {diff.assumedStatus}
                           </div>
                         </div>
 
-                        <div className="p-2.5 rounded bg-slate-900 border border-slate-800">
-                          <div className="text-[10px] uppercase text-slate-400 font-semibold mb-0.5">
+                        <div className="p-2.5 rounded bg-white border border-border">
+                          <div className="text-[10px] uppercase text-secondaryText font-medium mb-0.5">
                             What Is Known Now
                           </div>
                           <div
                             className={`font-mono font-bold ${
-                              diff.statusChanged ? 'text-roseVerdict' : 'text-tealVerdict'
+                              diff.statusChanged ? 'text-error' : 'text-success'
                             }`}
                           >
                             {diff.currentStatus}
@@ -217,10 +239,10 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
                         </div>
                       </div>
 
-                      {diff.causingOpIds.length > 0 && (
-                        <div className="text-[11px] text-slate-400 pt-1">
+                      {diff.causingOpIds?.length > 0 && (
+                        <div className="text-[11px] text-secondaryText pt-1">
                           Causing operations arrived after heal:{' '}
-                          <span className="font-mono text-amberVerdict">
+                          <span className="font-mono text-warning font-semibold">
                             {diff.causingOpIds.join(', ')}
                           </span>
                         </div>
@@ -229,18 +251,18 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="text-xs text-slate-400 py-4 text-center">
+                <div className="text-xs text-secondaryText py-4 text-center">
                   All recorded dependencies match current replica view.
                 </div>
               )}
             </div>
 
             {/* Remediation Action */}
-            <div className="p-4 bg-surface border border-border rounded-lg flex items-center justify-between">
+            <div className="p-4 bg-surface border border-border rounded-lg flex items-center justify-between shadow-subtle">
               <div>
-                <div className="text-xs font-semibold text-slate-200">Operational Remediation</div>
-                <div className="text-[11px] text-slate-400">
-                  Re-run Decision Gate against current truth to create a newly linked decision receipt.
+                <div className="text-xs font-semibold text-primaryText">Operational Remediation</div>
+                <div className="text-[11px] text-secondaryText">
+                  Re-evaluate Decision Gate against current truth to create a newly linked receipt.
                 </div>
               </div>
 
@@ -249,16 +271,16 @@ export const BlastRadiusView: React.FC<BlastRadiusViewProps> = ({
                   onClick={() =>
                     onOpenGateWithEntity(selectedDecision.dependencies?.[0]?.entityId || 'access-corridor-north')
                   }
-                  className="px-4 py-2 bg-tealVerdict text-slate-900 font-bold text-xs rounded hover:bg-teal-400 transition"
+                  className="px-3.5 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white font-medium text-xs rounded-md transition shadow-subtle"
                 >
-                  Re-evaluate in Gate Now
+                  Re-evaluate in Gate
                 </button>
               )}
             </div>
           </>
         ) : (
-          <div className="text-center py-24 text-slate-500 font-mono text-xs">
-            Select a decision from the left to inspect its blast radius.
+          <div className="text-center py-20 text-secondaryText font-mono text-xs">
+            Select a decision receipt on the left to inspect its blast radius.
           </div>
         )}
       </div>
