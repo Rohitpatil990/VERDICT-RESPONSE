@@ -1,0 +1,58 @@
+{
+  "rules": [
+    {
+      "incidentType": "flood",
+      "severity": "CRITICAL",
+      "keywords": {
+        "en": ["flood", "waterlogging", "submerged", "overflow", "drowning", "high tide", "water level rising"],
+        "hi": ["बाढ़", "जलभराव", "डूब", "पानी भर गया", "उफान", "जल स्तर"],
+        "mr": ["पूर", "पाणी साचले", "पाणी भरले", "बुडाले", "पाण्याची पातळी", "जलमय"]
+      }
+    },
+    {
+      "incidentType": "blocked_road",
+      "severity": "HIGH",
+      "keywords": {
+        "en": ["blocked", "closed", "landslide", "tree fell", "debris", "traffic stopped", "impassable"],
+        "hi": ["रास्ता बंद", "सड़क अवरुद्ध", "जाम", "पेड़ गिर गया", "मलबा", "मार्ग बंद"],
+        "mr": ["रस्ता बंद", "वाहतूक ठप्प", "झाड पडले", "मार्ग बंद", "दगड कोसळले", "अडथळा"]
+      }
+    },
+    {
+      "incidentType": "stranded_people",
+      "severity": "CRITICAL",
+      "keywords": {
+        "en": ["stranded", "trapped", "surrounded by water", "evacuation needed", "helpless", "rooftop"],
+        "hi": ["फंसे हुए", "अटके", "बचाव चाहिए", "छत पर", "मदद चाहिए"],
+        "mr": ["अडकलेले", "फसलेले", "मदत हवी", "छतावर", "स्थलांतर आवश्यक", "सुटका करा"]
+      }
+    },
+    {
+      "incidentType": "damaged_infrastructure",
+      "severity": "HIGH",
+      "keywords": {
+        "en": ["collapsed", "bridge damaged", "electric pole down", "wall crack", "transformer explosion"],
+        "hi": ["पुल टूटा", "दीवार गिरी", "खंभा गिरा", "बिजली गुल", "क्षतिग्रस्त"],
+        "mr": ["पूल खचला", "भिंत पडली", "खांब पडला", "वीज पुरवठा खंडित", "इमारत खचली"]
+      }
+    },
+    {
+      "incidentType": "medical_emergency",
+      "severity": "CRITICAL",
+      "keywords": {
+        "en": ["medical", "injury", "bleeding", "ambulance", "heart attack", "unconscious", "pregnant"],
+        "hi": ["चिकित्सा", "चोट", "रक्तस्राव", "एम्बुलेंस", "बेहोश", "गंभीर स्थिति"],
+        "mr": ["वैद्यकीय", "जखमी", "रक्तस्त्राव", "रुग्णवाहिका", "बेशुद्ध", "तातडीची मदत"]
+      }
+    },
+    {
+      "incidentType": "shelter_issue",
+      "severity": "MEDIUM",
+      "keywords": {
+        "en": ["shelter full", "food needed", "drinking water shortage", "no electricity", "overcrowded"],
+        "hi": ["आश्रय भरा", "भोजन चाहिए", "पीने का पानी", "राशन की कमी"],
+        "mr": ["निवारा पूर्ण भरला", "अन्नटंचाई", "पिण्याचे पाणी नाही", "औषध टंचाई"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "landmarks": [
+    { "id": "kurla", "name": "Kurla West", "lat": 19.0688, "lng": 72.8795, "region": "mumbai", "type": "flood_prone" },
+    { "id": "dharavi", "name": "Dharavi Transit Camp", "lat": 19.0434, "lng": 72.8567, "region": "mumbai", "type": "shelter" },
+    { "id": "csmt", "name": "CSMT Terminus", "lat": 18.9401, "lng": 72.8347, "region": "mumbai", "type": "transit" },
+    { "id": "powai", "name": "Powai Lake Basin", "lat": 19.1246, "lng": 72.9051, "region": "mumbai", "type": "flood_prone" },
+    { "id": "dadar", "name": "Dadar TT Circle", "lat": 19.0178, "lng": 72.8478, "region": "mumbai", "type": "junction" },
+    { "id": "bandra", "name": "Bandra Kurla Complex (BKC)", "lat": 19.0607, "lng": 72.8644, "region": "mumbai", "type": "commercial" },
+    { "id": "andheri", "name": "Andheri Subway", "lat": 19.1197, "lng": 72.8464, "region": "mumbai", "type": "flood_prone" },
+    { "id": "connaught_place", "name": "Connaught Place", "lat": 28.6315, "lng": 77.2167, "region": "delhi", "type": "junction" },
+    { "id": "india_gate", "name": "India Gate Command Base", "lat": 28.6129, "lng": 77.2295, "region": "delhi", "type": "transit" },
+    { "id": "mg_road", "name": "MG Road Logistics Center", "lat": 12.9756, "lng": 77.6066, "region": "bengaluru", "type": "depot" },
+    { "id": "silk_board", "name": "Central Silk Board", "lat": 12.9172, "lng": 77.6228, "region": "bengaluru", "type": "junction" }
+  ],
+  "roads": [
+    { "id": "road-kurla-csmt", "name": "Kurla-CSMT Arterial (LBS Marg)", "region": "mumbai", "start": [19.0688, 72.8795], "end": [18.9401, 72.8347], "defaultStatus": "BLOCKED" },
+    { "id": "road-andheri-subway", "name": "Andheri Subway Connector", "region": "mumbai", "start": [19.1197, 72.8464], "end": [19.1130, 72.8400], "defaultStatus": "BLOCKED" },
+    { "id": "road-bkc-express", "name": "BKC Connector Highway", "region": "mumbai", "start": [19.0607, 72.8644], "end": [19.0434, 72.8567], "defaultStatus": "OPEN" },
+    { "id": "road-powai-jvlr", "name": "JVLR Powai Stretch", "region": "mumbai", "start": [19.1246, 72.9051], "end": [19.1300, 72.8800], "defaultStatus": "OPEN" }
+  ],
+  "shelters": [
+    { "id": "shelter-dharavi-1", "name": "Dharavi Municipal Relief Center", "lat": 19.0434, "lng": 72.8567, "capacity": 450, "occupied": 320, "region": "mumbai" },
+    { "id": "shelter-kurla-gym", "name": "Kurla Sports Complex Shelter", "lat": 19.0688, "lng": 72.8795, "capacity": 300, "occupied": 280, "region": "mumbai" },
+    { "id": "shelter-dadar-hall", "name": "Dadar Community Relief Camp", "lat": 19.0178, "lng": 72.8478, "capacity": 250, "occupied": 110, "region": "mumbai" },
+    { "id": "shelter-powai-school", "name": "Powai Vidya Mandir Emergency Shelter", "lat": 19.1246, "lng": 72.9051, "capacity": 200, "occupied": 95, "region": "mumbai" }
+  ],
+  "stocks": [
+    { "id": "stock-med-kits", "name": "Critical Trauma Medical Kits", "class": "MEDICAL", "available": 5, "description": "High-priority emergency surgical and trauma kits for disaster triage" },
+    { "id": "stock-water-purifiers", "name": "High-Capacity Water Purification Units", "class": "WATER", "available": 10, "description": "Mobile filtration pods for flood-submerged municipal zones" },
+    { "id": "stock-food-rations", "name": "Ready-To-Eat Emergency Rations (boxes)", "class": "FOOD", "available": 15, "description": "72-hour family sustenance nutritional packs" }
+  ]
+}

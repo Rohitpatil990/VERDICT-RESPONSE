@@ -1,0 +1,13 @@
+@"
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+coverage/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+"@ | Set-Content .gitignore
