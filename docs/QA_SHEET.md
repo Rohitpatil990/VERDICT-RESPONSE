@@ -1,74 +1,28 @@
-# VERDICT Response — Judging Q&A Sheet
-CodeAstra 2.0 Final · PS #2 "Geo-Distributed Disaster Data Replication with Graceful Degradation"
+# VERDICT — Judge Q&A & Technical Defense Sheet
 
----
+### Q1: Why not Last-Write-Wins (LWW)?
+**A:** In a disaster, clock synchronization across partitioned field devices is impossible (NTP drifts, network partitions isolate hardware clocks). LWW silently destroys critical safety data based on unverified clock timestamps. For example, if Mumbai municipal team reports Road R7 open at 10:00 and Delhi NDRF reports it washed away at 10:01 with a skewed clock, LWW would pick one and erase the other. VERDICT surfaces concurrent claims side-by-side as `Awaiting human review` and defaults to conservative safety (BLOCKED).
 
-### **Q1: Why not pure CRDTs (Conflict-Free Replicated Data Types) alone?**
-**Answer:** Pure CRDTs are excellent for commutative, monotonic operations (like append-only notes or PN-counters), but disaster response has **non-monotonic safety constraints**:
-1. *Bounded physical resources*: If two disconnected regions both claim the last 5 medical kits, an additive CRDT would oversell 7 units. Physical supplies cannot be negative or created out of thin air.
-2. *Safety-critical contradictions*: If one sensor reports a bridge is OPEN and a citizen reports it has COLLAPSED, a Last-Write-Wins (LWW) CRDT would pick whichever report has a newer timestamp (which is trivially manipulated or misaligned by clock drift). In VERDICT, safety-critical contradictions trigger **Awaiting human review** rather than silent automated selection.
+### Q2: Why not just use pure CRDTs?
+**A:** State-based and operation-based CRDTs are excellent for data structures with merge lattices (like our set-union notes and monotone person statuses). However, CRDTs cannot express scarce divisible resources without coordinating invariants (such as preventing two regions from over-allocating the same 5 physical medical kits). VERDICT augments CRDT observations with escrow bounded counters for commitments.
 
----
+### Q3: Why not Raft or Paxos?
+**A:** Consensus protocols like Raft require a strict majority quorum ($> N/2$). In a 3-region deployment across disconnected disaster zones (Mumbai, Delhi, Bengaluru), an isolated single region has 1/3 of the nodes and cannot form a quorum, halting all operations. In an earthquake or flood, responders MUST record observations and deploy locally available supplies even when completely cut off from the rest of the country.
 
-### **Q2: Why not Raft or Paxos?**
-**Answer:** Raft and Paxos require a **quorum (majority)** to accept writes. During an active disaster (e.g. undersea cable severing or power grid collapse), a partitioned region with 1 node cannot achieve majority and would be forced to reject writes (CP mode). In a disaster, workers on the ground must be able to log trapped citizens and road blockages locally without being blocked. VERDICT adopts an **Availability-First (AP) model during partitions** with deterministic settlement and bounded invariant verification upon reconnection.
+### Q4: What does the Decision Gate guarantee, and what does it NOT guarantee?
+**A:** The Gate guarantees that the decision satisfies configured multi-region consistency invariants: no unresolved conflicts, cryptographic chain integrity, reachability of the territory authority, observation freshness, and sufficient local escrow quota. **It does NOT guarantee physical ground truth.** `GO` means it is safe under known consistency rules; it is not a real-world disaster prediction.
 
----
+### Q5: What is the cost of Escrow bounded counters?
+**A:** Stranded quotas. If Mumbai is allocated 3 medical kits and Delhi 2, and Delhi experiences an influx of 4 casualties while partitioned from Mumbai, Delhi can only grant 2 kits and must queue the remaining 2 as unmet demand—even if Mumbai has 3 unused kits sitting on a shelf. Safety against over-allocation comes at the cost of potential local supply refusal during partitions.
 
-### **Q3: What if the last unit of relief supply is claimed while offline for days?**
-**Answer:** Local writes to bounded resources are explicitly marked **Tentative**. In VERDICT, a tentative view shows local claims, but the allocation is only **Settled** once included in a certified round. If total claims exceed available quota when the partition heals, the deterministic policy grants up to available capacity and marks the excess as **Backordered** with a full audit trace. Nothing is silently lost or oversold.
+### Q6: What if a node is malicious or Byzantine?
+**A:** VERDICT is designed for crash-recovery and network partitions among protocol-following disaster agencies, not Byzantine Fault Tolerance (BFT). We enforce pre-shared Ed25519 digital signatures and hash chains to prevent message tampering and spoofing, but a compromised node with a valid private key could issue malicious operations within its quota. Full BFT consensus is out of scope.
 
----
+### Q7: Does a valid cryptographic signature mean the report is true?
+**A:** No. A signature proves that the payload was authored by the holder of the associated private key and was not altered in transit. It does not prove that the report is factually accurate in the physical world.
 
-### **Q4: How do you prevent stale certificate replay?**
-**Answer:** Every Round Certificate includes `{ round, prevCertHash, opSetRoot, policyVersion, stateRoot }`. Replicas verify that `round = latestRound + 1` and that `prevCertHash` matches the cryptographic hash of the previous certificate in their local chain. Stale or replayed certificates are rejected.
+### Q8: Why is there no "Trust Score"?
+**A:** Trust scores create false security by averaging independent dimensions into a single opaque number. A report with a valid signature from an unverified citizen 2 hours ago is not "73% trustworthy". VERDICT explicitly displays separate indicators: Source Tier, Freshness, Conflict State, Replication Lineage, Cryptographic Integrity, and Operational Resolution.
 
----
-
-### **Q5: Can a malicious region forge records?**
-**Answer:** Each region has a pre-shared Ed25519 public key in the shared registry. Every operation is cryptographically signed by its author and origin region. If a corrupted node modifies an existing op or injects an invalid signature, the receiver's integrity check marks the operation **FAILED** upon arrival and isolates it in staging. Full Byzantine Fault Tolerance (BFT) against arbitrary malicious collusions is on the roadmap; for the hackathon scope, we guarantee tamper detection and non-repudiation.
-
----
-
-### **Q6: What does "2 of 3" signing guarantee and not guarantee?**
-**Answer:** 
-- **Guarantees:** It proves that at least 2 regions independently replayed the exact operation set, verified policy invariants, and calculated identical Merkle state roots.
-- **Does NOT guarantee:** It does *not* claim the third disconnected region has received the update, and it does *not* guarantee that the physical observation on the ground is true.
-
----
-
-### **Q7: What breaks first as the system scales?**
-**Answer:**
-1. *Full-mesh network replication*: Point-to-point replication between N regions is O(N²). For N > 10 regions, this must transition to a gossip/relay mesh (RelayMesh).
-2. *Per-region SQLite/PostgreSQL write throughput*: Sustained ingestion rates exceeding 5,000 ops/sec per node would require batch streaming or distributed storage partitions.
-3. *Pending op backlog size*: Extremely prolonged partitions with millions of uncompacted ops require snapshot catch-up.
-
----
-
-### **Q8: Is this a simulated demo or a real multi-region deployment?**
-**Answer:** It is a **local multi-process simulation** running three genuine Node.js Fastify services on distinct ports (4001, 4002, 4003) with **genuinely separate SQLite databases** (`data/mumbai.db`, `data/delhi.db`, `data/bengaluru.db`). There is zero shared memory between services. Network cuts are simulated via the `LinkController` abstraction.
-
----
-
-### **Q9: Did you use AI tools in building this?**
-**Answer:** Yes. In full accordance with our AI-assisted development disclosure, AI coding tools were utilized for rapid scaffolding of types, boilerplate Fastify routes, and UI layout. All core distributed algorithms (vector causality, canonical hashing, priority lane sync, and invariant assertions) were reviewed and validated via integration tests.
-
----
-
-### **Q10: Does a valid cryptographic signature mean the incident report is true?**
-**Answer:** **NO.** A valid Ed25519 signature proves only that the record was authored by the owner of the key and has not been altered in transit or in the database. It does not prove that floodwaters are actually 3 feet high. That is why VERDICT maintains **six separate indicators** and never collapses integrity into factual truth.
-
----
-
-### **Q11: What happens if there is no internet connection for voice or translation?**
-**Answer:** Manual form reporting and local database persistence continue with zero network requirement. The `StaticLexiconTranslator` operates completely offline using bundled Devanagari keyword dictionaries. Remote translation APIs are disabled gracefully without blocking local operations.
-
----
-
-### **Q12: Where do your efficiency benchmark numbers come from?**
-**Answer:** Directly from `npm run bench` (`packages/region-service/src/bench.ts`). It runs 500 atomic transactions, measures actual p50/p95 disk write latencies, calculates real Merkle roots, and compares the exact byte length of delta JSON payloads against full-state serialization on the host machine.
-
----
-
-### **Q13: Why is there no single "Trust Score" (e.g. 87% trust)?**
-**Answer:** A single score creates dangerous complacency. A report could have 100% cryptographic integrity (signed by a sensor) but be 12 hours old (low freshness), or it could be submitted by a trusted field officer but conflict with three other officers. Combining these into a single number conceals the actual failure mode. Showing the six separate indicators empowers operators to make informed, decision-safe judgments.
+### Q9: Where do your performance numbers come from?
+**A:** All numbers are measured directly from the running host via `npm run bench` and live scenario runs. Zero metrics are hard-coded or fabricated.

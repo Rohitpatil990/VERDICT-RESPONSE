@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package verdict.sync;
+
+service ReplicationService {
+  rpc GetVersionVector (VectorRequest) returns (VectorResponse);
+  rpc PullOps (PullRequest) returns (stream OpMessage);
+  rpc PushOps (PushRequest) returns (PushAck);
+  rpc Heartbeat (PingMessage) returns (PongMessage);
+}
+
+message VectorRequest {
+  string requester_region = 1;
+}
+
+message VectorResponse {
+  string region = 1;
+  map<string, int64> version_vector = 2;
+  int64 timestamp_ms = 3;
+}
+
+message PullRequest {
+  string requester_region = 1;
+  map<string, int64> known_vector = 2;
+  int32 priority_lane = 3; // 0=control, 1=critical, 2=normal, 3=blobs
+  int32 max_ops = 4;
+}
+
+message PushRequest {
+  string sender_region = 1;
+  repeated OpMessage ops = 2;
+  int32 priority_lane = 3;
+}
+
+message PushAck {
+  bool success = 1;
+  int32 applied_count = 2;
+  int32 duplicate_count = 3;
+  int32 staged_count = 4;
+  string error_message = 5;
+}
+
+message OpMessage {
+  string op_id = 1;
+  string origin_region = 2;
+  int64 seq = 3;
+  string type = 4;
+  string entity_id = 5;
+  string payload_json = 6;
+  map<string, int64> deps = 7;
+  string author_id = 8;
+  string author_role = 9;
+  int64 created_at = 10;
+  string prev_hash = 11;
+  string hash = 12;
+  string sig = 13;
+  int32 priority_lane = 14;
+}
+
+message PingMessage {
+  string sender_region = 1;
+  int64 sent_at = 2;
+  map<string, int64> version_vector = 3;
+}
+
+message PongMessage {
+  string responder_region = 1;
+  int64 received_at = 2;
+  int64 responded_at = 3;
+  map<string, int64> version_vector = 4;
+}

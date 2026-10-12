@@ -1,38 +1,24 @@
 {
-  "name": "verdict-response",
+  "name": "verdict-monorepo",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
-  "description": "VERDICT Response - Verifiable Settlement for Multi-Region Disaster Data",
+  "description": "VERDICT — Verifiable Settlement for Multi-Region Data (CodeAstra 2.0)",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "verify": "npm run test && npm run typecheck",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "seed": "node packages/region-service/dist/seed.js",
-    "bench": "node packages/region-service/dist/bench.js",
-    "start:mumbai": "node packages/region-service/dist/server.js --region mumbai --port 4001",
-    "start:delhi": "node packages/region-service/dist/server.js --region delhi --port 4002",
-    "start:bengaluru": "node packages/region-service/dist/server.js --region bengaluru --port 4003",
-    "dev:backend": "node packages/region-service/dist/cluster.js",
-    "dev:dashboard": "npm run dev --workspace=packages/dashboard",
-    "dev": "node dev-runner.js"
+    "dev:local": "node scripts/dev-local.js",
+    "seed": "node scripts/seed-all.js",
+    "demo": "node scripts/run-demo.js",
+    "bench": "node scripts/run-bench.js",
+    "verify": "node scripts/verify-all.js"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.22",
     "@types/node": "^26.6.5",
-    "@vitejs/plugin-react": "^6.1.2",
-    "typescript": "^5.9.3",
-    "vite": "^8.3.4"
-  },
-  "dependencies": {
-    "@fastify/cors": "^11.3.1",
-    "fastify": "^5.12.5",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^1.55.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
   }
 }

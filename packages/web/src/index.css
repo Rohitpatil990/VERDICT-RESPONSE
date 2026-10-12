@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: #0B1220;
+  color: #E2E8F0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+/* Fog of information hatch pattern - slate-indigo with diagonal stripes */
+.fog-hatch-pattern {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(100, 116, 139, 0.25),
+    rgba(100, 116, 139, 0.25) 8px,
+    rgba(71, 85, 105, 0.55) 8px,
+    rgba(71, 85, 105, 0.55) 16px
+  );
+  border: 2px dashed #94A3B8;
+}
+
+/* Dark mode Leaflet adjustments */
+.leaflet-container {
+  background-color: #080D17 !important;
+  font-family: inherit;
+}
+
+.dark-tiles {
+  filter: brightness(0.65) invert(1) contrast(3.2) hue-rotate(200deg) saturate(0.35) brightness(0.7);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B1220;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E2A44;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2D3D60;
+}

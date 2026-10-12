@@ -1,77 +1,73 @@
-# VERDICT Response — Setup & Reproduction Guide
-CodeAstra 2.0 Final · PS #2 "Geo-Distributed Disaster Data Replication with Graceful Degradation"
+# VERDICT Setup & Deployment Guide
 
----
+## 1. System Requirements
+- Node.js ≥ 20.0.0 (Tested on Node.js v24)
+- npm ≥ 10.0.0
+- Any modern web browser (Chrome, Firefox, Safari, Edge)
 
-## 1. System Prerequisites
-- **Node.js:** v20.x or v22.x+ (tested on Node v24.12.0)
-- **Package Manager:** npm (v10+ or v11+)
-- **Operating System:** Windows, macOS, or Linux
-- **No external database server or Docker daemon required:** Each regional node runs a genuine, independent SQLite database file (`data/mumbai.db`, `data/delhi.db`, `data/bengaluru.db`) utilizing Node's built-in C-engine `DatabaseSync` (`node:sqlite`). Zero flaky setup!
+## 2. One-Command Installation & Build
 
----
-
-## 2. Quick Start (One Command)
-
-### Step 1: Install Dependencies
 ```bash
+# Clone or extract repository
+cd Final_PrintWinners
+
+# Install dependencies for all workspaces
 npm install
-```
 
-### Step 2: Build All Packages
-```bash
+# Build all TypeScript packages (core, region-service, web)
 npm run build
-```
 
-### Step 3: Seed Synthetic Disaster Scenario Data
-```bash
+# Safe demo reset: Back up old database state and seed fresh generic disaster scenario
+node scripts/backup-and-reset.js
 npm run seed
 ```
-*Seeds the synthetic Mumbai monsoon flooding scenario (Kurla waterlogging, Dharavi shelters, road statuses, and the 5-stock trauma medical kits) through the signed operation hash-chain pipeline.*
 
-### Step 4: Launch the Full Multi-Region System
+## 2.1 Automated Tests & Verification
+
 ```bash
-npm run dev
-```
-This starts:
-- **Mumbai Regional Service:** `http://localhost:4001` (Store: `data/mumbai.db`)
-- **Delhi Regional Service:** `http://localhost:4002` (Store: `data/delhi.db`)
-- **Bengaluru Regional Service:** `http://localhost:4003` (Store: `data/bengaluru.db`)
-- **Operations Dashboard:** `http://localhost:3000`
-
-Open `http://localhost:3000` in your browser.
-
----
-
-## 3. Running Verification & Automated Tests
-
-To run the complete unit, cryptographic, and multi-region integration test suites:
-```bash
+# Run core and region-service tests
 npm test
+
+# Run regional database failure and local standby recovery simulation
+node scripts/test-regional-loss-and-recovery.js
+
+# Run full end-to-end verification
+npm run verify
 ```
-Or run individual test suites:
+
+## 3. Running All Services Locally
+
 ```bash
-# Pure core tests (Canonical JSON, Ed25519, Version Vectors, Bounded Claims)
-node --test packages/core/test/core.test.js
-
-# Multi-region partition, sync, conflict, and tamper integration tests
-node --test packages/region-service/test/integration.test.js
+# Starts 3 regional nodes + web console concurrently
+npm run dev:local
 ```
 
----
+Access the following endpoints:
+- **Web Operations Console:** `http://localhost:3000`
+- **Mumbai Node REST/SSE:** `http://localhost:4001` (Authority)
+- **Delhi Node REST/SSE:** `http://localhost:4002`
+- **Bengaluru Node REST/SSE:** `http://localhost:4003`
+- **OpenAPI Interactive Docs:** `http://localhost:4001/docs`
 
-## 4. Running System Benchmarks
-To measure local write throughput, p50/p95 latencies, state root recomputation times, and delta bandwidth efficiency on your machine:
+## 4. Running the 3-Minute Automated Demo
+
+Ensure `npm run dev:local` is running in one terminal, then in another terminal execute:
+
 ```bash
-npm run bench
+npm run demo
 ```
-*Outputs measured results directly to `docs/BENCH.md`.*
 
----
+Or click the **"Run 3-Min Demo"** button directly in the web console top navigation bar.
 
-## 5. Simulating Failures & Partitions
-All failure scenarios can be triggered interactively from the **Chaos Lab** tab in the dashboard at `http://localhost:3000`:
-- **Sever/Restore Links:** Cut links between Mumbai, Delhi, and Bengaluru to simulate network partitions.
-- **Flip 1 Byte in DB:** Injects single-byte hash corruption in the SQLite database to trigger cryptographic integrity failure.
-- **Heal Ledger:** Restores the corrupted record and validates the hash chain.
-- **Run 3-Min Scripted Demo:** Automates the complete competition walkthrough!
+## 5. Mobile Device Access via LAN / HTTPS
+
+To test the mobile-first Field reporting interface from a smartphone on the local Wi-Fi:
+
+1. Determine your computer's local LAN IP:
+   - Windows: `ipconfig` (e.g. `192.168.1.100`)
+2. Start Vite with host binding:
+   ```bash
+   npx vite --host 0.0.0.0 --port 3000
+   ```
+3. Open `http://<YOUR_IP>:3000` on your mobile phone browser.
+4. For GPS geolocation APIs requiring secure contexts, modern browsers allow geolocation on `localhost` or via self-signed SSL/tunnel (e.g. `ngrok http 3000` or `mkcert`).

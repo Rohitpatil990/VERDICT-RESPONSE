@@ -1,251 +1,205 @@
-export type RegionId = 'mumbai' | 'delhi' | 'bengaluru';
+export type RegionId = 'mumbai' | 'delhi' | 'bengaluru' | string;
 
-export type DegradationLevel = 'L0_FULL' | 'L1_DEGRADED' | 'L2_ISOLATED' | 'L3_RECOVERING';
+export type PriorityLane = 0 | 1 | 2 | 3; // 0=control, 1=critical, 2=normal, 3=blobs
 
-export type AuthorRole = 'VOLUNTEER' | 'FIELD_OFFICER' | 'OFFICIAL' | 'REVIEWER' | 'ADMIN';
+export type SourceTier = 'OFFICIAL_SENSOR' | 'FIELD_OFFICER' | 'VOLUNTEER' | 'CITIZEN';
 
-export type AuthorTier = 'OFFICIAL_SENSOR' | 'FIELD_OFFICER' | 'VOLUNTEER' | 'CITIZEN';
+export type UserRole = 'VOLUNTEER' | 'FIELD_OFFICER' | 'OFFICIAL' | 'REVIEWER' | 'ADMIN';
 
-export type OpType = 
-  | 'REPORT'
-  | 'NOTE'
-  | 'PERSON_STATUS'
-  | 'FACT'
-  | 'RESOURCE_CLAIM'
-  | 'TRANSLATION'
-  | 'TRANSCRIPT'
-  | 'RESOLVE';
+export type EntityType = 'road' | 'incident' | 'shelter' | 'supply' | 'person' | 'team';
 
 export type VersionVector = Record<string, number>;
 
-export interface Operation<T = any> {
-  opId: string; // e.g. "mumbai:1" or UI alias "MUM-1"
+export interface Operation {
+  opId: string; // e.g. "mumbai:1042"
   region: RegionId;
   seq: number;
-  type: OpType;
+  type: string; // 'REPORT' | 'STATUS_CHANGE' | 'ADD_NOTE' | 'PERSON_STATUS' | 'DECISION' | 'ESCROW_INIT' | 'ESCROW_SPEND' | 'ESCROW_TRANSFER' | 'ESCROW_REQUEST' | 'RESOLVE' | 'CONFIRM_RESOLVED'
   entityId: string;
-  payload: T;
+  payload: any;
   deps: VersionVector;
   authorId: string;
-  authorRole: AuthorRole;
-  createdAt: string; // ISO 8601, display-only
+  authorRole: UserRole;
+  createdAt: number;
   prevHash: string;
-  hash: string; // SHA-256(canonical JSON w/o hash, sig)
-  sig: string;  // Ed25519 signature
+  hash: string;
+  sig: string;
+  priorityLane?: PriorityLane;
 }
 
-export type IncidentType = 
-  | 'flood'
-  | 'blocked_road'
-  | 'stranded_people'
-  | 'damaged_infrastructure'
-  | 'shelter_issue'
-  | 'medical_emergency'
-  | 'other';
+export type EntityStatus = 
+  | 'OPEN' | 'BLOCKED' 
+  | 'Reported' | 'Investigating' | 'Resolved' 
+  | 'Missing' | 'Found' | 'Safe'
+  | 'ACTIVE' | 'INACTIVE';
 
-export type LocationSource = 'GPS_DEVICE' | 'MANUAL_PIN' | 'SIMULATED' | 'SPOKEN_PLACE_APPROX' | 'UNKNOWN';
-
-export interface LocationData {
-  lat?: number;
-  lng?: number;
-  accuracyM?: number;
-  source: LocationSource;
-  placeText?: string;
+export interface EntityConflict {
+  field: string;
+  status: 'AWAITING_REVIEW' | 'RESOLVED_BY_POLICY' | 'RESOLVED_BY_HUMAN';
+  claims: Array<{
+    opId: string;
+    region: RegionId;
+    authorId: string;
+    authorRole: UserRole;
+    tier: SourceTier;
+    value: any;
+    timestamp: number;
+  }>;
+  resolution?: {
+    effectiveValue: any;
+    reason: string;
+    resolvedByOpId?: string;
+  };
 }
 
-export interface ReportPayload {
-  incidentId: string;
-  incidentType: IncidentType;
-  description: {
-    original: {
-      lang: 'en' | 'hi' | 'mr';
-      text: string;
-    };
+export interface Entity {
+  entityId: string;
+  type: EntityType;
+  authorityRegion: RegionId;
+  status: EntityStatus;
+  attributes: Record<string, any>;
+  versionVector: VersionVector;
+  participatingOpIds: string[];
+  conflict?: EntityConflict;
+  integrity: 'VERIFIED' | 'FAILED' | 'UNVERIFIED';
+  lastObservedAt: number;
+  lastUpdatedAt: number;
+}
+
+export type VerdictType = 'GO' | 'CAUTION' | 'HOLD';
+
+export interface CheckResult {
+  checkId: string; // 'conflict' | 'integrity' | 'authority_reachability' | 'freshness' | 'replication' | 'escrow' | 'confirmation'
+  name: string;
+  passed: boolean;
+  severity: 'pass' | 'warn' | 'fail';
+  reason: string;
+  i18nKey: string;
+}
+
+export interface DependencySnapshot {
+  entityId: string;
+  valueSeen: any;
+  statusSeen: EntityStatus;
+  versionOpIds: string[];
+  ageAtEvaluationMs: number;
+  authorityReachable: boolean;
+}
+
+export interface GateEvaluation {
+  verdict: VerdictType;
+  checks: CheckResult[];
+  dependencies: DependencySnapshot[];
+  whatWouldChange: string[];
+  evaluatedAt: number;
+  viewRegion: RegionId;
+  disclaimer: string;
+}
+
+export interface DecisionRequest {
+  type: 'DISPATCH' | 'ALLOCATE_SUPPLY' | 'CLOSE_INCIDENT';
+  entityId: string;
+  params: {
+    routeEntityIds?: string[];
+    qty?: number;
+    resource?: string;
+    teamId?: string;
+    closureReason?: string;
   };
-  location: LocationData;
-  observedAt: string; // ISO 8601, device-reported
-  severity: {
-    value: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-    source: 'SUGGESTED' | 'CONFIRMED' | 'UNSET';
-  };
-  source: {
-    kind: 'person' | 'team' | 'sensor' | 'org';
+  actorId: string;
+  actorRole: UserRole;
+}
+
+export interface DecisionReceipt {
+  decisionId: string;
+  type: string;
+  params: any;
+  verdictAtTime: VerdictType;
+  dependencies: DependencySnapshot[];
+  acknowledgedRisks: string[];
+  actor: string;
+  region: RegionId;
+  timestamp: number;
+  opId: string;
+}
+
+export type ReevaluationStatus = 'STILL_VALID' | 'NEEDS_RECHECK' | 'INVALIDATED';
+
+export interface ReevaluationOutcome {
+  decisionId: string;
+  status: ReevaluationStatus;
+  summary: string;
+  diffs: Array<{
+    entityId: string;
+    assumedValue: any;
+    assumedStatus: EntityStatus;
+    currentValue: any;
+    currentStatus: EntityStatus;
+    statusChanged: boolean;
+    hasConflictNow: boolean;
+    causingOpIds: string[];
+  }>;
+  evaluatedAt: number;
+}
+
+export interface EscrowResourceState {
+  resource: string;
+  total: number;
+  rights: Record<RegionId, number>;
+  spent: Record<RegionId, number>;
+  unmetQueue: Array<{
     id: string;
-    displayName: string;
-    tier: AuthorTier;
-  };
-  evidence?: {
-    originalText?: string;
-    attachments?: Array<{
-      hash: string;
-      filename: string;
-      mimeType: string;
-    }>;
-  };
-  channel: 'VOICE' | 'FORM' | 'SENSOR';
-  voice?: {
-    audioHash: string;
-    mime: string;
-    durationMs: number;
-    asrEngine: string;
-    asrLang: string;
-    asrConfidence?: number;
-    rawTranscript: string;
-    transcriptEdited: boolean;
-    transcribedOffline: boolean;
-  };
-}
-
-export interface FactPayload {
-  factType: 'ROAD_STATUS';
-  roadId: string;
-  status: 'OPEN' | 'BLOCKED' | 'CAUTION';
-  reportedReason?: string;
-}
-
-export interface ResourceClaimPayload {
-  stockId: string;
-  resourceClass: 'MEDICAL' | 'WATER' | 'FOOD' | 'SHELTER' | 'OTHER';
-  quantityRequested: number;
-  requestingRegion: RegionId;
-  purpose: string;
-}
-
-export interface PersonStatusPayload {
-  personId: string;
-  fullName: string;
-  status: 'MISSING' | 'FOUND' | 'SAFE' | 'INJURED';
-  lastSeenLocation?: string;
-}
-
-export interface ResolvePayload {
-  targetOpId: string;
-  conflictingOpId: string;
-  chosenEntityState: any;
-  justification: string;
-  policyUsed: string;
-}
-
-export interface TranslationPayload {
-  targetOpId: string;
-  targetLang: 'en' | 'hi' | 'mr';
-  translatedText: string;
-  engine: 'StaticLexiconTranslator' | 'RemoteTranslator';
-}
-
-export type FreshnessBucket = '<15 min' | '<1 h' | '<6 h' | 'older';
-
-export interface FreshnessInfo {
-  bucket: FreshnessBucket;
-  ageMinutes: number;
-  clockAnomaly: boolean;
-  anomalyReason?: string;
-}
-
-export type ConflictStatus = 
-  | 'None'
-  | 'Conflicting'
-  | 'Awaiting human review'
-  | 'Resolved by policy'
-  | 'Resolved by reviewer';
-
-export type ReplicationStatus = 
-  | 'Saved locally'
-  | 'Pending synchronization'
-  | 'Synchronized';
-
-export type RegionReceiptStatus = 'RECEIVED' | 'PENDING' | 'UNKNOWN';
-
-export interface ReplicationInfo {
-  status: ReplicationStatus;
-  syncedCount: number;
-  totalRegions: number;
-  perRegion: Record<RegionId, {
-    status: RegionReceiptStatus;
-    receivedAt?: string;
-    via?: 'LOCAL' | 'DIRECT' | 'RELAY';
-    chainVerified?: boolean;
-    reason?: string;
+    region: RegionId;
+    qty: number;
+    requesterId: string;
+    priorityClass: 'MEDICAL' | 'WATER' | 'FOOD' | 'SHELTER' | 'OTHER';
+    requestedAt: number;
   }>;
 }
 
-export type IntegrityStatus = 'Verified' | 'FAILED' | 'Unverified';
-
-export interface IntegrityCheckDetail {
-  check: 'signature' | 'chain_position' | 'blob_hash' | 'schema';
-  passed: boolean;
-  details: string;
-}
-
-export interface IntegrityInfo {
-  status: IntegrityStatus;
-  failedReason?: string;
-  checks: IntegrityCheckDetail[];
-}
-
-export type ResolutionStatus = 
-  | 'Tentative'
-  | 'Settled under policy'
-  | 'Awaiting human review'
-  | 'Superseded'
-  | 'Backordered';
-
-export interface SixIndicators {
-  source: {
-    displayName: string;
-    kind: string;
-    tier: AuthorTier;
-    channel: string;
-    originRegion: RegionId;
-  };
-  freshness: FreshnessInfo;
-  conflict: {
-    status: ConflictStatus;
-    conflictingCount: number;
-    conflictingOpIds: string[];
-    notes?: string;
-  };
-  replication: ReplicationInfo;
-  integrity: IntegrityInfo;
-  resolution: {
-    status: ResolutionStatus;
-    settledRound?: number;
-    reason?: string;
-    grantedQuantity?: number;
-    backorderedQuantity?: number;
-  };
-}
-
-export interface OpReceipt {
-  opId: string;
+export interface PeerState {
   region: RegionId;
-  receivedByRegion: RegionId;
-  receivedAt: string;
-  via: 'LOCAL' | 'DIRECT' | 'RELAY';
-  chainVerified: boolean;
-}
-
-export interface RoundCertificate {
-  round: number;
-  prevCertHash: string;
-  opSetRoot: string;
-  policyVersion: string;
-  stateRoot: string;
-  signers: RegionId[];
-  signatures: Record<RegionId, string>;
-  createdAt: string;
-}
-
-export interface RegionStatusSummary {
-  region: RegionId;
-  linkState: Record<RegionId, 'CONNECTED' | 'DISCONNECTED' | 'DEGRADED'>;
-  degradationLevel: DegradationLevel;
+  reachable: boolean;
+  lastContactAt: number;
+  lastKnownSeq: number;
+  rttMs: number;
   versionVector: VersionVector;
-  lagOps: number;
-  outboxPending: number;
-  latestSettledRound: number;
-  tentativeCount: number;
-  conflictCount: number;
-  stateRoot: string;
-  converged: boolean;
+}
+
+export interface TerritoryConfig {
+  region: RegionId;
+  center: { lat: number; lng: number };
+  radiusKm: number;
+}
+
+export interface FogEntry {
+  region: RegionId;
+  unreachable: boolean;
+  lastContactAt: number;
+  lastKnownSeq: number;
+  fogIntensity: number; // 0 to 1
+  hatchPattern: boolean;
+  legendText: string;
+}
+
+export interface MergeReportSummary {
+  episodeId: string;
+  startedAt: number;
+  convergedAt: number;
+  durationMs: number;
+  localOpsCreated: number;
+  remoteOpsReceived: number;
+  autoMergedCount: number;
+  supersededCount: number;
+  policyResolvedCount: number;
+  awaitingReviewCount: number;
+  escrowTransfersCount: number;
+  unmetDemandCount: number;
+  decisionsEvaluated: {
+    stillValid: number;
+    needsRecheck: number;
+    invalidated: number;
+  };
+  deltaBytesSent: number;
+  fullStateBytesEquivalent: number;
 }

@@ -1,82 +1,53 @@
-# VERDICT Response — 3-Minute Live Scripted Demo Script
-CodeAstra 2.0 Final · PS #2 "Geo-Distributed Disaster Data Replication with Graceful Degradation"
+# VERDICT 3-Minute Live Demo Script
+*CodeAstra 2.0 Final · Problem Statement #2*
 
----
+### (0:00 - 0:20) Phase 1: Normal Converged State & Multi-Lingual Console
+1. Open `http://localhost:3000`. Show the Operations Map centered on disaster logistics hubs and corridors.
+2. Point to the top bar: **"Viewing from: Mumbai (Authority)"**. The live status dot is green.
+3. Switch language to **मराठी** and **हिन्दी** via the top switcher. Point out that all navigation, gate checks, and indicators have native key parity.
+4. Open the **Escrow Supplies** view: Show global Medical Kits stock = 5, divided into Mumbai rights = 3, Delhi rights = 2.
 
-## **Minute 0:00 — Introduction & Map Operations**
-- **Action:** Open browser at `http://localhost:3000`.
-- **Display:** Full-screen interactive map opens centered on Mumbai (Kurla West). All three regions (Mumbai, Delhi, Bengaluru) show status `L0_FULL` (Green beacons). Inter-region link lines are active and solid green.
-- **Presenter says:**
-  > *"Welcome to VERDICT Response. This is a working prototype of a geo-distributed disaster intelligence platform designed for catastrophic network partitions. Unlike conventional dashboards that show a single shared cloud database, VERDICT operates three genuinely independent regional nodes in Mumbai, Delhi, and Bengaluru, each running its own local SQLite persistence store."*
-- **Action:** Click language switcher at top right to `मराठी` (Marathi) and back to `English` to demonstrate first-class Devanagari localization.
+### (0:20 - 0:35) Phase 2: Partition Cut & Fog of Information
+1. Navigate to **Regions & Sync**. Click **"Cut Link (DELHI)"**.
+2. Immediately show the top **Partition Ribbon**: `"DEGRADED: MUMBAI↔DELHI down — local writes OK, escrow-limited commitments"`.
+3. Return to **Operations Map**: Delhi's territory is now covered in an **indigo-grey hatch pattern veil (Fog of Information)**.
+4. Show the legend chip: `"Fog: Delhi unreachable · last heard 12s ago · last known seq 120"`.
+5. Point out the honest disclaimer: *"Fog means no recent information from this region. It does not mean nothing is happening there."*
 
----
+### (0:35 - 1:05) Phase 3: Autonomous Writes & Decision Gate
+1. In Mumbai, click **Report Here** on `access-corridor-north` and report **OPEN** (`FIELD_OFFICER` tier).
+2. Open **Decision Gate**: Evaluate **"DISPATCH Team T-12 via access-corridor-north"**.
+3. Mumbai Gate returns **GO** (Authority territory reachable, clean fresh observation). Commit receipt.
+4. Switch **"Viewing from: Delhi"**. A field team in Delhi reports `access-corridor-north` **BLOCKED** (`OFFICIAL` tier).
+5. Delhi evaluates the same dispatch: Gate returns **CAUTION** with reason: *"Mumbai (authority) unreachable; newer updates may exist"*.
+6. Show that a non-reviewer attempting to close **Incident #101** receives **HOLD** (*"Closure requires reviewer confirmation"*).
 
-## **Minute 0:20 — Field Worker Reporting & Acknowledgement Ladder**
-- **Action:** Click **"Report at this location"** at Kurla West junction.
-- **Form:** Select `Urban Flooding`, enter: *"Submerged subway with 3ft rising water"*, confirm severity `HIGH`. Click **"Sign & Submit"**.
-- **Display:** Show the real-time acknowledgement ladder:
-  1. *Saved on device* (Local buffer)
-  2. *Saved in Mumbai local store* (Atomic SQLite transaction + outbox commit)
-  3. *Replicating across regions...*
-- **Verification:** Switch **"Viewing from"** selector to `Delhi`. The marker immediately appears in Delhi’s view! All 3 nodes hold the signed op.
+### (1:05 - 1:30) Phase 4: Escrow Under Partition (5 / 3 / 4 Case)
+1. Open **Supplies**: Mumbai allocates 3 medical kits against its local rights (3) -> **GO**.
+2. Switch to Delhi: Delhi requests 4 medical kits.
+3. Show the result: **2 granted** (Delhi's remaining quota), **2 queued as UNMET**.
+4. Invariant chip: $\sum \text{spent} \le 5$ in every replica's view. Zero over-allocation!
 
----
+### (1:30 - 2:00) Phase 5: Reconnect with Bandwidth Cap & Blast Radius
+1. In **Regions & Sync**, click **"Reconnect (10 KB/s Cap)"**.
+2. Critical operations (L1) sync first.
+3. The Fog of Information recedes with a real counter: `"N operations revealed"`.
+4. Open **Merge Reports**: Show the PR-style report diffing ops created, ops synced, and bandwidth savings (~97% reduction).
+5. Show **Review Inbox**: `access-corridor-north` is flagged **Awaiting human review** with both claims side-by-side; neither was silently overwritten with LWW!
+6. Open **Blast Radius**: Mumbai's earlier dispatch decision is flagged **NEEDS_RECHECK** with then-vs-now side-by-side diff.
 
-## **Minute 0:40 — Network Partition & Concurrent Contradictory Updates**
-- **Action:** Navigate to **Chaos Lab** tab. Under *Network Partition Simulation*, click **"Sever Link"** on `Mumbai ↔ Delhi`.
-- **Display:** The link line between Mumbai and Delhi turns dashed red. Degradation ladder transitions from `L0_FULL` to `L1_DEGRADED`.
-- **Action:**
-  1. In **Mumbai view**, submit a road report on `road-lbs-marg`: Status `BLOCKED` (submerged).
-  2. Switch to **Delhi view**, submit a report on the *same road* `road-lbs-marg`: Status `OPEN` (drone survey).
-  3. In Delhi view, request 4 units of medical trauma kits. In Mumbai view, request 3 units of the same 5-unit stock (Total 7 > 5).
-- **Presenter says:**
-  > *"During this partition, both regions continue accepting local writes with zero downtime. Notice the markers show dashed rings indicating 'Pending synchronization'. Neither region falsely claims remote receipt."*
+### (2:00 - 2:20) Phase 6: Human Review Adjudication
+1. In **Review Inbox**, Certified Reviewer Alice reviews ground sensor evidence and signs resolution: **BLOCKED**.
+2. Click **"Re-evaluate in Gate Now"**: The new decision returns **HOLD** (route blocked), preventing dispatch onto an impassable corridor.
 
----
+### (2:20 - 2:40) Phase 7: Regional Loss & Recovery Simulation (Local Multi-Process)
+1. Run `node scripts/test-regional-loss-and-recovery.js`.
+2. Demonstrate simulated catastrophic loss of Delhi's active database file.
+3. Node restarts and auto-recovers from the local standby recovery replica snapshot with 0 data loss.
+4. *Honesty Note:* Recovery copy is preserved on local standby replica storage (simulated DR; not multi-cloud or AWS).
 
-## **Minute 1:15 — Reconnection with Bandwidth Throttling & Delta Anti-Entropy**
-- **Action:** In Chaos Lab, click **"Restore Link"** on `Mumbai ↔ Delhi` with simulated 80ms latency.
-- **Display:** The link line turns green. Anti-entropy exchanges version vectors.
-- **Verification:**
-  - Critical medical and stranded reports replicate first on the L1 priority lane.
-  - The **Efficiency Panel** displays measured numbers: *90% bandwidth saved* using delta ops vs sending a full state snapshot.
-  - Version vectors and Merkle state roots re-converge.
-
----
-
-## **Minute 1:45 — Explicit Conflict Resolution & Bounded Escrow Settlement**
-- **Action:** Open **Conflicts & Review** tab.
-- **Display:** The road `road-lbs-marg` is flagged as `Awaiting human review` due to safety-critical contradiction (BLOCKED vs OPEN).
-- **Action:** Click **"Choose This State"** on Mumbai's BLOCKED report with justification: *"Ground inspection verified heavy waterlogging"*. Submit signed resolution.
-- **Action:** Open **Relief Supplies** tab.
-  - Show the 5 available medical kits.
-  - Mumbai requested 3, Delhi requested 4.
-  - Show the settled outcome: Delhi granted 4 kits, Mumbai granted 1 kit + 2 kits **Backordered** with full policy trace. Zero kits oversold.
-
----
-
-## **Minute 2:15 — SourceTrace Drawer & Decision-Safe Intelligence**
-- **Action:** On the map, click the Kurla incident marker to open the **SourceTrace Drawer**.
-- **Display:** Show the **Six Standalone Indicators**:
-  1. **Source:** Field Officer (origin: Mumbai)
-  2. **Freshness:** < 15 min (Server verified)
-  3. **Conflict:** None (Resolved)
-  4. **Replication:** Synchronized (3 of 3 regions)
-  5. **Integrity:** Verified (Ed25519 signature valid)
-  6. **Resolution:** Settled under policy
-- **Presenter points out:**
-  > *"Notice we never collapse these into a single fake 'trust score'. Each indicator informs a distinct operational decision. And notice our mandatory cryptographic footnote: A verified signature proves the record was signed by the key and untampered; it does not claim the observation is factually true."*
-
----
-
-## **Minute 2:35 — Cryptographic Tamper & Self-Healing**
-- **Action:** In Chaos Lab, click **"Flip 1 Byte in DB"**.
-- **Display:** Open SourceTrace on the tampered record. The Integrity chip immediately flips to **Integrity FAILED**, identifying the exact canonical hash mismatch!
-- **Action:** Click **"Heal Ledger"**. The record is restored and re-verifies as **Verified**.
-
----
-
-## **Minute 2:50 — Conclusion**
-- **Presenter closes:**
-  > *"VERDICT Response doesn't just show where a disaster is reported. It shows how far each report can be relied on, traces where it originated, how it propagated across disconnected regions, and why its final state was accepted, without losing the evidence behind conflicting updates."*
+### (2:40 - 3:00) Phase 8: Chaos Lab & Cryptographic Tamper Self-Healing
+1. Open **Ledger & Verify**: Select an op. Click **Verify Cryptographic Chain** -> **VERIFIED**.
+2. Click **"Flip 1 Byte"**: Payload mutated on disk. Verify now reports **FAILED** with exact hash mismatch.
+3. Click **"Heal from Peer"**: Authoritative copy pulled from remote peer and re-verified -> **VERIFIED**.
+4. Closing: *"VERDICT doesn't just replicate data. It tells you what you can't see, what you can safely commit, whether it is safe to act, and which decisions the new truth puts in question."*

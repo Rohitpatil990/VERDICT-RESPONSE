@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mumbai:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - REGION=mumbai
+      - PORT=4001
+      - DATA_DIR=/app/data
+    command: node packages/region-service/dist/index.js
+    ports:
+      - "4001:4001"
+    restart: unless-stopped
+
+  delhi:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - REGION=delhi
+      - PORT=4002
+      - DATA_DIR=/app/data
+    command: node packages/region-service/dist/index.js
+    ports:
+      - "4002:4002"
+    restart: unless-stopped
+
+  bengaluru:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - REGION=bengaluru
+      - PORT=4003
+      - DATA_DIR=/app/data
+    command: node packages/region-service/dist/index.js
+    ports:
+      - "4003:4003"
+    restart: unless-stopped
+
+  web:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npx vite --port 3000 --host 0.0.0.0
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mumbai
+      - delhi
+      - bengaluru
+    restart: unless-stopped

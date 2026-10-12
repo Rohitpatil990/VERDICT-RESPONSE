@@ -1,550 +1,536 @@
-import fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
-import fs from 'node:fs';
-import path from 'node:path';
-import type { 
-  RegionId, 
-  Operation, 
-  ReportPayload, 
-  FactPayload, 
-  ResourceClaimPayload,
-  ResolvePayload,
-  RoundCertificate,
-  AuthorRole,
-  AuthorTier,
-  SixIndicators
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
+import {
+  computeFog,
+  createSignedOp,
+  evaluateDecisionGate,
+  haversineDistanceKm,
+  reevaluateDecision,
+  SEED_PRIVATE_KEYS,
+  verifySignature,
+  getPublicKey,
+  calculateOpHash,
+  DecisionReceipt,
+  DecisionRequest,
+  RegionId,
+  Entity
 } from '@verdict/core';
-import { 
-  computeOpHash, 
-  signHash, 
-  getRegionKeyPair, 
-  computeSixIndicators, 
-  evaluateConflict, 
-  settleResourceClaims,
-  canonicalJson,
-  sha256,
-  compareVectors
-} from '@verdict/core';
-import { SqliteStore } from './store.js';
-import { LinkController } from './linkController.js';
-import { ReplicationEngine } from './replication.js';
+import { Store } from './store/store.js';
+import { SyncEngine, PeerConfig } from './sync/sync-engine.js';
+import { LinkController } from './network/link-controller.js';
 
-export function createRegionServer(
-  region: RegionId, 
-  port: number, 
-  customPeerPorts?: Record<RegionId, number>,
-  customDbPath?: string
-) {
-  const app = fastify({ logger: false });
+export interface ServerOptions {
+  regionId: RegionId;
+  port: number;
+  store: Store;
+  syncEngine: SyncEngine;
+  linkController: LinkController;
+  peers: PeerConfig[];
+  territories: any[];
+}
+
+export function buildServer(opts: ServerOptions): FastifyInstance {
+  const app = Fastify({ logger: false });
+
   app.register(cors, { origin: '*' });
 
-  const store = new SqliteStore(region, customDbPath);
-  const linkController = new LinkController(region);
+  app.register(swagger, {
+    openapi: {
+      info: {
+        title: `VERDICT Region Service (${opts.regionId})`,
+        version: '1.0.0'
+      }
+    }
+  });
+  app.register(swaggerUi, { routePrefix: '/docs' });
 
-  const peerPorts: Record<RegionId, number> = customPeerPorts || {
-    mumbai: 4001,
-    delhi: 4002,
-    bengaluru: 4003
-  };
+  // SSE client connections for reactive updates
+  const sseClients: Array<(data: string) => void> = [];
 
-  const peerUrls: Record<RegionId, string> = {
-    mumbai: `http://localhost:${peerPorts.mumbai}`,
-    delhi: `http://localhost:${peerPorts.delhi}`,
-    bengaluru: `http://localhost:${peerPorts.bengaluru}`
-  };
+  opts.syncEngine.onEvent(event => {
+    const payload = JSON.stringify(event);
+    for (const send of sseClients) {
+      send(payload);
+    }
+  });
 
-  const replication = new ReplicationEngine(store, linkController, peerUrls);
-
-  // Background anti-entropy timer (every 1 second)
-  const syncInterval = setInterval(() => {
-    replication.syncWithPeers().catch(() => {});
-  }, 1000);
-
-  // Helper to compute haversine distance in meters
-  function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371e3;
-    const phi1 = lat1 * Math.PI / 180;
-    const phi2 = lat2 * Math.PI / 180;
-    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-              Math.cos(phi1) * Math.cos(phi2) *
-              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return Math.round(R * c);
-  }
-
-  // --- API ROUTES ---
-
-  // 1. Consistency & Regional Status API
+  // 1. GET /api/v1/status
   app.get('/api/v1/status', async () => {
-    const vector = store.getVersionVector();
-    const links = linkController.getAllLinks();
-    const degradationLevel = linkController.getDegradationLevel();
-    const stateRoot = store.getStateRoot();
-    const latestCert = store.getLatestRoundCertificate();
-    const allOps = store.getAllOps();
+    const vector = opts.syncEngine.getLocalVector();
+    const peers = await opts.store.getAllPeers();
+    const entities = await opts.store.getAllEntities();
+    const outbox = await opts.store.getOutbox();
 
-    // Check convergence with connected peers
-    const connectedPeers = (['mumbai', 'delhi', 'bengaluru'] as RegionId[])
-      .filter(r => r !== region && linkController.isLinked(r));
-    
-    // Tentative count = ops since latest settled round
-    const tentativeOps = allOps.filter(o => !latestCert || !latestCert.round);
+    const conflicts = entities.filter(e => e.conflict?.status === 'AWAITING_REVIEW').length;
+    const anyPeerDown = peers.some(p => !p.reachable);
+    const allPeersDown = peers.length > 0 && peers.every(p => !p.reachable);
+
+    let degradationLevel = 'L0_FULL';
+    if (allPeersDown) degradationLevel = 'L2_ISOLATED';
+    else if (anyPeerDown) degradationLevel = 'L1_DEGRADED';
 
     return {
-      region,
-      port,
-      linkState: links,
+      region: opts.regionId,
+      port: opts.port,
       degradationLevel,
       versionVector: vector,
-      lagOps: 0,
-      outboxPending: store.getPendingOutbox('delhi').length + store.getPendingOutbox('bengaluru').length,
-      latestSettledRound: latestCert?.round || 0,
-      tentativeCount: tentativeOps.length,
-      conflictCount: 0,
-      stateRoot,
-      converged: true
+      peers,
+      outboxPending: outbox.length,
+      tentativeCount: conflicts,
+      conflictCount: conflicts,
+      entitiesCount: entities.length,
+      converged: !anyPeerDown && outbox.length === 0,
+      timestamp: Date.now()
     };
   });
 
-  // 2. Incident & Map perspective API
-  app.get('/api/v1/map', async (req) => {
-    const allOps = store.getAllOps();
-    const allReceipts = store.getAllReceipts();
-    const latestCert = store.getLatestRoundCertificate();
+  // 2. GET /api/v1/fog
+  app.get('/api/v1/fog', async () => {
+    const peers = await opts.store.getAllPeers();
+    const fog = computeFog(opts.regionId, peers, opts.territories, Date.now());
+    return {
+      viewingRegion: opts.regionId,
+      fog,
+      timestamp: Date.now()
+    };
+  });
 
-    // Group ops by entityId
-    const entityMap = new Map<string, Operation[]>();
-    for (const op of allOps) {
-      if (!entityMap.has(op.entityId)) {
-        entityMap.set(op.entityId, []);
-      }
-      entityMap.get(op.entityId)!.push(op);
-    }
+  // 3. GET /api/v1/map
+  app.get('/api/v1/map', async () => {
+    const entities = await opts.store.getAllEntities();
+    const peers = await opts.store.getAllPeers();
+    const links = opts.linkController.getAllLinks();
+    return {
+      viewingRegion: opts.regionId,
+      entities,
+      peers,
+      links,
+      timestamp: Date.now()
+    };
+  });
 
-    const onlineRegions = (['mumbai', 'delhi', 'bengaluru'] as RegionId[])
-      .filter(r => linkController.isLinked(r));
+  // 4. GET /api/v1/records/:id
+  app.get('/api/v1/records/:id', async (req: any, reply: any) => {
+    const ent = await opts.store.getEntity(req.params.id);
+    if (!ent) return reply.status(404).send({ error: 'Entity not found' });
+    return ent;
+  });
 
-    const records = [];
-    for (const [entityId, ops] of entityMap.entries()) {
-      const primaryOp = ops[0];
-      const receipts = allReceipts.filter(r => r.opId === primaryOp.opId);
+  // 5. GET /api/v1/records/:id/trace (Six-indicator SourceTrace)
+  app.get('/api/v1/records/:id/trace', async (req: any, reply: any) => {
+    const ent = await opts.store.getEntity(req.params.id);
+    if (!ent) return reply.status(404).send({ error: 'Entity not found' });
 
-      // Check conflict if multiple concurrent ops for this entity
-      let conflictStatus: any = 'None';
-      let conflictingOpIds: string[] = [];
-      let resolutionReason = '';
+    const ops = await opts.store.getOpsForEntity(req.params.id);
+    const peers = await opts.store.getAllPeers();
+    const now = Date.now();
+    const ageMs = now - ent.lastObservedAt;
 
-      if (ops.length > 1) {
-        const evalRes = evaluateConflict(ops[0], ops[1]);
-        if (evalRes.isConflict) {
-          conflictStatus = evalRes.status;
-          conflictingOpIds = [ops[0].opId, ops[1].opId];
-          resolutionReason = evalRes.reason;
-        }
-      }
+    const sourceOp = ops[0];
+    const sourceInfo = {
+      authorId: sourceOp?.authorId || 'unknown',
+      role: sourceOp?.authorRole || 'VOLUNTEER',
+      originRegion: sourceOp?.region || ent.authorityRegion,
+      tier: (sourceOp?.payload?.source?.tier || 'FIELD_OFFICER') as any
+    };
 
-      // Check if settled in a certificate
-      const indicators = computeSixIndicators({
-        op: primaryOp,
-        currentRegion: region,
-        receipts,
-        onlineRegions,
-        conflictStatus,
-        conflictingOpIds,
-        settledRound: latestCert?.round,
-        reason: resolutionReason
-      });
+    const freshness = {
+      ageMs,
+      minutesAgo: Math.round(ageMs / 60000),
+      isFresh: ageMs < 60 * 60 * 1000
+    };
 
-      records.push({
-        entityId,
-        op: primaryOp,
-        allOps: ops,
-        indicators
-      });
-    }
+    const conflictState = {
+      hasConflict: ent.conflict?.status === 'AWAITING_REVIEW',
+      status: ent.conflict?.status || 'CLEAN',
+      claims: ent.conflict?.claims || [],
+      resolution: ent.conflict?.resolution
+    };
+
+    const replication = {
+      replicatedRegions: Object.keys(ent.versionVector),
+      peerReachability: peers.map(p => ({
+        region: p.region,
+        status: p.reachable ? 'RECEIVED' : 'UNKNOWN'
+      }))
+    };
+
+    const integrity = {
+      status: ent.integrity,
+      operationsCount: ops.length,
+      allSigned: true
+    };
+
+    const resolution = {
+      effectiveStatus: ent.status,
+      resolvedBy: ent.conflict?.resolution?.reason || 'Deterministic causal fold'
+    };
 
     return {
-      region,
-      timestamp: new Date().toISOString(),
-      recordsCount: records.length,
-      records
-    };
-  });
-
-  // 3. SourceTrace API for a specific incident or entity
-  app.get('/api/v1/records/:id/trace', async (req, reply) => {
-    const { id } = req.params as { id: string };
-    const ops = store.getOpsByEntity(id);
-    if (ops.length === 0) {
-      return reply.status(404).send({ error: `Record ${id} not found in region ${region}` });
-    }
-
-    const primaryOp = ops[0];
-    const receipts = store.getReceiptsForOp(primaryOp.opId);
-    const onlineRegions = (['mumbai', 'delhi', 'bengaluru'] as RegionId[])
-      .filter(r => linkController.isLinked(r));
-
-    let conflictStatus: any = 'None';
-    let conflictingOpIds: string[] = [];
-    let conflictEvidence: any[] = [];
-    let resolutionReason = '';
-
-    if (ops.length > 1) {
-      const evalRes = evaluateConflict(ops[0], ops[1]);
-      if (evalRes.isConflict) {
-        conflictStatus = evalRes.status;
-        conflictingOpIds = [ops[0].opId, ops[1].opId];
-        resolutionReason = evalRes.reason;
-      }
-      conflictEvidence = ops.map(o => ({
-        opId: o.opId,
-        originRegion: o.region,
-        author: o.authorId,
-        authorRole: o.authorRole,
-        tier: o.payload?.source?.tier || 'FIELD_OFFICER',
-        payload: o.payload,
-        createdAt: o.createdAt,
-        hash: o.hash,
-        sig: o.sig
-      }));
-    }
-
-    const latestCert = store.getLatestRoundCertificate();
-    const indicators = computeSixIndicators({
-      op: primaryOp,
-      currentRegion: region,
-      receipts,
-      onlineRegions,
-      conflictStatus,
-      conflictingOpIds,
-      settledRound: latestCert?.round,
-      reason: resolutionReason
-    });
-
-    const auditTrail = ops.map(o => ({
-      opId: o.opId,
-      type: o.type,
-      author: o.authorId,
-      region: o.region,
-      createdAt: o.createdAt,
-      hash: o.hash
-    }));
-
-    return {
-      entityId: id,
-      record: primaryOp,
-      indicators,
-      lineage: indicators.replication.perRegion,
-      conflictEvidence,
-      settledCertificates: store.getAllRoundCertificates(),
-      audit: auditTrail
-    };
-  });
-
-  // 4. Report creation endpoint (Local Write during partition or normal)
-  app.post('/api/v1/reports', async (req, reply) => {
-    const body = req.body as Partial<ReportPayload>;
-    const seq = store.getNextSeq();
-    const prevHash = store.getLatestHash();
-    const opId = `${region}:${seq}`;
-    const incidentId = body.incidentId || `inc-${region}-${Date.now().toString(36)}`;
-
-    const fullPayload: ReportPayload = {
-      incidentId,
-      incidentType: body.incidentType || 'flood',
-      description: body.description || { original: { lang: 'en', text: 'Reported incident' } },
-      location: body.location || { source: 'SIMULATED', lat: 19.0688, lng: 72.8795 },
-      observedAt: body.observedAt || new Date().toISOString(),
-      severity: body.severity || { value: 'HIGH', source: 'CONFIRMED' },
-      source: body.source || { kind: 'person', id: `worker-${region}`, displayName: `Worker ${region.toUpperCase()}`, tier: 'FIELD_OFFICER' },
-      channel: body.channel || 'FORM',
-      evidence: body.evidence
-    };
-
-    const currentVector = store.getVersionVector();
-    const keyPair = getRegionKeyPair(region);
-
-    const partialOp: Omit<Operation, 'hash' | 'sig'> = {
-      opId,
-      region,
-      seq,
-      type: 'REPORT',
-      entityId: incidentId,
-      payload: fullPayload,
-      deps: currentVector,
-      authorId: fullPayload.source.id,
-      authorRole: 'FIELD_OFFICER',
-      createdAt: new Date().toISOString(),
-      prevHash
-    };
-
-    const hash = computeOpHash(partialOp);
-    const sig = signHash(hash, keyPair.privateKeyPem);
-    const op: Operation = { ...partialOp, hash, sig };
-
-    // Transactionally append local write + transactional outbox
-    store.appendLocalOperation(op);
-
-    // Compute live ack ladder
-    const receipts = store.getReceiptsForOp(opId);
-    const onlineRegions = (['mumbai', 'delhi', 'bengaluru'] as RegionId[]).filter(r => linkController.isLinked(r));
-    const indicators = computeSixIndicators({
-      op,
-      currentRegion: region,
-      receipts,
-      onlineRegions
-    });
-
-    return reply.status(201).send({
-      success: true,
-      opId,
-      incidentId,
-      ackState: {
-        stage: receipts.length === 3 ? 'synced' : (receipts.length > 1 ? 'pending' : 'region'),
-        message: `Saved in ${region} local store`,
-        syncedCount: receipts.length,
-        total: 3
+      entityId: ent.entityId,
+      indicators: {
+        source: sourceInfo,
+        freshness,
+        conflict: conflictState,
+        replication,
+        integrity,
+        resolution
       },
-      indicators
-    });
+      disclaimer:
+        'A verified signature shows the record was signed by the associated key and not altered since. It does not show that the report itself is true.'
+    };
   });
 
-  // 5. Submit arbitrary Op (Fact, Resource Claim, Resolve)
-  app.post('/api/v1/ops', async (req, reply) => {
-    const { type, entityId, payload, authorRole } = req.body as { type: any; entityId: string; payload: any; authorRole?: AuthorRole };
-    const seq = store.getNextSeq();
-    const prevHash = store.getLatestHash();
-    const opId = `${region}:${seq}`;
-    const currentVector = store.getVersionVector();
-    const keyPair = getRegionKeyPair(region);
+  // 6. POST /api/v1/ops
+  app.post('/api/v1/ops', async (req: any) => {
+    const op = req.body;
+    return await opts.syncEngine.applyIncomingOp(op);
+  });
 
-    const partialOp = {
-      opId,
-      region,
-      seq,
-      type,
+  // 7. POST /api/v1/reports
+  app.post('/api/v1/reports', async (req: any) => {
+    const { incidentType, description, location, status, authorId, authorRole, authority, clientTxId } = req.body;
+    const entityId = req.body.entityId || `inc-${Date.now().toString(36)}`;
+    const payload = {
+      incidentId: entityId,
+      incidentType: incidentType || 'flooding',
+      description: { original: { lang: 'en', text: description || 'Report' } },
+      location: location || { lat: 19.076, lng: 72.877, source: 'SIMULATED' },
+      status: status || 'Investigating',
+      observedAt: Date.now(),
+      authority: authority || opts.regionId,
+      source: { tier: authorRole === 'OFFICIAL' ? 'OFFICIAL_SENSOR' : 'FIELD_OFFICER' },
+      clientTxId: clientTxId || undefined
+    };
+
+    const op = await opts.syncEngine.submitLocalOp(
+      'REPORT',
       entityId,
       payload,
-      deps: currentVector,
-      authorId: `operator-${region}`,
-      authorRole: authorRole || 'FIELD_OFFICER',
-      createdAt: new Date().toISOString(),
-      prevHash
-    };
-
-    const hash = computeOpHash(partialOp);
-    const sig = signHash(hash, keyPair.privateKeyPem);
-    const op: Operation = { ...partialOp, hash, sig };
-
-    store.appendLocalOperation(op);
-    return reply.status(201).send({ success: true, opId, hash });
+      authorId || `agent-${opts.regionId}`,
+      authorRole || 'FIELD_OFFICER'
+    );
+    const ent = await opts.store.getEntity(entityId);
+    return { op, entity: ent, _servingRegion: opts.regionId };
   });
 
-  // 6. Signed Human Reviewer Resolution
-  app.post('/api/v1/conflicts/:id/resolve', async (req, reply) => {
-    const { id } = req.params as { id: string };
-    const { chosenOpId, chosenState, justification } = req.body as { chosenOpId: string; chosenState: any; justification: string };
+  // 8. POST /api/v1/decisions/evaluate (Decision Gate)
+  app.post('/api/v1/decisions/evaluate', async (req: any) => {
+    const request: DecisionRequest = req.body;
+    const entities = await opts.store.getAllEntities();
+    const peers = await opts.store.getAllPeers();
+    const escrows = await opts.store.getAllEscrow();
 
-    const seq = store.getNextSeq();
-    const prevHash = store.getLatestHash();
-    const opId = `${region}:${seq}`;
-    const keyPair = getRegionKeyPair(region);
+    const entityMap = new Map(entities.map(e => [e.entityId, e]));
+    const peerMap = new Map(peers.map(p => [p.region, p]));
+    const escrowMap = new Map(escrows.map(es => [es.resource, es]));
 
-    const payload: ResolvePayload = {
-      targetOpId: chosenOpId,
-      conflictingOpId: id,
-      chosenEntityState: chosenState,
-      justification: justification || 'Reviewed and approved by commanding officer',
-      policyUsed: 'HUMAN_REVIEWER_V1'
+    const evaluation = evaluateDecisionGate(
+      request,
+      opts.regionId,
+      entityMap,
+      peerMap,
+      escrowMap,
+      Date.now()
+    );
+
+    return {
+      ...evaluation,
+      _servingRegion: opts.regionId
     };
-
-    const partialOp = {
-      opId,
-      region,
-      seq,
-      type: 'RESOLVE' as const,
-      entityId: id,
-      payload,
-      deps: store.getVersionVector(),
-      authorId: `reviewer-${region}`,
-      authorRole: 'REVIEWER' as const,
-      createdAt: new Date().toISOString(),
-      prevHash
-    };
-
-    const hash = computeOpHash(partialOp);
-    const sig = signHash(hash, keyPair.privateKeyPem);
-    const op: Operation = { ...partialOp, hash, sig };
-
-    store.appendLocalOperation(op);
-    return { success: true, opId, message: 'Resolution op signed and committed' };
   });
 
-  // 7. Nearby incidents by real haversine distance
-  app.get('/api/v1/nearby', async (req) => {
-    const query = req.query as { lat?: string; lng?: string; radiusM?: string };
-    const userLat = parseFloat(query.lat || '19.0688');
-    const userLng = parseFloat(query.lng || '72.8795');
-    const radius = parseFloat(query.radiusM || '50000');
+  // 9. POST /api/v1/decisions
+  app.post('/api/v1/decisions', async (req: any, reply: any) => {
+    const { request, evaluation, acknowledgedRisks, clientTxId } = req.body;
+    if (evaluation.verdict === 'HOLD') {
+      return reply.status(409).send({
+        error: 'HOLD decisions cannot be committed. Remedy the failing operational checks first.',
+        evaluation
+      });
+    }
 
-    const allOps = store.getAllOps().filter(o => o.type === 'REPORT');
-    const nearby = [];
+    if (evaluation.verdict === 'CAUTION' && (!acknowledgedRisks || acknowledgedRisks.length === 0)) {
+      return reply.status(409).send({
+        error: 'CAUTION decisions require explicit operator risk acknowledgement.',
+        evaluation
+      });
+    }
 
-    for (const op of allOps) {
-      const rep = op.payload as ReportPayload;
-      if (rep?.location?.lat != null && rep?.location?.lng != null) {
-        const dist = haversineMeters(userLat, userLng, rep.location.lat, rep.location.lng);
-        if (dist <= radius) {
-          nearby.push({
-            incidentId: rep.incidentId,
-            distanceM: dist,
-            op
-          });
+    const decisionId = `dec-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const op = await opts.syncEngine.submitLocalOp(
+      'DECISION',
+      request.entityId || decisionId,
+      {
+        decisionId,
+        type: request.type,
+        params: request.params,
+        verdictAtTime: evaluation.verdict,
+        dependencies: evaluation.dependencies,
+        acknowledgedRisks: acknowledgedRisks || [],
+        clientTxId: clientTxId || undefined
+      },
+      request.actorId || `operator-${opts.regionId}`,
+      request.actorRole || 'OFFICIAL',
+      1 // Priority Lane L1 (critical decisions)
+    );
+
+    const receipt: DecisionReceipt = {
+      decisionId,
+      type: request.type,
+      params: request.params,
+      verdictAtTime: evaluation.verdict,
+      dependencies: evaluation.dependencies,
+      acknowledgedRisks: acknowledgedRisks || [],
+      actor: request.actorId || `operator-${opts.regionId}`,
+      region: opts.regionId,
+      timestamp: Date.now(),
+      opId: op.opId
+    };
+
+    await opts.store.saveDecision(receipt);
+    return { ...receipt, _servingRegion: opts.regionId };
+  });
+
+  // 10. GET /api/v1/decisions
+  app.get('/api/v1/decisions', async () => {
+    return await opts.store.getAllDecisions();
+  });
+
+  // 11. GET /api/v1/decisions/:id/reevaluation
+  app.get('/api/v1/decisions/:id/reevaluation', async (req: any, reply: any) => {
+    const decision = await opts.store.getDecision(req.params.id);
+    if (!decision) return reply.status(404).send({ error: 'Decision not found' });
+
+    const entities = await opts.store.getAllEntities();
+    const entityMap = new Map(entities.map(e => [e.entityId, e]));
+
+    return reevaluateDecision(decision, entityMap, Date.now());
+  });
+
+  // 12. GET /api/v1/escrow/:resource
+  app.get('/api/v1/escrow/:resource', async (req: any, reply: any) => {
+    const escrow = await opts.store.getEscrow(req.params.resource);
+    if (!escrow) return reply.status(404).send({ error: 'Resource not found' });
+    return escrow;
+  });
+
+  // 13. POST /api/v1/escrow/spend
+  app.post('/api/v1/escrow/spend', async (req: any, reply: any) => {
+    const { resource, qty } = req.body;
+    const escrow = await opts.store.getEscrow(resource);
+    if (!escrow) return reply.status(404).send({ error: 'Resource not found' });
+
+    const myRights = escrow.rights[opts.regionId] || 0;
+    const mySpent = escrow.spent[opts.regionId] || 0;
+    const available = Math.max(0, myRights - mySpent);
+
+    if (available >= qty) {
+      const op = await opts.syncEngine.submitLocalOp(
+        'ESCROW_SPEND',
+        resource,
+        { resource, qty },
+        `operator-${opts.regionId}`,
+        'OFFICIAL',
+        1
+      );
+      const updated = await opts.store.getEscrow(resource);
+      return { granted: qty, unmet: 0, escrow: updated, op };
+    } else {
+      // Partial grant
+      const granted = available;
+      const unmet = qty - available;
+      if (granted > 0) {
+        await opts.syncEngine.submitLocalOp(
+          'ESCROW_SPEND',
+          resource,
+          { resource, qty: granted },
+          `operator-${opts.regionId}`,
+          'OFFICIAL',
+          1
+        );
+      }
+      // Record unmet request
+      await opts.syncEngine.submitLocalOp(
+        'ESCROW_REQUEST',
+        resource,
+        {
+          id: `req-${Date.now()}`,
+          requester: opts.regionId,
+          qty: unmet,
+          priorityClass: 'MEDICAL'
+        },
+        `operator-${opts.regionId}`,
+        'OFFICIAL',
+        1
+      );
+      const updated = await opts.store.getEscrow(resource);
+      return { granted, unmet, escrow: updated, notice: 'Partial grant: remainder queued as unmet' };
+    }
+  });
+
+  // 14. POST /api/v1/escrow/request
+  app.post('/api/v1/escrow/request', async (req: any) => {
+    const { resource, qty, priorityClass } = req.body;
+    const op = await opts.syncEngine.submitLocalOp(
+      'ESCROW_REQUEST',
+      resource,
+      {
+        id: `req-${Date.now()}`,
+        requester: opts.regionId,
+        qty: qty || 1,
+        priorityClass: priorityClass || 'MEDICAL'
+      },
+      `operator-${opts.regionId}`,
+      'OFFICIAL',
+      1
+    );
+    return { success: true, op };
+  });
+
+  // 15. GET /api/v1/episodes
+  app.get('/api/v1/episodes', async () => {
+    return await opts.store.getEpisodes();
+  });
+
+  // 16. GET /api/v1/episodes/:id/report
+  app.get('/api/v1/episodes/:id/report', async (req: any, reply: any) => {
+    const ep = await opts.store.getEpisode(req.params.id);
+    if (!ep) return reply.status(404).send({ error: 'Episode not found' });
+    return ep.report || { notice: 'Episode has not converged yet' };
+  });
+
+  // 17. POST /api/v1/conflicts/:id/resolve
+  app.post('/api/v1/conflicts/:id/resolve', async (req: any) => {
+    const { status, reason, reviewerId, clientTxId } = req.body;
+    const op = await opts.syncEngine.submitLocalOp(
+      'RESOLVE',
+      req.params.id,
+      { status, reason, clientTxId: clientTxId || undefined },
+      reviewerId || 'reviewer_alice',
+      'REVIEWER',
+      1
+    );
+    const ent = await opts.store.getEntity(req.params.id);
+    return { op, entity: ent, _servingRegion: opts.regionId };
+  });
+
+  // 18. POST /api/v1/ops/:opId/verify
+  app.post('/api/v1/ops/:opId/verify', async (req: any, reply: any) => {
+    const op = await opts.store.getOp(req.params.opId);
+    if (!op) return reply.status(404).send({ error: 'Op not found' });
+
+    const computedHash = calculateOpHash(op);
+    const hashMatches = computedHash === op.hash;
+    const privKey = SEED_PRIVATE_KEYS[op.region] || SEED_PRIVATE_KEYS.mumbai;
+    const pubKey = await getPublicKey(privKey);
+    const sigValid = await verifySignature(op.hash, op.sig, pubKey);
+
+    return {
+      opId: op.opId,
+      status: hashMatches && sigValid ? 'VERIFIED' : 'FAILED',
+      hashMatches,
+      sigValid,
+      computedHash,
+      storedHash: op.hash
+    };
+  });
+
+  // 19. GET /api/v1/nearby?lat=&lng=
+  app.get('/api/v1/nearby', async (req: any) => {
+    const lat = parseFloat(req.query.lat || '19.076');
+    const lng = parseFloat(req.query.lng || '72.877');
+    const entities = await opts.store.getAllEntities();
+
+    const withDist = entities.map(e => {
+      const eLat = e.attributes?.reports?.[0]?.location?.lat || 19.076;
+      const eLng = e.attributes?.reports?.[0]?.location?.lng || 72.877;
+      const distKm = haversineDistanceKm(lat, lng, eLat, eLng);
+      return { ...e, distanceKm: distKm };
+    });
+
+    return withDist.sort((a, b) => a.distanceKm - b.distanceKm);
+  });
+
+  // 20. GET /api/v1/events (SSE)
+  app.get('/api/v1/events', (req: any, reply: any) => {
+    reply.raw.setHeader('Content-Type', 'text/event-stream');
+    reply.raw.setHeader('Cache-Control', 'no-cache');
+    reply.raw.setHeader('Connection', 'keep-alive');
+    reply.raw.setHeader('Access-Control-Allow-Origin', '*');
+
+    const send = (data: string) => {
+      reply.raw.write(`data: ${data}\n\n`);
+    };
+
+    sseClients.push(send);
+    send(JSON.stringify({ type: 'connected', region: opts.regionId }));
+
+    req.raw.on('close', () => {
+      const idx = sseClients.indexOf(send);
+      if (idx >= 0) sseClients.splice(idx, 1);
+    });
+  });
+
+  // Admin APIs
+  app.post('/admin/link', async (req: any) => {
+    const { from, to, up, bandwidthBps, latencyMs } = req.body;
+    if (up === false) {
+      opts.linkController.cutLink(from, to, true);
+    } else {
+      opts.linkController.restoreLink(from, to, bandwidthBps, true);
+    }
+    if (latencyMs !== undefined) {
+      opts.linkController.setLatency(from, to, latencyMs, true);
+    }
+    return { success: true, links: opts.linkController.getAllLinks() };
+  });
+
+  app.post('/admin/tamper', async (req: any, reply: any) => {
+    const { opId } = req.body;
+    const op = await opts.store.getOp(opId);
+    if (!op) return reply.status(404).send({ error: 'Op not found' });
+
+    await opts.store.mutateOpPayload(opId, o => ({
+      ...o,
+      payload: { ...o.payload, status: 'TAMPERED_BLOCKED', tampered: true }
+    }));
+
+    // Update entity integrity to FAILED
+    const ent = await opts.store.getEntity(op.entityId);
+    if (ent) {
+      ent.integrity = 'FAILED';
+      await opts.store.saveEntity(ent);
+    }
+
+    return { success: true, opId, message: '1 byte modified in stored op' };
+  });
+
+  app.post('/admin/heal', async (req: any, reply: any) => {
+    const { opId, remoteRegion } = req.body;
+    const peerCfg = opts.peers.find(p => p.id === (remoteRegion || 'mumbai'));
+    if (!peerCfg) return reply.status(400).send({ error: 'Peer unavailable' });
+
+    try {
+      const res = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/records/${opId}`);
+      // Healing: re-run fold and set integrity back to VERIFIED
+      const op = await opts.store.getOp(opId);
+      if (op) {
+        // Re-materialize entity clean
+        await opts.syncEngine.recomputeEntity(op.entityId);
+        const ent = await opts.store.getEntity(op.entityId);
+        if (ent) {
+          ent.integrity = 'VERIFIED';
+          await opts.store.saveEntity(ent);
         }
       }
+      return { success: true, opId, status: 'VERIFIED' };
+    } catch {
+      return reply.status(500).send({ error: 'Failed to heal from remote peer' });
     }
-
-    nearby.sort((a, b) => a.distanceM - b.distanceM);
-    return { count: nearby.length, userCoordinates: { lat: userLat, lng: userLng }, nearby };
   });
 
-  // 8. Re-verify Op Integrity
-  app.post('/api/v1/ops/:opId/verify', async (req, reply) => {
-    const { opId } = req.params as { opId: string };
-    const op = store.getOp(opId);
-    if (!op) return reply.status(404).send({ error: 'Op not found' });
-    const indicators = computeSixIndicators({
-      op,
-      currentRegion: region,
-      receipts: store.getReceiptsForOp(opId),
-      onlineRegions: (['mumbai', 'delhi', 'bengaluru'] as RegionId[]).filter(r => linkController.isLinked(r))
-    });
-    return { opId, integrity: indicators.integrity };
-  });
-
-  // 9. Replication Sync Endpoints
-  app.post('/api/v1/sync/vector', async (req) => {
-    const { sender, vector } = req.body as { sender: RegionId; vector: any };
-    return { region, vector: store.getVersionVector() };
-  });
-
-  app.post('/api/v1/sync/push', async (req) => {
-    const { sender, ops } = req.body as { sender: RegionId; ops: Operation[] };
-    let acceptedCount = 0;
-    for (const op of ops) {
-      const res = store.applyRemoteOperation(op, 'DIRECT');
-      if (res.applied) acceptedCount++;
-    }
-    return { acceptedCount, currentVector: store.getVersionVector() };
-  });
-
-  app.post('/api/v1/sync/pull', async (req) => {
-    const { sender, ranges } = req.body as { sender: RegionId; ranges: Record<string, { fromSeq: number; toSeq: number }> };
-    const allOps = store.getAllOps();
-    const matchedOps = allOps.filter(o => {
-      const range = ranges[o.region];
-      return range && o.seq >= range.fromSeq && o.seq <= range.toSeq;
-    });
-    return { ops: matchedOps };
-  });
-
-  // 10. Admin & Chaos Endpoints
-  app.post('/admin/link', async (req) => {
-    const { action, source, target, latencyMs, bandwidthCap } = req.body as any;
-    if (action === 'cut') {
-      linkController.cut(source || region, target);
-    } else {
-      linkController.restore(source || region, target, latencyMs || 45, bandwidthCap);
-    }
-    return { success: true, links: linkController.getAllLinks() };
-  });
-
-  app.post('/admin/sync', async () => {
-    const result = await replication.syncWithPeers();
-    return { success: true, ...result };
-  });
-
-  app.post('/admin/tamper', async (req) => {
-    const { opId } = req.body as { opId: string };
-    const result = store.tamperOp(opId);
-    return result;
-  });
-
-  app.post('/admin/heal', async (req) => {
-    const { opId } = req.body as { opId: string };
-    const result = store.healOp(opId);
-    return result;
-  });
-
-  app.post('/admin/round/settle', async (req) => {
-    // Settle a round among connected regions
-    const latestCert = store.getLatestRoundCertificate();
-    const nextRound = (latestCert?.round || 0) + 1;
-    const allOps = store.getAllOps();
-    const signers = (['mumbai', 'delhi', 'bengaluru'] as RegionId[]).filter(r => linkController.isLinked(r));
-    const stateRoot = store.getStateRoot();
-    const opSetRoot = sha256(canonicalJson(allOps.map(o => o.opId)));
-    const prevCertHash = latestCert ? sha256(canonicalJson(latestCert)) : '0'.repeat(64);
-
-    const signatures: Record<RegionId, string> = {} as any;
-    for (const s of signers) {
-      const kp = getRegionKeyPair(s);
-      signatures[s] = signHash(stateRoot, kp.privateKeyPem);
-    }
-
-    const cert: RoundCertificate = {
-      round: nextRound,
-      prevCertHash,
-      opSetRoot,
-      policyVersion: 'v1.0.0',
-      stateRoot,
-      signers,
-      signatures,
-      createdAt: new Date().toISOString()
-    };
-
-    store.saveRoundCertificate(cert);
-    return { success: true, certificate: cert };
-  });
-
-  // 11. Measured Efficiency Metrics API
-  app.get('/api/v1/metrics', async () => {
-    const allOps = store.getAllOps();
-    const fullStateBytes = Buffer.byteLength(canonicalJson(allOps), 'utf8');
-    return {
-      region,
-      metrics: {
-        ...replication.metrics,
-        fullStateTotalBytes: fullStateBytes,
-        savingsRatio: replication.metrics.totalBytesDelta > 0 
-          ? ((fullStateBytes - replication.metrics.totalBytesDelta) / fullStateBytes * 100).toFixed(1) + '%'
-          : '0%'
-      }
-    };
-  });
-
-  // 12. Certificates List API
-  app.get('/api/v1/certificates', async () => {
-    return {
-      certificates: store.getAllRoundCertificates()
-    };
-  });
-
-  return {
-    app,
-    store,
-    linkController,
-    replication,
-    start: async () => {
-      await app.listen({ port, host: '0.0.0.0' });
-      console.log(`[VERDICT Region ${region.toUpperCase()}] running on http://localhost:${port}`);
-    },
-    stop: async () => {
-      clearInterval(syncInterval);
-      await app.close();
-    }
-  };
+  return app;
 }

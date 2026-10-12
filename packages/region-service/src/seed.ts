@@ -1,205 +1,153 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { SqliteStore } from './store.js';
-import type { RegionId, Operation, ReportPayload, FactPayload, ResourceClaimPayload, PersonStatusPayload } from '@verdict/core';
-import { computeOpHash, signHash, getRegionKeyPair, canonicalJson } from '@verdict/core';
+import * as path from 'node:path';
+import { createEscrowResource } from '@verdict/core';
+import { FileStore } from './store/file-store.js';
+import { SyncEngine } from './sync/sync-engine.js';
+import { LinkController } from './network/link-controller.js';
 
-async function seedData() {
-  console.log('--- SEEDING SYNTHETIC DISASTER DATA VIA SIGNED OP PIPELINE ---');
+export async function seedRegion(regionId: string, port: number, dataDir: string) {
+  console.log(`[SEED] Initializing clean PS #2 disaster dataset for [${regionId.toUpperCase()}]...`);
+  const store = new FileStore(regionId, dataDir);
+  await store.init();
 
-  const gazetteerPath = path.resolve(process.cwd(), 'assets', 'seed_gazetteer.json');
-  const gazetteer = JSON.parse(fs.readFileSync(gazetteerPath, 'utf8'));
-
-  const mumbaiStore = new SqliteStore('mumbai');
-  const delhiStore = new SqliteStore('delhi');
-  const blrStore = new SqliteStore('bengaluru');
-
-  const mumbaiKp = getRegionKeyPair('mumbai');
-  const delhiKp = getRegionKeyPair('delhi');
-  const blrKp = getRegionKeyPair('bengaluru');
-
-  // 1. Initial Flood Reports in Mumbai
-  const reports: Array<{ store: SqliteStore; kp: any; payload: ReportPayload }> = [
-    {
-      store: mumbaiStore,
-      kp: mumbaiKp,
-      payload: {
-        incidentId: 'inc-mumbai-kurla-flood',
-        incidentType: 'flood',
-        description: {
-          original: {
-            lang: 'mr',
-            text: 'कुर्ला पश्चिम रेल्वे स्थानक भागात ३ फूट पाणी साचले आहे. वाहतूक पूर्णपणे थांबली आहे.'
-          }
-        },
-        location: {
-          lat: 19.0688,
-          lng: 72.8795,
-          source: 'GPS_DEVICE',
-          accuracyM: 4,
-          placeText: 'Kurla West Station Junction'
-        },
-        observedAt: new Date(Date.now() - 12 * 60000).toISOString(),
-        severity: { value: 'CRITICAL', source: 'CONFIRMED' },
-        source: {
-          kind: 'person',
-          id: 'officer-pawar',
-          displayName: 'Inspector Ramesh Pawar',
-          tier: 'FIELD_OFFICER'
-        },
-        channel: 'FORM'
-      }
-    },
-    {
-      store: mumbaiStore,
-      kp: mumbaiKp,
-      payload: {
-        incidentId: 'inc-mumbai-dharavi-stranded',
-        incidentType: 'stranded_people',
-        description: {
-          original: {
-            lang: 'hi',
-            text: 'धारावी ट्रांजिट कैंप के पास 15 परिवार पानी में घिरे हैं। तत्काल नाव की आवश्यकता है।'
-          }
-        },
-        location: {
-          lat: 19.0434,
-          lng: 72.8567,
-          source: 'GPS_DEVICE',
-          accuracyM: 6,
-          placeText: 'Dharavi Transit Camp'
-        },
-        observedAt: new Date(Date.now() - 25 * 60000).toISOString(),
-        severity: { value: 'CRITICAL', source: 'CONFIRMED' },
-        source: {
-          kind: 'team',
-          id: 'mumbai-rescue-team-4',
-          displayName: 'Mumbai Fire & Rescue Team 4',
-          tier: 'FIELD_OFFICER'
-        },
-        channel: 'FORM'
-      }
-    },
-    {
-      store: mumbaiStore,
-      kp: mumbaiKp,
-      payload: {
-        incidentId: 'inc-mumbai-powai-overflow',
-        incidentType: 'flood',
-        description: {
-          original: {
-            lang: 'en',
-            text: 'Powai Lake spillway overflowing onto JVLR arterial road. Water level rising 5cm/hr.'
-          }
-        },
-        location: {
-          lat: 19.1246,
-          lng: 72.9051,
-          source: 'MANUAL_PIN',
-          accuracyM: 10,
-          placeText: 'Powai Lake Promenade'
-        },
-        observedAt: new Date(Date.now() - 40 * 60000).toISOString(),
-        severity: { value: 'HIGH', source: 'CONFIRMED' },
-        source: {
-          kind: 'sensor',
-          id: 'sensor-powai-hydro-01',
-          displayName: 'Powai Automated Hydro Gauge',
-          tier: 'OFFICIAL_SENSOR'
-        },
-        channel: 'SENSOR'
-      }
-    }
+  const peers = [
+    { id: 'mumbai', name: 'Mumbai', port: 4001, authority: true },
+    { id: 'delhi', name: 'Delhi', port: 4002, authority: false },
+    { id: 'bengaluru', name: 'Bengaluru', port: 4003, authority: false }
   ];
 
-  for (const item of reports) {
-    const seq = item.store.getNextSeq();
-    const prevHash = item.store.getLatestHash();
-    const opId = `${item.store.region}:${seq}`;
+  const sync = new SyncEngine(regionId, store, peers, new LinkController());
+  await sync.init();
 
-    const partialOp = {
-      opId,
-      region: item.store.region,
-      seq,
-      type: 'REPORT' as const,
-      entityId: item.payload.incidentId,
-      payload: item.payload,
-      deps: item.store.getVersionVector(),
-      authorId: item.payload.source.id,
-      authorRole: 'FIELD_OFFICER' as const,
-      createdAt: new Date().toISOString(),
-      prevHash
-    };
+  // 1. Escrow Resources (Bounded counters for scarce resources)
+  const medicalKits = createEscrowResource('medical_kits', 5, { mumbai: 3, delhi: 2, bengaluru: 0 });
+  await store.saveEscrow(medicalKits);
 
-    const hash = computeOpHash(partialOp);
-    const sig = signHash(hash, item.kp.privateKeyPem);
-    const op: Operation = { ...partialOp, hash, sig };
-    item.store.appendLocalOperation(op);
+  const rations = createEscrowResource('emergency_rations', 10, { mumbai: 5, delhi: 3, bengaluru: 2 });
+  await store.saveEscrow(rations);
+
+  // 2. Disrupted Transport Arteries / Access Routes
+  const routes = [
+    { id: 'access-corridor-north', name: 'Access Corridor North (Primary Supply Route)', lat: 19.0688, lng: 72.8800, status: 'OPEN' },
+    { id: 'transit-artery-east', name: 'Transit Artery East', lat: 19.0558, lng: 72.8682, status: 'BLOCKED' },
+    { id: 'evacuation-route-1', name: 'Evacuation Route Alpha', lat: 19.0620, lng: 72.8620, status: 'OPEN' },
+    { id: 'coastal-access-corridor', name: 'Coastal Access Corridor', lat: 19.0710, lng: 72.8900, status: 'OPEN' },
+    { id: 'inter-hub-highway-4', name: 'Inter-Hub Connector 4', lat: 19.0390, lng: 72.8619, status: 'OPEN' },
+    { id: 'logistics-link-west', name: 'Logistics Link West', lat: 19.0580, lng: 72.8940, status: 'OPEN' }
+  ];
+
+  for (const r of routes) {
+    await sync.submitLocalOp(
+      'REPORT',
+      r.id,
+      {
+        incidentId: r.id,
+        incidentType: 'route_condition',
+        name: r.name,
+        location: { lat: r.lat, lng: r.lng, source: 'GPS_DEVICE' },
+        status: r.status,
+        observedAt: Date.now() - 1000 * 60 * 5,
+        authority: 'mumbai',
+        source: { tier: 'FIELD_OFFICER' }
+      },
+      'officer-1',
+      'FIELD_OFFICER'
+    );
   }
 
-  // 2. Initial Road Facts
-  const roads = gazetteer.roads || [];
-  for (const road of roads) {
-    const seq = mumbaiStore.getNextSeq();
-    const prevHash = mumbaiStore.getLatestHash();
-    const opId = `mumbai:${seq}`;
+  // 3. Triage & Distribution Hubs
+  const hubs = [
+    { id: 'triage-hub-alpha', name: 'Regional Triage Hub Alpha', lat: 19.0657, lng: 72.8687, capacity: 500 },
+    { id: 'distribution-center-1', name: 'Emergency Distribution Center 1', lat: 19.0645, lng: 72.8885, capacity: 350 },
+    { id: 'medical-staging-base', name: 'Medical Staging Base South', lat: 19.0410, lng: 72.8640, capacity: 250 }
+  ];
 
-    const factPayload: FactPayload = {
-      factType: 'ROAD_STATUS',
-      roadId: road.id,
-      status: road.defaultStatus,
-      reportedReason: 'Monsoon high water surge assessment'
-    };
-
-    const partialOp = {
-      opId,
-      region: 'mumbai' as RegionId,
-      seq,
-      type: 'FACT' as const,
-      entityId: road.id,
-      payload: factPayload,
-      deps: mumbaiStore.getVersionVector(),
-      authorId: 'traffic-police-mumbai',
-      authorRole: 'OFFICIAL' as const,
-      createdAt: new Date().toISOString(),
-      prevHash
-    };
-
-    const hash = computeOpHash(partialOp);
-    const sig = signHash(hash, mumbaiKp.privateKeyPem);
-    mumbaiStore.appendLocalOperation({ ...partialOp, hash, sig });
+  for (const h of hubs) {
+    await sync.submitLocalOp(
+      'REPORT',
+      h.id,
+      {
+        incidentId: h.id,
+        incidentType: 'shelter',
+        name: h.name,
+        location: { lat: h.lat, lng: h.lng, source: 'MANUAL_PIN' },
+        status: 'ACTIVE',
+        capacity: h.capacity,
+        observedAt: Date.now() - 1000 * 60 * 10,
+        authority: 'mumbai',
+        source: { tier: 'OFFICIAL_SENSOR' }
+      },
+      'admin-ops',
+      'OFFICIAL'
+    );
   }
 
-  // 3. Person Status (Monotone)
-  const personOp1 = {
-    opId: `mumbai:${mumbaiStore.getNextSeq()}`,
-    region: 'mumbai' as RegionId,
-    seq: mumbaiStore.getNextSeq(),
-    type: 'PERSON_STATUS' as const,
-    entityId: 'person-sunil-kamble',
-    payload: {
-      personId: 'person-sunil-kamble',
-      fullName: 'Sunil Kamble',
-      status: 'MISSING',
-      lastSeenLocation: 'Kurla Station'
-    } as PersonStatusPayload,
-    deps: mumbaiStore.getVersionVector(),
-    authorId: 'kamble-family',
-    authorRole: 'VOLUNTEER' as const,
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    prevHash: mumbaiStore.getLatestHash()
-  };
-  const hP1 = computeOpHash(personOp1);
-  mumbaiStore.appendLocalOperation({ ...personOp1, hash: hP1, sig: signHash(hP1, mumbaiKp.privateKeyPem) });
+  // 4. Incident #101: Core PS #2 Concurrent Adjudication Incident
+  await sync.submitLocalOp(
+    'REPORT',
+    'incident-101',
+    {
+      incidentId: 'incident-101',
+      incidentType: 'infrastructure_failure',
+      name: 'Incident #101: Disrupted Transit Artery at Access Corridor North',
+      description: { original: { lang: 'en', text: 'Bridge structural displacement detected. Structural assessment underway.' } },
+      location: { lat: 19.0650, lng: 72.8790, source: 'GPS_DEVICE' },
+      status: 'Investigating',
+      observedAt: Date.now() - 1000 * 60 * 15,
+      authority: 'mumbai',
+      source: { tier: 'FIELD_OFFICER' }
+    },
+    'field-unit-mumbai',
+    'FIELD_OFFICER'
+  );
 
-  console.log('Seeded synthetic data:');
-  console.log(` - Mumbai store ops: ${mumbaiStore.getAllOps().length}`);
-  console.log(` - Delhi store ops: ${delhiStore.getAllOps().length}`);
-  console.log(` - Bengaluru store ops: ${blrStore.getAllOps().length}`);
-  console.log('Seed completed successfully.');
+  // 5. Deployed Response Teams
+  await sync.submitLocalOp(
+    'REPORT',
+    'team-alpha',
+    {
+      incidentId: 'team-alpha',
+      incidentType: 'rescue_team',
+      name: 'Regional Response Team Alpha',
+      homeRegion: 'mumbai',
+      location: { lat: 19.0600, lng: 72.8700, source: 'GPS_DEVICE' },
+      status: 'ACTIVE',
+      observedAt: Date.now(),
+      authority: 'mumbai',
+      source: { tier: 'FIELD_OFFICER' }
+    },
+    'dispatch-hq',
+    'OFFICIAL'
+  );
+
+  // 6. Monotone Person Statuses
+  for (let i = 1; i <= 10; i++) {
+    const pId = `person-${i}`;
+    const pStatus = i <= 8 ? 'Safe' : 'Missing';
+    await sync.submitLocalOp(
+      'PERSON_STATUS',
+      pId,
+      {
+        personId: pId,
+        name: `Civilian Personnel Record #${500 + i}`,
+        status: pStatus,
+        observedAt: Date.now() - 1000 * 60 * (i * 2)
+      },
+      'census-unit',
+      'VOLUNTEER'
+    );
+  }
+
+  await store.close();
+  console.log(`[SEED] Finished seeding clean dataset for [${regionId.toUpperCase()}].`);
 }
 
-seedData().catch(err => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+async function main() {
+  const dataDir = path.resolve(process.cwd(), 'data');
+  await seedRegion('mumbai', 4001, dataDir);
+  await seedRegion('delhi', 4002, dataDir);
+  await seedRegion('bengaluru', 4003, dataDir);
+}
+
+if (process.argv[1] && (process.argv[1].endsWith('seed.js') || process.argv[1].endsWith('seed.ts'))) {
+  main().catch(console.error);
+}

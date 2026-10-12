@@ -1,0 +1,54 @@
+{
+  "regions": [
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "code": "MUM",
+      "authority": true,
+      "port": 4001,
+      "p2pPort": 5001,
+      "coordinates": { "lat": 19.0760, "lng": 72.8777 },
+      "radiusKm": 45,
+      "defaultColor": "#4FD1B5"
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "code": "DEL",
+      "authority": false,
+      "port": 4002,
+      "p2pPort": 5002,
+      "coordinates": { "lat": 28.6139, "lng": 77.2090 },
+      "radiusKm": 50,
+      "defaultColor": "#A78BFA"
+    },
+    {
+      "id": "bengaluru",
+      "name": "Bengaluru",
+      "code": "BLR",
+      "authority": false,
+      "port": 4003,
+      "p2pPort": 5003,
+      "coordinates": { "lat": 12.9716, "lng": 77.5946 },
+      "radiusKm": 40,
+      "defaultColor": "#38BDF8"
+    }
+  ],
+  "heartbeatMs": 2000,
+  "fogThresholdMs": 5000,
+  "fogMaxRampMs": 30000,
+  "defaultResourceSplit": {
+    "medical_kits": {
+      "total": 5,
+      "distribution": { "mumbai": 3, "delhi": 2, "bengaluru": 0 }
+    },
+    "rescue_boats": {
+      "total": 4,
+      "distribution": { "mumbai": 2, "delhi": 1, "bengaluru": 1 }
+    },
+    "drinking_water_tanks": {
+      "total": 10,
+      "distribution": { "mumbai": 5, "delhi": 3, "bengaluru": 2 }
+    }
+  }
+}

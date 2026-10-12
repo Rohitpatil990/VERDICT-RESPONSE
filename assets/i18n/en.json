@@ -1,76 +1,76 @@
 {
   "app": {
     "title": "VERDICT Response",
-    "subtitle": "Offline-First Disaster Intelligence · Geo-Distributed Replication",
-    "simulatedNotice": "Simulated demo data, not live disaster information",
-    "signatureNotice": "A verified signature shows the record was signed by the associated key and not altered since. It does not show that the report itself is true.",
-    "certificateNotice": "A certificate shows that the signing regions endorse a specific settled state for a specific round. Correctness comes from the versioned policy and invariant checks."
+    "tagline": "Observe anywhere. Commit safely. Decide with eyes open.",
+    "simulated_warning": "Simulated demo data, not live disaster information."
   },
   "nav": {
-    "map": "Map Operations",
-    "incidents": "Incidents",
-    "conflicts": "Conflicts & Review",
+    "map": "Operations Map",
+    "decisions": "Decision Gate",
+    "receipts": "Blast Radius",
+    "supplies": "Escrow Supplies",
     "regions": "Regions & Sync",
-    "supplies": "Relief Supplies",
-    "chaos": "Chaos Lab",
-    "field": "Field Reporter",
-    "about": "System Traceability"
+    "mergeReports": "Merge Reports",
+    "review": "Review Inbox",
+    "ledger": "Ledger & Verify",
+    "lab": "Chaos Lab",
+    "about": "About & Honesty"
   },
-  "indicators": {
+  "gate": {
+    "title": "Decision Gate",
+    "subtitle": "Turn consistency state into an operational verdict",
+    "disclaimer": "GO means the information this decision relies on satisfies the configured consistency rules. It does not mean the action is safe in the real world.",
+    "verdict": "Verdict",
+    "evaluatedAt": "Evaluated at",
+    "viewingFrom": "Viewing from",
+    "checks": "Evaluated Checks",
+    "dependencies": "Dependencies Seen",
+    "whatWouldChange": "What Would Change This Verdict",
+    "acknowledge": "I acknowledge these operational consistency risks",
+    "commit": "Commit Decision Receipt",
+    "holdNotice": "HOLD decisions cannot be committed. Remedy the failing constraints first."
+  },
+  "verdicts": {
+    "GO": "GO",
+    "CAUTION": "CAUTION",
+    "HOLD": "HOLD"
+  },
+  "fog": {
+    "legend": "Fog of Information: territory of unreachable region",
+    "disclaimer": "Fog means no recent information from this region. It does not mean nothing is happening there.",
+    "lastContact": "Last heard",
+    "lastSeq": "Last known seq",
+    "revealed": "{{count}} operations revealed on reconnection"
+  },
+  "escrow": {
+    "title": "Escrow Scarce Resources",
+    "subtitle": "Bounded counters prevent over-allocation during partitions by construction",
+    "resource": "Resource",
+    "total": "Global Total",
+    "myRights": "Local Rights",
+    "spent": "Spent",
+    "available": "Available Local Spend",
+    "unmet": "Unmet Requests Queue",
+    "allocate": "Allocate Supply",
+    "transfer": "Request Transfer"
+  },
+  "merge": {
+    "title": "Merge Report",
+    "subtitle": "Partition is a branch, healing is a verifiable merge",
+    "episode": "Partition Episode",
+    "duration": "Duration",
+    "opsCreated": "Local Ops Created",
+    "opsSynced": "Ops Exchanged",
+    "conflicts": "Conflicts Surfaced",
+    "decisionsAffected": "Decisions Affected"
+  },
+  "sourceTrace": {
     "source": "Source",
     "freshness": "Freshness",
     "conflict": "Conflict",
     "replication": "Replication",
     "integrity": "Integrity",
     "resolution": "Resolution",
-    "tooltips": {
-      "source": "Who submitted the report, authority tier, and channel. Tiers are defined by registry, not self-claimed.",
-      "freshness": "Age based on reported observation time. Flagged if future or abnormal.",
-      "conflict": "Whether contradictory reports exist for this location/entity.",
-      "replication": "Which regional stores have received and verified this record.",
-      "integrity": "Cryptographic Ed25519 hash chain and payload schema verification.",
-      "resolution": "Policy status: Tentative (local pending) vs Settled (certified round)."
-    }
-  },
-  "status": {
-    "tentative": "Tentative",
-    "settled": "Settled under policy",
-    "review": "Awaiting human review",
-    "superseded": "Superseded",
-    "backordered": "Backordered",
-    "verified": "Verified",
-    "failed": "Integrity FAILED",
-    "unverified": "Unverified",
-    "savedLocally": "Saved locally",
-    "pendingSync": "Pending synchronization",
-    "synchronized": "Synchronized"
-  },
-  "incidentTypes": {
-    "flood": "Urban Flooding / Waterlogging",
-    "blocked_road": "Road Obstruction / Blockage",
-    "stranded_people": "Stranded Citizens",
-    "damaged_infrastructure": "Infrastructure Damage",
-    "medical_emergency": "Critical Medical Emergency",
-    "shelter_issue": "Relief Shelter Needs",
-    "other": "Other Incident"
-  },
-  "ack": {
-    "device": "Saved on device, not yet in region",
-    "region": "Saved in local regional database",
-    "pending": "Pending inter-region synchronization",
-    "synced": "Synchronized across {{count}} of 3 regions"
-  },
-  "actions": {
-    "reportHere": "Report at this location",
-    "disconnect": "Simulate Partition",
-    "reconnect": "Restore Link (Anti-Entropy)",
-    "tamper": "Flip 1 Byte (Tamper)",
-    "heal": "Heal Ledger",
-    "viewingFrom": "Viewing from region",
-    "compare": "Compare Regions",
-    "runDemo": "Run 3-Min Scripted Demo",
-    "verifyNow": "Verify Now",
-    "resolve": "Submit Signed Resolution",
-    "explain": "Explain This Verdict"
+    "sigNotice": "A verified signature shows the record was signed by the associated key and not altered since. It does not show that the report itself is true."
   }
 }

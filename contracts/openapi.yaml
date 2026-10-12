@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: VERDICT Response API
+  version: 1.0.0
+  description: Verifiable Settlement for Multi-Region Data — Operational Consistency Engine
+servers:
+  - url: http://localhost:{port}
+    description: Regional API instance (Mumbai: 4001, Delhi: 4002, Bengaluru: 4003)
+paths:
+  /api/v1/status:
+    get:
+      summary: Node operational status, version vector, outbox depth, and peers
+      responses:
+        '200':
+          description: Region status object
+  /api/v1/fog:
+    get:
+      summary: Fog-of-information view computed from unreachable peer boundaries
+      responses:
+        '200':
+          description: Fog polygons and age calculations
+  /api/v1/map:
+    get:
+      summary: Spatially indexed entities, road conditions, incidents and shelters
+      responses:
+        '200':
+          description: Map entities list
+  /api/v1/records/{id}:
+    get:
+      summary: Get unified view of an entity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Entity record
+  /api/v1/records/{id}/trace:
+    get:
+      summary: Six-indicator SourceTrace and lineage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SourceTrace details
+  /api/v1/ops:
+    post:
+      summary: Ingest single or batched signed operations
+      responses:
+        '200':
+          description: Operation ingested or staged
+  /api/v1/reports:
+    post:
+      summary: Submit a new observation or incident report
+      responses:
+        '201':
+          description: Created signed operation and entity
+  /api/v1/decisions/evaluate:
+    post:
+      summary: Pure Decision Gate evaluation
+      responses:
+        '200':
+          description: Verdict explanation tree
+  /api/v1/decisions:
+    post:
+      summary: Commit evaluated decision receipt
+      responses:
+        '201':
+          description: Decision receipt created
+        '409':
+          description: Rejected when verdict is HOLD or unacknowledged CAUTION
+    get:
+      summary: List committed decisions
+      responses:
+        '200':
+          description: Decisions list
+  /api/v1/decisions/{id}/reevaluation:
+    get:
+      summary: Re-evaluate past decision against current merged state
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: STILL_VALID, NEEDS_RECHECK, or INVALIDATED
+  /api/v1/escrow/{resource}:
+    get:
+      summary: Current escrow rights, spent amounts, and unmet queue
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escrow status
+  /api/v1/escrow/spend:
+    post:
+      summary: Allocate scarce resource locally against escrow balance
+      responses:
+        '200':
+          description: Spend result or partial unmet
+  /api/v1/escrow/request:
+    post:
+      summary: Request escrow share transfer from connected peers
+      responses:
+        '200':
+          description: Transfer request queued
+  /api/v1/episodes:
+    get:
+      summary: List partition episodes and merge histories
+      responses:
+        '200':
+          description: Episode list
+  /api/v1/episodes/{id}/report:
+    get:
+      summary: Countable diff-based merge report for a healed episode
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full merge report
+  /api/v1/conflicts/{id}/resolve:
+    post:
+      summary: Human reviewer signed conflict resolution
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resolution op committed
+  /api/v1/ops/{opId}/verify:
+    post:
+      summary: Cryptographically verify op hash chain and Ed25519 signature
+      parameters:
+        - name: opId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification report
+  /api/v1/nearby:
+    get:
+      summary: Entities sorted by true Haversine distance
+      responses:
+        '200':
+          description: Nearby entities
+  /admin/link:
+    post:
+      summary: Cut, restore, delay, or throttle link between regions
+      responses:
+        '200':
+          description: Link state altered
+  /admin/tamper:
+    post:
+      summary: Flip 1 byte in stored op payload for audit testing
+      responses:
+        '200':
+          description: Op tampered
+  /admin/heal:
+    post:
+      summary: Fetch authoritative copy from peer to heal tampered op
+      responses:
+        '200':
+          description: Op healed and verified
+  /lab/run:
+    post:
+      summary: Run predefined chaos scenario
+      responses:
+        '200':
+          description: Scenario execution report
+  /lab/simulate:
+    get:
+      summary: Run seeded in-process random partition/reordering simulator
+      responses:
+        '200':
+          description: Invariants verification report

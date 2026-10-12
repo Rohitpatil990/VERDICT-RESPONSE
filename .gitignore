@@ -1,13 +1,7 @@
-@"
 node_modules/
-.env
-.env.*
-!.env.example
 dist/
-build/
-coverage/
 *.log
-*.db
-*.sqlite
-*.sqlite3
-"@ | Set-Content .gitignore
+.DS_Store
+VERDICT_Response_Project.zip
+data/backups/
+data/recovery_simulation/

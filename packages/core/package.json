@@ -2,12 +2,20 @@
   "name": "@verdict/core",
   "version": "1.0.0",
   "type": "module",
+  "description": "Deterministic pure logic for VERDICT consensus and decision engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test test/*.test.js"
+    "test": "vitest run"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^1.4.0"
+  },
+  "devDependencies": {
+    "fast-check": "^3.21.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
 }

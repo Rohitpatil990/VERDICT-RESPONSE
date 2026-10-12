@@ -1,0 +1,3280 @@
+{
+  "ops": [
+    {
+      "opId": "delhi:1",
+      "region": "delhi",
+      "seq": 1,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "route_condition",
+        "name": "Access Corridor North (Primary Supply Route)",
+        "location": {
+          "lat": 19.0688,
+          "lng": 72.88,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510692,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 1
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810692,
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "priorityLane": 2,
+      "hash": "d710304c4343b71f98a19ee4d09c682f4d02456d3a322d382f51140ecca6cb69",
+      "sig": "71a077da136fb9bff6f7121e90999a4e1ca177a77fe7f2539f18f507e8fcf78f208c6722c2ad53cfc054e337bd0f85b0ad4e0274f359c0032e14eb9a2ca22909"
+    },
+    {
+      "opId": "delhi:2",
+      "region": "delhi",
+      "seq": 2,
+      "type": "REPORT",
+      "entityId": "transit-artery-east",
+      "payload": {
+        "incidentId": "transit-artery-east",
+        "incidentType": "route_condition",
+        "name": "Transit Artery East",
+        "location": {
+          "lat": 19.0558,
+          "lng": 72.8682,
+          "source": "GPS_DEVICE"
+        },
+        "status": "BLOCKED",
+        "observedAt": 1791811510698,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 2
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810698,
+      "prevHash": "d710304c4343b71f98a19ee4d09c682f4d02456d3a322d382f51140ecca6cb69",
+      "priorityLane": 2,
+      "hash": "117ca4b807b86c1a758e5568928279b2ef04e66918da7d08a768a514317a45bb",
+      "sig": "5c0843913dfba2000f2edf02a30a6a9cad434456f34940d813bf5d26025d9e2160f5171c5b7df2ecaca82ef82811c6d219cb857102e7a31450d2dd4c78dc6504"
+    },
+    {
+      "opId": "delhi:3",
+      "region": "delhi",
+      "seq": 3,
+      "type": "REPORT",
+      "entityId": "evacuation-route-1",
+      "payload": {
+        "incidentId": "evacuation-route-1",
+        "incidentType": "route_condition",
+        "name": "Evacuation Route Alpha",
+        "location": {
+          "lat": 19.062,
+          "lng": 72.862,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510704,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 3
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810704,
+      "prevHash": "117ca4b807b86c1a758e5568928279b2ef04e66918da7d08a768a514317a45bb",
+      "priorityLane": 2,
+      "hash": "f489179404c3425be08d3c7fb7c4ed964cf2d0891b60c38bba4fbdb1f55da33f",
+      "sig": "c0d4d2803e25706cfa9ecb46fe6c05cc4d554cc5bec3d30b7cb4d75823a572c3e003f8c6cf0bb9396ee367196940248d5f5810faa0a5679093e2a8bad50b3f0e"
+    },
+    {
+      "opId": "delhi:4",
+      "region": "delhi",
+      "seq": 4,
+      "type": "REPORT",
+      "entityId": "coastal-access-corridor",
+      "payload": {
+        "incidentId": "coastal-access-corridor",
+        "incidentType": "route_condition",
+        "name": "Coastal Access Corridor",
+        "location": {
+          "lat": 19.071,
+          "lng": 72.89,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510710,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 4
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810710,
+      "prevHash": "f489179404c3425be08d3c7fb7c4ed964cf2d0891b60c38bba4fbdb1f55da33f",
+      "priorityLane": 2,
+      "hash": "a3b69dcae2b28e041ddc75aed2f06206a2cab3dd9b968bd533cdd53a6e4fecdd",
+      "sig": "986a90f2245574d264719d6e4eda801b236b97bec047acefd1e99df0bceea1ffae6dca5a796780963628c9cfdfa8990e785200c7a78adcb11e50af61cf77240a"
+    },
+    {
+      "opId": "delhi:5",
+      "region": "delhi",
+      "seq": 5,
+      "type": "REPORT",
+      "entityId": "inter-hub-highway-4",
+      "payload": {
+        "incidentId": "inter-hub-highway-4",
+        "incidentType": "route_condition",
+        "name": "Inter-Hub Connector 4",
+        "location": {
+          "lat": 19.039,
+          "lng": 72.8619,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510717,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 5
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810717,
+      "prevHash": "a3b69dcae2b28e041ddc75aed2f06206a2cab3dd9b968bd533cdd53a6e4fecdd",
+      "priorityLane": 2,
+      "hash": "99c21c25f55157ccc662377eee4f12250377a5ca43b77287bc17831597cc730d",
+      "sig": "6759033583dc4da9d10fec0dc154439c11d3f54f3fd9dbe959ea56e4db401cbd824310c70b0a38bc2af6bacd0d8769fd577fa6abc1f5f434cf883d86cc941c04"
+    },
+    {
+      "opId": "delhi:6",
+      "region": "delhi",
+      "seq": 6,
+      "type": "REPORT",
+      "entityId": "logistics-link-west",
+      "payload": {
+        "incidentId": "logistics-link-west",
+        "incidentType": "route_condition",
+        "name": "Logistics Link West",
+        "location": {
+          "lat": 19.058,
+          "lng": 72.894,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510724,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 6
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810724,
+      "prevHash": "99c21c25f55157ccc662377eee4f12250377a5ca43b77287bc17831597cc730d",
+      "priorityLane": 2,
+      "hash": "c444e1da2837c3282173e2942d9062ce529de9914f15167de868f21b5ba16e19",
+      "sig": "cf0979b93c16c9db6ad6250e16d8a22b336d51a98a264b9d221812fa6bb301fd733bd8df89ae639079d3310da509aa05d50b1e2bb88137ad5190111f0839c708"
+    },
+    {
+      "opId": "delhi:7",
+      "region": "delhi",
+      "seq": 7,
+      "type": "REPORT",
+      "entityId": "triage-hub-alpha",
+      "payload": {
+        "incidentId": "triage-hub-alpha",
+        "incidentType": "shelter",
+        "name": "Regional Triage Hub Alpha",
+        "location": {
+          "lat": 19.0657,
+          "lng": 72.8687,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 500,
+        "observedAt": 1791811210733,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "delhi": 7
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810733,
+      "prevHash": "c444e1da2837c3282173e2942d9062ce529de9914f15167de868f21b5ba16e19",
+      "priorityLane": 2,
+      "hash": "e3625a9caa694078c941c3e4dc8ff162f6700a5e6369e9ff949b9de79d4b65b7",
+      "sig": "fdbf0e02616c9ad143e2c9f532c3c06805b7e490384dee98eae4bbf25519894a31d9138d0d250fef70d7d8194760d1ecfa6bbc2f2a79e2d0f732b8a2cf926608"
+    },
+    {
+      "opId": "delhi:8",
+      "region": "delhi",
+      "seq": 8,
+      "type": "REPORT",
+      "entityId": "distribution-center-1",
+      "payload": {
+        "incidentId": "distribution-center-1",
+        "incidentType": "shelter",
+        "name": "Emergency Distribution Center 1",
+        "location": {
+          "lat": 19.0645,
+          "lng": 72.8885,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 350,
+        "observedAt": 1791811210740,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "delhi": 8
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810740,
+      "prevHash": "e3625a9caa694078c941c3e4dc8ff162f6700a5e6369e9ff949b9de79d4b65b7",
+      "priorityLane": 2,
+      "hash": "bd18867af474f5db641f6a58c8d4f159f2b2c74a5def47e3eed0637732a7fdac",
+      "sig": "840b222ad9b5f784c3822449907051c2a1726e83575f4a3642b4a90cb6437a69ad7337c770bdcef0ee361911097ffbe1985ccde5c3a0a3e67e1f22abe3bda40b"
+    },
+    {
+      "opId": "delhi:9",
+      "region": "delhi",
+      "seq": 9,
+      "type": "REPORT",
+      "entityId": "medical-staging-base",
+      "payload": {
+        "incidentId": "medical-staging-base",
+        "incidentType": "shelter",
+        "name": "Medical Staging Base South",
+        "location": {
+          "lat": 19.041,
+          "lng": 72.864,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 250,
+        "observedAt": 1791811210750,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "delhi": 9
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810750,
+      "prevHash": "bd18867af474f5db641f6a58c8d4f159f2b2c74a5def47e3eed0637732a7fdac",
+      "priorityLane": 2,
+      "hash": "0c7e21d05eb1e86c432d84c5bc75cef06d327f7c3ce2ba95862560ab345b0560",
+      "sig": "f0f1e0c3ce86d675e3f29fd1efc1430d08e74f1f535bfaab8bf247a3afe57ab5bff9c0903141104d87aea3e3122cdae8702a3ac67b04375c5b115ec477e0df00"
+    },
+    {
+      "opId": "delhi:10",
+      "region": "delhi",
+      "seq": 10,
+      "type": "REPORT",
+      "entityId": "incident-101",
+      "payload": {
+        "incidentId": "incident-101",
+        "incidentType": "infrastructure_failure",
+        "name": "Incident #101: Disrupted Transit Artery at Access Corridor North",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Bridge structural displacement detected. Structural assessment underway."
+          }
+        },
+        "location": {
+          "lat": 19.065,
+          "lng": 72.879,
+          "source": "GPS_DEVICE"
+        },
+        "status": "Investigating",
+        "observedAt": 1791810910757,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 10
+      },
+      "authorId": "field-unit-mumbai",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810757,
+      "prevHash": "0c7e21d05eb1e86c432d84c5bc75cef06d327f7c3ce2ba95862560ab345b0560",
+      "priorityLane": 2,
+      "hash": "8c75e865d67970812456b096f25ed7a081db3dd84227ac6cfa1890e52919c9e6",
+      "sig": "5c750d61117b42d6394595caaf2216907e763640ba61da1a72d4bcd3de27e5123f9a495932d5adbb1058b6d8f5660b0577e5a75fe319292c8530ceecde60060d"
+    },
+    {
+      "opId": "delhi:11",
+      "region": "delhi",
+      "seq": 11,
+      "type": "REPORT",
+      "entityId": "team-alpha",
+      "payload": {
+        "incidentId": "team-alpha",
+        "incidentType": "rescue_team",
+        "name": "Regional Response Team Alpha",
+        "homeRegion": "mumbai",
+        "location": {
+          "lat": 19.06,
+          "lng": 72.87,
+          "source": "GPS_DEVICE"
+        },
+        "status": "ACTIVE",
+        "observedAt": 1791811810764,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "delhi": 11
+      },
+      "authorId": "dispatch-hq",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810764,
+      "prevHash": "8c75e865d67970812456b096f25ed7a081db3dd84227ac6cfa1890e52919c9e6",
+      "priorityLane": 2,
+      "hash": "d5285d4e1530958901933ed5fdc3c65452b8ab136590eab0b7b64c81967c67f9",
+      "sig": "cfda972748a07c3eb379d74ed4b08d249bbfa01a7cea784bff27400bb61995549e4d55fbff319bfadd52f336289879f64bbffdfc246e539fd4e102df531d2506"
+    },
+    {
+      "opId": "delhi:12",
+      "region": "delhi",
+      "seq": 12,
+      "type": "PERSON_STATUS",
+      "entityId": "person-1",
+      "payload": {
+        "personId": "person-1",
+        "name": "Civilian Personnel Record #501",
+        "status": "Safe",
+        "observedAt": 1791811690772
+      },
+      "deps": {
+        "delhi": 12
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810772,
+      "prevHash": "d5285d4e1530958901933ed5fdc3c65452b8ab136590eab0b7b64c81967c67f9",
+      "priorityLane": 2,
+      "hash": "a779d89ad55a910cf964e0493dec62f1e9b283841653d839dca798c42c2d9dd4",
+      "sig": "b010ac57efc6dc35fd024fcca6b5a2a977870c783fd94f41ed359b397a8eb5ba22f6818b31ba26f395ff2939126c4eba39c5d552031fdfcd6577fb15be44850f"
+    },
+    {
+      "opId": "delhi:13",
+      "region": "delhi",
+      "seq": 13,
+      "type": "PERSON_STATUS",
+      "entityId": "person-2",
+      "payload": {
+        "personId": "person-2",
+        "name": "Civilian Personnel Record #502",
+        "status": "Safe",
+        "observedAt": 1791811570781
+      },
+      "deps": {
+        "delhi": 13
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810781,
+      "prevHash": "a779d89ad55a910cf964e0493dec62f1e9b283841653d839dca798c42c2d9dd4",
+      "priorityLane": 2,
+      "hash": "64ddb3b873ccd1c16d0d7b0f3d5e5d4708c235c7ac11c5748f18d466529b1dbf",
+      "sig": "5723915e88f8efcf612550220e2aa73afd2f5de22dc0c0d747044afd0d6c086b43677aa2348849e7cbcb6743def7d8873f2593b3a9cf81212c8ba48ed5eb6800"
+    },
+    {
+      "opId": "delhi:14",
+      "region": "delhi",
+      "seq": 14,
+      "type": "PERSON_STATUS",
+      "entityId": "person-3",
+      "payload": {
+        "personId": "person-3",
+        "name": "Civilian Personnel Record #503",
+        "status": "Safe",
+        "observedAt": 1791811450791
+      },
+      "deps": {
+        "delhi": 14
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810791,
+      "prevHash": "64ddb3b873ccd1c16d0d7b0f3d5e5d4708c235c7ac11c5748f18d466529b1dbf",
+      "priorityLane": 2,
+      "hash": "f13cc640373cd652dfc8b482772df41d267ddef1056761281916ab9ffd30391a",
+      "sig": "ecdf49449bae63d409e2c7df05d7d3a0fefb0b862adb891ab3efce79c85830feddaa6d9b947a3b5c0dc7a8b2c6404b6bf9b2517e464c19ae3c743c9e1bbdb20c"
+    },
+    {
+      "opId": "delhi:15",
+      "region": "delhi",
+      "seq": 15,
+      "type": "PERSON_STATUS",
+      "entityId": "person-4",
+      "payload": {
+        "personId": "person-4",
+        "name": "Civilian Personnel Record #504",
+        "status": "Safe",
+        "observedAt": 1791811330800
+      },
+      "deps": {
+        "delhi": 15
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810800,
+      "prevHash": "f13cc640373cd652dfc8b482772df41d267ddef1056761281916ab9ffd30391a",
+      "priorityLane": 2,
+      "hash": "a1fbad79a04d0a9529b1f6e2b36f5d585d5c83d7398340d9825cd36e11a07a13",
+      "sig": "de8b166fe17f7c47516d9c9f4860be0144baf72232ad9789146e92a1c4bf5ce63d384cd8dcef6c260e337c02cf14c667e3b4a6f6d899906ed18b20776ad97607"
+    },
+    {
+      "opId": "delhi:16",
+      "region": "delhi",
+      "seq": 16,
+      "type": "PERSON_STATUS",
+      "entityId": "person-5",
+      "payload": {
+        "personId": "person-5",
+        "name": "Civilian Personnel Record #505",
+        "status": "Safe",
+        "observedAt": 1791811210811
+      },
+      "deps": {
+        "delhi": 16
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810811,
+      "prevHash": "a1fbad79a04d0a9529b1f6e2b36f5d585d5c83d7398340d9825cd36e11a07a13",
+      "priorityLane": 2,
+      "hash": "2f6a6b9ea88fe001968de1638b7a19a417b2a1f72abbb3e7b01ffc16f2634a70",
+      "sig": "e8e817f74fccb874bc136665f38cfaf82231803e5243fcb0b001eebaff602592f457496492469492e975a9a3d7db02caddaed60a2ba6f4d674dbfd2d3eaa290d"
+    },
+    {
+      "opId": "delhi:17",
+      "region": "delhi",
+      "seq": 17,
+      "type": "PERSON_STATUS",
+      "entityId": "person-6",
+      "payload": {
+        "personId": "person-6",
+        "name": "Civilian Personnel Record #506",
+        "status": "Safe",
+        "observedAt": 1791811090820
+      },
+      "deps": {
+        "delhi": 17
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810820,
+      "prevHash": "2f6a6b9ea88fe001968de1638b7a19a417b2a1f72abbb3e7b01ffc16f2634a70",
+      "priorityLane": 2,
+      "hash": "d68a06a2d6a8e0f803c1403aa89f08be4490617bf265b387442e6d0e8aa4cd3d",
+      "sig": "5a11050429153841a70d7cdfb0381d6df4142c0db2a6234d897aa4ac8573799dbdb0989c8eadc1e5a01ff37859f68e4c499593ee18fc13a10afb1eba0fbea401"
+    },
+    {
+      "opId": "delhi:18",
+      "region": "delhi",
+      "seq": 18,
+      "type": "PERSON_STATUS",
+      "entityId": "person-7",
+      "payload": {
+        "personId": "person-7",
+        "name": "Civilian Personnel Record #507",
+        "status": "Safe",
+        "observedAt": 1791810970830
+      },
+      "deps": {
+        "delhi": 18
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810831,
+      "prevHash": "d68a06a2d6a8e0f803c1403aa89f08be4490617bf265b387442e6d0e8aa4cd3d",
+      "priorityLane": 2,
+      "hash": "515c123d699b8cc324832094f54066741d2c0a6cd622f4b7924247f2eac2785a",
+      "sig": "4b7721996a5051a61a11961a5148d9127f15b262c82ec97c374604cac084c5bab5304415f9c0cc20dc18e670d15096db8b87c7e67421f038d8de7d6ea197a30f"
+    },
+    {
+      "opId": "delhi:19",
+      "region": "delhi",
+      "seq": 19,
+      "type": "PERSON_STATUS",
+      "entityId": "person-8",
+      "payload": {
+        "personId": "person-8",
+        "name": "Civilian Personnel Record #508",
+        "status": "Safe",
+        "observedAt": 1791810850842
+      },
+      "deps": {
+        "delhi": 19
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810842,
+      "prevHash": "515c123d699b8cc324832094f54066741d2c0a6cd622f4b7924247f2eac2785a",
+      "priorityLane": 2,
+      "hash": "a70dfba5a9f4bd9913d602f68bf43ca5f62c901a4a755b2d88a4929fc9ee0747",
+      "sig": "0282a480ff5197fff84819bca63e376ba829478349645afdf3ff9307e61bd77194e3d1fa7bef8d5e2826ad0b3624090b6abf7c60d0e08cd8555998b3e533d202"
+    },
+    {
+      "opId": "delhi:20",
+      "region": "delhi",
+      "seq": 20,
+      "type": "PERSON_STATUS",
+      "entityId": "person-9",
+      "payload": {
+        "personId": "person-9",
+        "name": "Civilian Personnel Record #509",
+        "status": "Missing",
+        "observedAt": 1791810730853
+      },
+      "deps": {
+        "delhi": 20
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810853,
+      "prevHash": "a70dfba5a9f4bd9913d602f68bf43ca5f62c901a4a755b2d88a4929fc9ee0747",
+      "priorityLane": 2,
+      "hash": "ca131159807573fca980f071ec93d4ee5e5063881cb82049b3023e6d6e9d0441",
+      "sig": "60c8b68b4ac66bcbc18b6c6d00fdbcaa773e620dfaa09c4a3f23771391a69ad92eb28b460c881c074bea688bfd694a7a5258407ab59ead61c70662ce81123201"
+    },
+    {
+      "opId": "delhi:21",
+      "region": "delhi",
+      "seq": 21,
+      "type": "PERSON_STATUS",
+      "entityId": "person-10",
+      "payload": {
+        "personId": "person-10",
+        "name": "Civilian Personnel Record #510",
+        "status": "Missing",
+        "observedAt": 1791810610867
+      },
+      "deps": {
+        "delhi": 21
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810867,
+      "prevHash": "ca131159807573fca980f071ec93d4ee5e5063881cb82049b3023e6d6e9d0441",
+      "priorityLane": 2,
+      "hash": "a7f1cc03596f8201a155432a045bb81657a6411d3ca4ad81ee6e079e3ee5d637",
+      "sig": "079a1d2f411490ed2dab89e433d906ebf89af558f4b6ae0efe31353ca6c944a36520c1417fed307c1ea4df51622f468d3c075eb37fc60df845e08d456fdbe90c"
+    },
+    {
+      "opId": "mumbai:1",
+      "region": "mumbai",
+      "seq": 1,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "route_condition",
+        "name": "Access Corridor North (Primary Supply Route)",
+        "location": {
+          "lat": 19.0688,
+          "lng": 72.88,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510432,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 1
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810433,
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "priorityLane": 2,
+      "hash": "71a18ce595ae75200c0a98a071db1658bd12b63ab1403c697cdea6241ac7cdd7",
+      "sig": "245c1e84f0e5599f93bd6c07579433903910a9b5a5a375b8265893a3d18c4936a0b12f57a85ba2aa6d38b25969d60b6babf389c515434006c8c7020128e6ac0e"
+    },
+    {
+      "opId": "mumbai:2",
+      "region": "mumbai",
+      "seq": 2,
+      "type": "REPORT",
+      "entityId": "transit-artery-east",
+      "payload": {
+        "incidentId": "transit-artery-east",
+        "incidentType": "route_condition",
+        "name": "Transit Artery East",
+        "location": {
+          "lat": 19.0558,
+          "lng": 72.8682,
+          "source": "GPS_DEVICE"
+        },
+        "status": "BLOCKED",
+        "observedAt": 1791811510488,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 2
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810488,
+      "prevHash": "71a18ce595ae75200c0a98a071db1658bd12b63ab1403c697cdea6241ac7cdd7",
+      "priorityLane": 2,
+      "hash": "1f658cb173e1b5ec92681ddd70a7e42b29cdbacef6281b7ba82f2b484fb7c209",
+      "sig": "2857e56c8de961a1f22f6f55af6583bc50921d70e2857a1f46d23c7d61d91ed27862322748a2641d3bc7c24a8f6cd23d61ba283b4e4dfb54823b05e12eaa7f0f"
+    },
+    {
+      "opId": "mumbai:3",
+      "region": "mumbai",
+      "seq": 3,
+      "type": "REPORT",
+      "entityId": "evacuation-route-1",
+      "payload": {
+        "incidentId": "evacuation-route-1",
+        "incidentType": "route_condition",
+        "name": "Evacuation Route Alpha",
+        "location": {
+          "lat": 19.062,
+          "lng": 72.862,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510500,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 3
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810500,
+      "prevHash": "1f658cb173e1b5ec92681ddd70a7e42b29cdbacef6281b7ba82f2b484fb7c209",
+      "priorityLane": 2,
+      "hash": "1eb637295becdbea38d0654f8180ad3f181ef5df416167a6d6b53210239ad6e2",
+      "sig": "b36a3ce0e80720dfbf0e2c5df410381b77c0d1402d65dc0e8283b08d6c1c289cfb4bc7503960cf16a2926f3384ed310961cf0d3bc83db36cab2f37aa3f02ec0e"
+    },
+    {
+      "opId": "mumbai:4",
+      "region": "mumbai",
+      "seq": 4,
+      "type": "REPORT",
+      "entityId": "coastal-access-corridor",
+      "payload": {
+        "incidentId": "coastal-access-corridor",
+        "incidentType": "route_condition",
+        "name": "Coastal Access Corridor",
+        "location": {
+          "lat": 19.071,
+          "lng": 72.89,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510508,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 4
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810508,
+      "prevHash": "1eb637295becdbea38d0654f8180ad3f181ef5df416167a6d6b53210239ad6e2",
+      "priorityLane": 2,
+      "hash": "d2d42b2865f6fd538a2a883acdd101426020fe22e7888112e9fd079168222a52",
+      "sig": "3be8d19c84060474d804dae8f817437f03736e65669e3e16145debc423241378c2ca5c4c4481958e078fbbacb2b6918907ac6e59b42f3109769e1bcdb02ef909"
+    },
+    {
+      "opId": "mumbai:5",
+      "region": "mumbai",
+      "seq": 5,
+      "type": "REPORT",
+      "entityId": "inter-hub-highway-4",
+      "payload": {
+        "incidentId": "inter-hub-highway-4",
+        "incidentType": "route_condition",
+        "name": "Inter-Hub Connector 4",
+        "location": {
+          "lat": 19.039,
+          "lng": 72.8619,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510521,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 5
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810521,
+      "prevHash": "d2d42b2865f6fd538a2a883acdd101426020fe22e7888112e9fd079168222a52",
+      "priorityLane": 2,
+      "hash": "95e6a8bd095baf57f6ed471941f35249a8aafa7b6fdc3695ae64fec257a0f7a8",
+      "sig": "54207635ed024cef1d19c1856393ab33ffb2daa9f788e1d834c78c92fcd0a392a61b57723975f572c1e8e9690fbdba9dab503e51a2df0b0af61098e1fff6640f"
+    },
+    {
+      "opId": "mumbai:6",
+      "region": "mumbai",
+      "seq": 6,
+      "type": "REPORT",
+      "entityId": "logistics-link-west",
+      "payload": {
+        "incidentId": "logistics-link-west",
+        "incidentType": "route_condition",
+        "name": "Logistics Link West",
+        "location": {
+          "lat": 19.058,
+          "lng": 72.894,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510531,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 6
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810531,
+      "prevHash": "95e6a8bd095baf57f6ed471941f35249a8aafa7b6fdc3695ae64fec257a0f7a8",
+      "priorityLane": 2,
+      "hash": "88042bd9650f171c06f5a9f852c9da13a8d52cad2b52e7b5fb91c905e0ee93d5",
+      "sig": "54f1f1c31a71582162e9d7301fb6015fd912d943c198ec9061f4ef889ffd1e1c9c46de8cfdb0c634b07eb9d617b156f8157898d6f8e5cfd7b4d26292c8b5e907"
+    },
+    {
+      "opId": "mumbai:7",
+      "region": "mumbai",
+      "seq": 7,
+      "type": "REPORT",
+      "entityId": "triage-hub-alpha",
+      "payload": {
+        "incidentId": "triage-hub-alpha",
+        "incidentType": "shelter",
+        "name": "Regional Triage Hub Alpha",
+        "location": {
+          "lat": 19.0657,
+          "lng": 72.8687,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 500,
+        "observedAt": 1791811210540,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "mumbai": 7
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810540,
+      "prevHash": "88042bd9650f171c06f5a9f852c9da13a8d52cad2b52e7b5fb91c905e0ee93d5",
+      "priorityLane": 2,
+      "hash": "8f7ff76fb4dc6de229a48dd852b758b498ae74007515d50bf772390583098de2",
+      "sig": "c24d29cac47ddb94cc6a0bdd62f6e3c15ce0e1ccd8fadf295da863cf69c90de1fb4779e26d7519812754625e60d4f8b94bcea27ea0f589af3cb41c34c5b7ea05"
+    },
+    {
+      "opId": "mumbai:8",
+      "region": "mumbai",
+      "seq": 8,
+      "type": "REPORT",
+      "entityId": "distribution-center-1",
+      "payload": {
+        "incidentId": "distribution-center-1",
+        "incidentType": "shelter",
+        "name": "Emergency Distribution Center 1",
+        "location": {
+          "lat": 19.0645,
+          "lng": 72.8885,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 350,
+        "observedAt": 1791811210552,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "mumbai": 8
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810552,
+      "prevHash": "8f7ff76fb4dc6de229a48dd852b758b498ae74007515d50bf772390583098de2",
+      "priorityLane": 2,
+      "hash": "a9c4b681fdb5b900b349070a567018bfb01cb4a865b039f37559142de21bbc03",
+      "sig": "4b9a5efd83cb009f9e10c16322b14a0113e433b113cd318db8dfe870464705bd9de50c0e83a9f21aa9cb603ef5d1896f63eac16839bf76d6b6ef7bec8786190d"
+    },
+    {
+      "opId": "mumbai:9",
+      "region": "mumbai",
+      "seq": 9,
+      "type": "REPORT",
+      "entityId": "medical-staging-base",
+      "payload": {
+        "incidentId": "medical-staging-base",
+        "incidentType": "shelter",
+        "name": "Medical Staging Base South",
+        "location": {
+          "lat": 19.041,
+          "lng": 72.864,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 250,
+        "observedAt": 1791811210561,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "mumbai": 9
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810561,
+      "prevHash": "a9c4b681fdb5b900b349070a567018bfb01cb4a865b039f37559142de21bbc03",
+      "priorityLane": 2,
+      "hash": "b7669874adcf95ddd6a4e0477404bf4418d8e59ae34fd7c1237731d7b9e009e7",
+      "sig": "17347cfe2ea60d8f675066e4fff0e061296cae29038ec97bc22db5d3afadb6b9aafcea5febfd86a2065fbc3d0d9a94cd6634f1925ff098e6fa38421db9e03806"
+    },
+    {
+      "opId": "mumbai:10",
+      "region": "mumbai",
+      "seq": 10,
+      "type": "REPORT",
+      "entityId": "incident-101",
+      "payload": {
+        "incidentId": "incident-101",
+        "incidentType": "infrastructure_failure",
+        "name": "Incident #101: Disrupted Transit Artery at Access Corridor North",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Bridge structural displacement detected. Structural assessment underway."
+          }
+        },
+        "location": {
+          "lat": 19.065,
+          "lng": 72.879,
+          "source": "GPS_DEVICE"
+        },
+        "status": "Investigating",
+        "observedAt": 1791810910572,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 10
+      },
+      "authorId": "field-unit-mumbai",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810572,
+      "prevHash": "b7669874adcf95ddd6a4e0477404bf4418d8e59ae34fd7c1237731d7b9e009e7",
+      "priorityLane": 2,
+      "hash": "5d4ab0f30284ada81d655f00557d5ee2d7e48db057348a551ac0030b7ed87aec",
+      "sig": "29eefa09ec6345dc03f39fe9ecea5d84ec7c2b6dffbb5dcf2e2320fe6c63684f42eddb026d02ab07f0b1e993beb641356322dc5ab4825f82b9e5ac1a1c3b0a03"
+    },
+    {
+      "opId": "mumbai:11",
+      "region": "mumbai",
+      "seq": 11,
+      "type": "REPORT",
+      "entityId": "team-alpha",
+      "payload": {
+        "incidentId": "team-alpha",
+        "incidentType": "rescue_team",
+        "name": "Regional Response Team Alpha",
+        "homeRegion": "mumbai",
+        "location": {
+          "lat": 19.06,
+          "lng": 72.87,
+          "source": "GPS_DEVICE"
+        },
+        "status": "ACTIVE",
+        "observedAt": 1791811810581,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 11
+      },
+      "authorId": "dispatch-hq",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810581,
+      "prevHash": "5d4ab0f30284ada81d655f00557d5ee2d7e48db057348a551ac0030b7ed87aec",
+      "priorityLane": 2,
+      "hash": "16462333c65af3654b157360e7b20c9d90cf57fdc7485b25124bea1572e1d8f1",
+      "sig": "35b8e3df018c07432bec57e02f2bea403f5d0f501649be528dff8864af3fb4b1824ae511a776156c954d89cf9019c8c00bd255c2ed3c60a347e8be59f590460f"
+    },
+    {
+      "opId": "mumbai:12",
+      "region": "mumbai",
+      "seq": 12,
+      "type": "PERSON_STATUS",
+      "entityId": "person-1",
+      "payload": {
+        "personId": "person-1",
+        "name": "Civilian Personnel Record #501",
+        "status": "Safe",
+        "observedAt": 1791811690591
+      },
+      "deps": {
+        "mumbai": 12
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810592,
+      "prevHash": "16462333c65af3654b157360e7b20c9d90cf57fdc7485b25124bea1572e1d8f1",
+      "priorityLane": 2,
+      "hash": "ae21df607871ad7423ff63c58aaff0f8835e41b6160805d47ac877c9a367522e",
+      "sig": "61e0e7b86e848266c8c9f0e719b91ab821e446cb316e51f0fdfed3b4116df62dd4b8fb95522aa530f4b21f460cc884fb00e16eb8a0f0aac19336d39c8db39a0a"
+    },
+    {
+      "opId": "mumbai:13",
+      "region": "mumbai",
+      "seq": 13,
+      "type": "PERSON_STATUS",
+      "entityId": "person-2",
+      "payload": {
+        "personId": "person-2",
+        "name": "Civilian Personnel Record #502",
+        "status": "Safe",
+        "observedAt": 1791811570602
+      },
+      "deps": {
+        "mumbai": 13
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810602,
+      "prevHash": "ae21df607871ad7423ff63c58aaff0f8835e41b6160805d47ac877c9a367522e",
+      "priorityLane": 2,
+      "hash": "147bf665bade61837a27ef5d068e05d0547e9b633c9785ffc1973e6de4378c4b",
+      "sig": "b4401f026279747a06548901c7134bff1ac225548ba5c0c1ed6ffe6e7116b554a5ea48204bc801b413fdb7f675530e1130d22e05ce243ddcb9fff958c2541501"
+    },
+    {
+      "opId": "mumbai:14",
+      "region": "mumbai",
+      "seq": 14,
+      "type": "PERSON_STATUS",
+      "entityId": "person-3",
+      "payload": {
+        "personId": "person-3",
+        "name": "Civilian Personnel Record #503",
+        "status": "Safe",
+        "observedAt": 1791811450611
+      },
+      "deps": {
+        "mumbai": 14
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810611,
+      "prevHash": "147bf665bade61837a27ef5d068e05d0547e9b633c9785ffc1973e6de4378c4b",
+      "priorityLane": 2,
+      "hash": "ceef66bdcc0a943b6f1d3456645d5e1e0f378a98f09c2befa933fa76c56e199f",
+      "sig": "d4f010fef3c5b0b48565fa467c0e5e51c68efb324639aca2df2d411dd000cbbee75a9faf39e97029b138034738128cdaf0c04545a06b83f314af633808671907"
+    },
+    {
+      "opId": "mumbai:15",
+      "region": "mumbai",
+      "seq": 15,
+      "type": "PERSON_STATUS",
+      "entityId": "person-4",
+      "payload": {
+        "personId": "person-4",
+        "name": "Civilian Personnel Record #504",
+        "status": "Safe",
+        "observedAt": 1791811330620
+      },
+      "deps": {
+        "mumbai": 15
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810620,
+      "prevHash": "ceef66bdcc0a943b6f1d3456645d5e1e0f378a98f09c2befa933fa76c56e199f",
+      "priorityLane": 2,
+      "hash": "1f31ef8fd849f105b460661c78bb4a1e2ae68d8a4e2c3ca4b0e15d8845d83ace",
+      "sig": "16e89e7c3c18c21bd68a5e702b88145380d7a02df477e4b95bbc24e69fe007446004750c30a1e314bedccfd6474bbe2129a65a99b18cfacff33d997ff64f940a"
+    },
+    {
+      "opId": "mumbai:16",
+      "region": "mumbai",
+      "seq": 16,
+      "type": "PERSON_STATUS",
+      "entityId": "person-5",
+      "payload": {
+        "personId": "person-5",
+        "name": "Civilian Personnel Record #505",
+        "status": "Safe",
+        "observedAt": 1791811210631
+      },
+      "deps": {
+        "mumbai": 16
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810631,
+      "prevHash": "1f31ef8fd849f105b460661c78bb4a1e2ae68d8a4e2c3ca4b0e15d8845d83ace",
+      "priorityLane": 2,
+      "hash": "d43b33d97d106c4b12409c786df7308275ac7eb987c8d44695782d80c012f217",
+      "sig": "18608c551baf1ea4a30c5d96437ad20284db657e125be22cab4845f2021b30bd3e43d5df7265304c7f041d555ec0ebe992723500d5db62e1289e06101a747c05"
+    },
+    {
+      "opId": "bengaluru:1",
+      "region": "bengaluru",
+      "seq": 1,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "route_condition",
+        "name": "Access Corridor North (Primary Supply Route)",
+        "location": {
+          "lat": 19.0688,
+          "lng": 72.88,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510890,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 1
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810890,
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "priorityLane": 2,
+      "hash": "53b8565edc7e1006666ae0a38bc8d6fde1ab5af7db613b74f1797c1e5be123d3",
+      "sig": "1b5894e8aa4726cd8cf2e62981efb78b357cf08fd8b6b94fa1fdcbe1db331e50a2863213d3bcc254d566ae4d817a69cdccc15053e8ed7db4e700b233ae654f04"
+    },
+    {
+      "opId": "bengaluru:2",
+      "region": "bengaluru",
+      "seq": 2,
+      "type": "REPORT",
+      "entityId": "transit-artery-east",
+      "payload": {
+        "incidentId": "transit-artery-east",
+        "incidentType": "route_condition",
+        "name": "Transit Artery East",
+        "location": {
+          "lat": 19.0558,
+          "lng": 72.8682,
+          "source": "GPS_DEVICE"
+        },
+        "status": "BLOCKED",
+        "observedAt": 1791811510898,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 2
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810898,
+      "prevHash": "53b8565edc7e1006666ae0a38bc8d6fde1ab5af7db613b74f1797c1e5be123d3",
+      "priorityLane": 2,
+      "hash": "5d798b8dc6f5b503a08f5cefe86789ddd00db65fd354d7247b8ca02de0818b4a",
+      "sig": "160d5bf134e945ba0318725147e5f62fd9c907b98b507f0bc29c29e532834e0c05c0bfaabed5b8b0536e32ffa5c5d0ccf76b412433d24709084bf6c60d34380a"
+    },
+    {
+      "opId": "mumbai:17",
+      "region": "mumbai",
+      "seq": 17,
+      "type": "PERSON_STATUS",
+      "entityId": "person-6",
+      "payload": {
+        "personId": "person-6",
+        "name": "Civilian Personnel Record #506",
+        "status": "Safe",
+        "observedAt": 1791811090640
+      },
+      "deps": {
+        "mumbai": 17
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810640,
+      "prevHash": "d43b33d97d106c4b12409c786df7308275ac7eb987c8d44695782d80c012f217",
+      "priorityLane": 2,
+      "hash": "be858a606437861b0ace765cce7662e48bcb1c24865ebcc034aae9b1e34520fa",
+      "sig": "5268026e7ffbffdb011ba017213d88b536492b76c01dc967fa501371f3fc73f63cd9ad2ddc2c58fa022fc13082654fa490738c2e9534f7a779a993b3f876ad07"
+    },
+    {
+      "opId": "bengaluru:3",
+      "region": "bengaluru",
+      "seq": 3,
+      "type": "REPORT",
+      "entityId": "evacuation-route-1",
+      "payload": {
+        "incidentId": "evacuation-route-1",
+        "incidentType": "route_condition",
+        "name": "Evacuation Route Alpha",
+        "location": {
+          "lat": 19.062,
+          "lng": 72.862,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510907,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 3
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810907,
+      "prevHash": "5d798b8dc6f5b503a08f5cefe86789ddd00db65fd354d7247b8ca02de0818b4a",
+      "priorityLane": 2,
+      "hash": "6a6d4ff033f84e5d357ebc4b65c43b71533a4bba668c8602982e862f8b2d6764",
+      "sig": "19f8f917640151cc8aff4628e6b86de336e8c4ff146ab4d33674a084a6ceca0a2588eb2e92b5ed309fe31ba456b9143bc54c070eaa2513fe8c1470c7efee0405"
+    },
+    {
+      "opId": "mumbai:18",
+      "region": "mumbai",
+      "seq": 18,
+      "type": "PERSON_STATUS",
+      "entityId": "person-7",
+      "payload": {
+        "personId": "person-7",
+        "name": "Civilian Personnel Record #507",
+        "status": "Safe",
+        "observedAt": 1791810970649
+      },
+      "deps": {
+        "mumbai": 18
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810649,
+      "prevHash": "be858a606437861b0ace765cce7662e48bcb1c24865ebcc034aae9b1e34520fa",
+      "priorityLane": 2,
+      "hash": "67529f2e910f174afb3b2f1b15e3a4aea01111a86f740e7e31e1752be5b8d9d1",
+      "sig": "d35a56ca59f2bcbfc4573f355197088e9e3341420a3bd601b06c1b41a829a41508aae1fbadfd16decbe80d9b04626ad466dd655a7e447144748344f0ec486703"
+    },
+    {
+      "opId": "bengaluru:4",
+      "region": "bengaluru",
+      "seq": 4,
+      "type": "REPORT",
+      "entityId": "coastal-access-corridor",
+      "payload": {
+        "incidentId": "coastal-access-corridor",
+        "incidentType": "route_condition",
+        "name": "Coastal Access Corridor",
+        "location": {
+          "lat": 19.071,
+          "lng": 72.89,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510914,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 4
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810914,
+      "prevHash": "6a6d4ff033f84e5d357ebc4b65c43b71533a4bba668c8602982e862f8b2d6764",
+      "priorityLane": 2,
+      "hash": "c245ac591da5f7eaf8e845dfa1d22cb095fc6587ca087b690f8edabcc8668a19",
+      "sig": "0df64415329979318ac4b947f8326b5a723ef1327b4db41d92a51790d877d832ae7550d5588cb06b28b40eb936ff7e9ee9cd952c71fe008e1a10aac3ff2e2c09"
+    },
+    {
+      "opId": "bengaluru:5",
+      "region": "bengaluru",
+      "seq": 5,
+      "type": "REPORT",
+      "entityId": "inter-hub-highway-4",
+      "payload": {
+        "incidentId": "inter-hub-highway-4",
+        "incidentType": "route_condition",
+        "name": "Inter-Hub Connector 4",
+        "location": {
+          "lat": 19.039,
+          "lng": 72.8619,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510921,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 5
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810921,
+      "prevHash": "c245ac591da5f7eaf8e845dfa1d22cb095fc6587ca087b690f8edabcc8668a19",
+      "priorityLane": 2,
+      "hash": "41cab5bad3a050695f7f6d7e4c6eaa8fca01059ece81a267f4c66f2843251663",
+      "sig": "ccde51423aa602b5edb8f9ca767135d98227e9370d30293e7d4977e01e6c670d56c0f65d3fd94828ea985664356bbc54c62c2b773c8289809cf145843b67bd00"
+    },
+    {
+      "opId": "mumbai:19",
+      "region": "mumbai",
+      "seq": 19,
+      "type": "PERSON_STATUS",
+      "entityId": "person-8",
+      "payload": {
+        "personId": "person-8",
+        "name": "Civilian Personnel Record #508",
+        "status": "Safe",
+        "observedAt": 1791810850658
+      },
+      "deps": {
+        "mumbai": 19
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810658,
+      "prevHash": "67529f2e910f174afb3b2f1b15e3a4aea01111a86f740e7e31e1752be5b8d9d1",
+      "priorityLane": 2,
+      "hash": "f69025e0ce32b25f1827c5c4592425543ec8a948000c8fd741f72b02d803ca80",
+      "sig": "7dcb2ec2c9974666fbbb3c52e570eada70ac937127e2d7ca4f54efc69700189ba1af7b988cd40716914b50340abf841b1054032d9223c138ed005102968aaa0a"
+    },
+    {
+      "opId": "bengaluru:6",
+      "region": "bengaluru",
+      "seq": 6,
+      "type": "REPORT",
+      "entityId": "logistics-link-west",
+      "payload": {
+        "incidentId": "logistics-link-west",
+        "incidentType": "route_condition",
+        "name": "Logistics Link West",
+        "location": {
+          "lat": 19.058,
+          "lng": 72.894,
+          "source": "GPS_DEVICE"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811510927,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 6
+      },
+      "authorId": "officer-1",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810927,
+      "prevHash": "41cab5bad3a050695f7f6d7e4c6eaa8fca01059ece81a267f4c66f2843251663",
+      "priorityLane": 2,
+      "hash": "b80fa0348f150fba1cb77043b157bd6c6d7338295c45b3d76df5ac20b9b2faf8",
+      "sig": "5d1c31ae4a05b9b58b4ef5e6c21472804ede8c34ecc9689802bf8a99d0c2ac7f1c718342eb7b0ca6f349528c7fb1b0db4f7bd7d4278e1a8105f26b049c4d570a"
+    },
+    {
+      "opId": "mumbai:20",
+      "region": "mumbai",
+      "seq": 20,
+      "type": "PERSON_STATUS",
+      "entityId": "person-9",
+      "payload": {
+        "personId": "person-9",
+        "name": "Civilian Personnel Record #509",
+        "status": "Missing",
+        "observedAt": 1791810730666
+      },
+      "deps": {
+        "mumbai": 20
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810666,
+      "prevHash": "f69025e0ce32b25f1827c5c4592425543ec8a948000c8fd741f72b02d803ca80",
+      "priorityLane": 2,
+      "hash": "799c57d44d3692e0dbbee7683c9879c5d28fc931de6cacfdff9f531b24f113ce",
+      "sig": "38d3c0a7fd491f8d63c3638359fb0c33af9bc5be7d08540615da82a28cf211b5a3b1e8e5f980a342b649c0cf6cedabd4c8977601277fba51975b979b85ddb70c"
+    },
+    {
+      "opId": "bengaluru:7",
+      "region": "bengaluru",
+      "seq": 7,
+      "type": "REPORT",
+      "entityId": "triage-hub-alpha",
+      "payload": {
+        "incidentId": "triage-hub-alpha",
+        "incidentType": "shelter",
+        "name": "Regional Triage Hub Alpha",
+        "location": {
+          "lat": 19.0657,
+          "lng": 72.8687,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 500,
+        "observedAt": 1791811210934,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "bengaluru": 7
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810934,
+      "prevHash": "b80fa0348f150fba1cb77043b157bd6c6d7338295c45b3d76df5ac20b9b2faf8",
+      "priorityLane": 2,
+      "hash": "201f58f90f39747ef54345d8caf51e372947e2a69c7e4fc500cf664384cbca9d",
+      "sig": "fad241859360ec9b6a649e286c677c96ca9635d50aa91d7eed2e1e9da851966f0b241c95b4873b2350886126b3b9f538c796125245e18e09b80c23eb283a9d0f"
+    },
+    {
+      "opId": "bengaluru:8",
+      "region": "bengaluru",
+      "seq": 8,
+      "type": "REPORT",
+      "entityId": "distribution-center-1",
+      "payload": {
+        "incidentId": "distribution-center-1",
+        "incidentType": "shelter",
+        "name": "Emergency Distribution Center 1",
+        "location": {
+          "lat": 19.0645,
+          "lng": 72.8885,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 350,
+        "observedAt": 1791811210942,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "bengaluru": 8
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810942,
+      "prevHash": "201f58f90f39747ef54345d8caf51e372947e2a69c7e4fc500cf664384cbca9d",
+      "priorityLane": 2,
+      "hash": "a1e6066002f9a2d19553c27b157e194c5d29602598ba972804ac8612ac75078c",
+      "sig": "34924c4bfe734d7f02eeef02f88e6e9f0ab39d367a436c8b37f27b24963d72d45fbd4337812517040b3619098553e749a2e6afb20228d17889dfc0e0438c5d00"
+    },
+    {
+      "opId": "mumbai:21",
+      "region": "mumbai",
+      "seq": 21,
+      "type": "PERSON_STATUS",
+      "entityId": "person-10",
+      "payload": {
+        "personId": "person-10",
+        "name": "Civilian Personnel Record #510",
+        "status": "Missing",
+        "observedAt": 1791810610676
+      },
+      "deps": {
+        "mumbai": 21
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810676,
+      "prevHash": "799c57d44d3692e0dbbee7683c9879c5d28fc931de6cacfdff9f531b24f113ce",
+      "priorityLane": 2,
+      "hash": "ed74a24c2b9d5f28c4c0d35daa2d89c7d8dd930797325944bda0e3a79e6245da",
+      "sig": "d12c5079676dfa5e110cd687967db2fe461e4bc1d16e397a3073b71da11b4230eb671b168f7e86b66662b76c38964009ae26fdbb744f4386627a9f57ecf68b07"
+    },
+    {
+      "opId": "bengaluru:9",
+      "region": "bengaluru",
+      "seq": 9,
+      "type": "REPORT",
+      "entityId": "medical-staging-base",
+      "payload": {
+        "incidentId": "medical-staging-base",
+        "incidentType": "shelter",
+        "name": "Medical Staging Base South",
+        "location": {
+          "lat": 19.041,
+          "lng": 72.864,
+          "source": "MANUAL_PIN"
+        },
+        "status": "ACTIVE",
+        "capacity": 250,
+        "observedAt": 1791811210951,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "bengaluru": 9
+      },
+      "authorId": "admin-ops",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810951,
+      "prevHash": "a1e6066002f9a2d19553c27b157e194c5d29602598ba972804ac8612ac75078c",
+      "priorityLane": 2,
+      "hash": "5274b3b566e4f38cd6c5db5e23a84952d2c836d474e517609078a3f269646bb1",
+      "sig": "8c4066c6e631936cfe1c2e47f9b8bab0c6df644202cebe3b327ee9184a676e745a44cd178d4019a6fd8e7507cb113acd5e17864cdcafcb7206a5ea0de5850101"
+    },
+    {
+      "opId": "bengaluru:10",
+      "region": "bengaluru",
+      "seq": 10,
+      "type": "REPORT",
+      "entityId": "incident-101",
+      "payload": {
+        "incidentId": "incident-101",
+        "incidentType": "infrastructure_failure",
+        "name": "Incident #101: Disrupted Transit Artery at Access Corridor North",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Bridge structural displacement detected. Structural assessment underway."
+          }
+        },
+        "location": {
+          "lat": 19.065,
+          "lng": 72.879,
+          "source": "GPS_DEVICE"
+        },
+        "status": "Investigating",
+        "observedAt": 1791810910958,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 10
+      },
+      "authorId": "field-unit-mumbai",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811810958,
+      "prevHash": "5274b3b566e4f38cd6c5db5e23a84952d2c836d474e517609078a3f269646bb1",
+      "priorityLane": 2,
+      "hash": "54cdd98fb4e4d0a4729e9f08f9f0a0c705a6879d0505cf7b1847085b8f01eace",
+      "sig": "d41cd3cd5c4f14ae5db05e94721760b0cad1f283bd7c23c4c713f3b997b609bbfa36dba8d095bfa89371e54f0ab7ff9f5db6e5fd5a6cbd420fe6173690e6060f"
+    },
+    {
+      "opId": "bengaluru:11",
+      "region": "bengaluru",
+      "seq": 11,
+      "type": "REPORT",
+      "entityId": "team-alpha",
+      "payload": {
+        "incidentId": "team-alpha",
+        "incidentType": "rescue_team",
+        "name": "Regional Response Team Alpha",
+        "homeRegion": "mumbai",
+        "location": {
+          "lat": 19.06,
+          "lng": 72.87,
+          "source": "GPS_DEVICE"
+        },
+        "status": "ACTIVE",
+        "observedAt": 1791811810968,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "bengaluru": 11
+      },
+      "authorId": "dispatch-hq",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811810968,
+      "prevHash": "54cdd98fb4e4d0a4729e9f08f9f0a0c705a6879d0505cf7b1847085b8f01eace",
+      "priorityLane": 2,
+      "hash": "964bd0f6650f8cbb83fd75946b9557b6302eb08a15b85dde005f5a02537e1709",
+      "sig": "8ded524058a12b73d6a1872c73b8295094b9398ed6c8d4133b4e7b13ad412f84559194c55f9a369ca8db8e823213536588ea31be8b6ff2d010bfa4b6e7530e01"
+    },
+    {
+      "opId": "bengaluru:12",
+      "region": "bengaluru",
+      "seq": 12,
+      "type": "PERSON_STATUS",
+      "entityId": "person-1",
+      "payload": {
+        "personId": "person-1",
+        "name": "Civilian Personnel Record #501",
+        "status": "Safe",
+        "observedAt": 1791811690975
+      },
+      "deps": {
+        "bengaluru": 12
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810975,
+      "prevHash": "964bd0f6650f8cbb83fd75946b9557b6302eb08a15b85dde005f5a02537e1709",
+      "priorityLane": 2,
+      "hash": "3a6609a155504b21f17fdaeaff6a8f9817404f1af5248af30c4c1ac1e1865da1",
+      "sig": "2dc99f94f88e6e06e5992d9bdab4fd0269e46890beaa3d55695e44919caf6f02329730c3d0ff167c40fa15c7eef4bbd427dee78aad274ca2cec75316b5e1c50a"
+    },
+    {
+      "opId": "bengaluru:13",
+      "region": "bengaluru",
+      "seq": 13,
+      "type": "PERSON_STATUS",
+      "entityId": "person-2",
+      "payload": {
+        "personId": "person-2",
+        "name": "Civilian Personnel Record #502",
+        "status": "Safe",
+        "observedAt": 1791811570984
+      },
+      "deps": {
+        "bengaluru": 13
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810984,
+      "prevHash": "3a6609a155504b21f17fdaeaff6a8f9817404f1af5248af30c4c1ac1e1865da1",
+      "priorityLane": 2,
+      "hash": "54207f774b560487b12f0a6cc9f044841c2fdd61ccb1815277ceee0f67458f13",
+      "sig": "cc4524c7ac7ee83000e64e523f9749e8b5275796973ac59fdd8d77902aeca19474662776bf3b2bb1455a606414c0073c9bb9e49f7c84300eff4d33aeefa9200a"
+    },
+    {
+      "opId": "bengaluru:14",
+      "region": "bengaluru",
+      "seq": 14,
+      "type": "PERSON_STATUS",
+      "entityId": "person-3",
+      "payload": {
+        "personId": "person-3",
+        "name": "Civilian Personnel Record #503",
+        "status": "Safe",
+        "observedAt": 1791811450992
+      },
+      "deps": {
+        "bengaluru": 14
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811810992,
+      "prevHash": "54207f774b560487b12f0a6cc9f044841c2fdd61ccb1815277ceee0f67458f13",
+      "priorityLane": 2,
+      "hash": "ddfccf39ee2262b370e3cb96085e082fb776cfca28a6b40db2fbc793d602c11e",
+      "sig": "58ce9ddc4fd7abc3a603c0d9766786d1472a25070c752a96b131795b250150d3d4f1288b765f3a872b01b1e73817b58f10ef56df5a7dec83f22a908709b9d006"
+    },
+    {
+      "opId": "bengaluru:15",
+      "region": "bengaluru",
+      "seq": 15,
+      "type": "PERSON_STATUS",
+      "entityId": "person-4",
+      "payload": {
+        "personId": "person-4",
+        "name": "Civilian Personnel Record #504",
+        "status": "Safe",
+        "observedAt": 1791811331002
+      },
+      "deps": {
+        "bengaluru": 15
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811002,
+      "prevHash": "ddfccf39ee2262b370e3cb96085e082fb776cfca28a6b40db2fbc793d602c11e",
+      "priorityLane": 2,
+      "hash": "90eafe3dc1cdd0aec4a68a8be4a1dda4c75e55566ee4c3a6e28e6be861603bea",
+      "sig": "a9be496b0a81b200566cc42b243c872fa907f3e4208d529b7bd97fe054b8d6373e96f577ee9cc327957be4b8064ba4e7196eac5dcc886fd4a3e47e004be5440c"
+    },
+    {
+      "opId": "bengaluru:16",
+      "region": "bengaluru",
+      "seq": 16,
+      "type": "PERSON_STATUS",
+      "entityId": "person-5",
+      "payload": {
+        "personId": "person-5",
+        "name": "Civilian Personnel Record #505",
+        "status": "Safe",
+        "observedAt": 1791811211011
+      },
+      "deps": {
+        "bengaluru": 16
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811011,
+      "prevHash": "90eafe3dc1cdd0aec4a68a8be4a1dda4c75e55566ee4c3a6e28e6be861603bea",
+      "priorityLane": 2,
+      "hash": "006c9dd9c9b9b12e81f2e15b0392d9efb1459554b493750e0dfecf742c3892e5",
+      "sig": "5b5064b1637f728508e140d871cfca25a9443885c12487ee6d1d4cc482518fdbc07627b71750893d186c3f725e584b00c48d93ec22be7ca83cacfed9f02f6c00"
+    },
+    {
+      "opId": "bengaluru:17",
+      "region": "bengaluru",
+      "seq": 17,
+      "type": "PERSON_STATUS",
+      "entityId": "person-6",
+      "payload": {
+        "personId": "person-6",
+        "name": "Civilian Personnel Record #506",
+        "status": "Safe",
+        "observedAt": 1791811091019
+      },
+      "deps": {
+        "bengaluru": 17
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811019,
+      "prevHash": "006c9dd9c9b9b12e81f2e15b0392d9efb1459554b493750e0dfecf742c3892e5",
+      "priorityLane": 2,
+      "hash": "0e5d21ebf43e75e629507d279e848103e4c991591af00125e5aeea14176f95a6",
+      "sig": "e41ce68f1090901fc6f85c4d33d14c230d1411dba1c1e5fa4e8b927735b8da83638c5bed2e3db713f6db12ecf59b26decb2ab1935bca50155d7098e02015450e"
+    },
+    {
+      "opId": "bengaluru:18",
+      "region": "bengaluru",
+      "seq": 18,
+      "type": "PERSON_STATUS",
+      "entityId": "person-7",
+      "payload": {
+        "personId": "person-7",
+        "name": "Civilian Personnel Record #507",
+        "status": "Safe",
+        "observedAt": 1791810971028
+      },
+      "deps": {
+        "bengaluru": 18
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811028,
+      "prevHash": "0e5d21ebf43e75e629507d279e848103e4c991591af00125e5aeea14176f95a6",
+      "priorityLane": 2,
+      "hash": "af667fd6c5dad92ee7c7b30c7ae76bcbf70659ce03dac5a42d731a64d4239aa1",
+      "sig": "333a08a943fff12c74f773496b55c576ce205f05b27f2e9f635c84b39222217c15a1c6d914bcdb10fa873bd64b9bd2dfe0e9aa8e648ab3b6520f44526fdf7301"
+    },
+    {
+      "opId": "bengaluru:19",
+      "region": "bengaluru",
+      "seq": 19,
+      "type": "PERSON_STATUS",
+      "entityId": "person-8",
+      "payload": {
+        "personId": "person-8",
+        "name": "Civilian Personnel Record #508",
+        "status": "Safe",
+        "observedAt": 1791810851037
+      },
+      "deps": {
+        "bengaluru": 19
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811037,
+      "prevHash": "af667fd6c5dad92ee7c7b30c7ae76bcbf70659ce03dac5a42d731a64d4239aa1",
+      "priorityLane": 2,
+      "hash": "ede43f4c335833edda6cfdc757788d996b2a5f22c686552c2d76993f3e28c495",
+      "sig": "e7dae5cd1bc61617d42945c90526543c8ca7461a5a902e2fe2526e5c8caadcc9c17d5b926b9a4d4463c0bf40e95f4452942658448e5cceb4f91ae7b581cd8f08"
+    },
+    {
+      "opId": "bengaluru:20",
+      "region": "bengaluru",
+      "seq": 20,
+      "type": "PERSON_STATUS",
+      "entityId": "person-9",
+      "payload": {
+        "personId": "person-9",
+        "name": "Civilian Personnel Record #509",
+        "status": "Missing",
+        "observedAt": 1791810731045
+      },
+      "deps": {
+        "bengaluru": 20
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811046,
+      "prevHash": "ede43f4c335833edda6cfdc757788d996b2a5f22c686552c2d76993f3e28c495",
+      "priorityLane": 2,
+      "hash": "2d30c8e9c7811f706ce4805fdf09cf62d01c7631eea0aba4f9ca6b2eb80cc2e1",
+      "sig": "de5918244f34bc4402fbd3cece690eee0e002fd82314a17ba3f9b82da903b524850a9632cf4fb2e6667c1b2d3aa19f4b7c95065b541221525224462ce9fb9201"
+    },
+    {
+      "opId": "bengaluru:21",
+      "region": "bengaluru",
+      "seq": 21,
+      "type": "PERSON_STATUS",
+      "entityId": "person-10",
+      "payload": {
+        "personId": "person-10",
+        "name": "Civilian Personnel Record #510",
+        "status": "Missing",
+        "observedAt": 1791810611056
+      },
+      "deps": {
+        "bengaluru": 21
+      },
+      "authorId": "census-unit",
+      "authorRole": "VOLUNTEER",
+      "createdAt": 1791811811056,
+      "prevHash": "2d30c8e9c7811f706ce4805fdf09cf62d01c7631eea0aba4f9ca6b2eb80cc2e1",
+      "priorityLane": 2,
+      "hash": "d2a1da3dbfb86d830f9466a016c516b96b58a656e0d94494edab949be71741e6",
+      "sig": "f373b1134bc35e7eaf77e9a52ce1a316ef1f0cb8b5d77bec0f0cfa2824a17e9c5bfe823d5e8fc210abb1ad28c6b54f7a357dbc5b56df9a09b5aac924464fd103"
+    },
+    {
+      "opId": "delhi:22",
+      "region": "delhi",
+      "seq": 22,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "BLOCKED",
+        "observedAt": 1791811867179,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        }
+      },
+      "deps": {
+        "delhi": 22,
+        "mumbai": 21,
+        "bengaluru": 21
+      },
+      "authorId": "ndrf-team-delhi",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811867180,
+      "prevHash": "a7f1cc03596f8201a155432a045bb81657a6411d3ca4ad81ee6e079e3ee5d637",
+      "priorityLane": 2,
+      "hash": "c53c6d6ea539aff847112c3e44d39584ae49f0a7ad0e4509576da3f330863dfb",
+      "sig": "b15c7e1aed5c8c66cfe7ae9448cce7031313180cf5bc4a6f401540ccd68c3477d8aa52e25324b71f7982ca9271e9a62eccade3019b00c90669bd58ed2a798207"
+    },
+    {
+      "opId": "delhi:23",
+      "region": "delhi",
+      "seq": 23,
+      "type": "ESCROW_SPEND",
+      "entityId": "medical_kits",
+      "payload": {
+        "resource": "medical_kits",
+        "qty": 2
+      },
+      "deps": {
+        "delhi": 23,
+        "mumbai": 21,
+        "bengaluru": 21
+      },
+      "authorId": "operator-delhi",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811868724,
+      "prevHash": "c53c6d6ea539aff847112c3e44d39584ae49f0a7ad0e4509576da3f330863dfb",
+      "priorityLane": 1,
+      "hash": "a289550d5b44c499cc629880d40295975b05768b577ca4fa3c413185db18d6da",
+      "sig": "62eb49c584e61fdabe75d2037b90e5ff64e09c499d2bccde02268e89cbaf64afeba247d65d90b3bc9b54086680bbeec786b7d437bce9c2b235c5c2ca0f006b02"
+    },
+    {
+      "opId": "delhi:24",
+      "region": "delhi",
+      "seq": 24,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791811868737",
+        "requester": "delhi",
+        "qty": 2,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "delhi": 24,
+        "mumbai": 21,
+        "bengaluru": 21
+      },
+      "authorId": "operator-delhi",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811868737,
+      "prevHash": "a289550d5b44c499cc629880d40295975b05768b577ca4fa3c413185db18d6da",
+      "priorityLane": 1,
+      "hash": "cec30aec5ed80d70bc199f92891836b11b40e9ba64e831beaa15b524e20a4dbc",
+      "sig": "b6595fd98d08148f15834e6db24d68bd7daf861737e860fd07161c0b4b28d4b5fe9130c0254a7b3206ea805c279688738b649969860d09126e0c7f73d4685202"
+    },
+    {
+      "opId": "mumbai:23",
+      "region": "mumbai",
+      "seq": 23,
+      "type": "DECISION",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "decisionId": "dec-1791811867159-cqw1",
+        "type": "DISPATCH",
+        "params": {
+          "routeEntityIds": [
+            "access-corridor-north"
+          ]
+        },
+        "verdictAtTime": "GO",
+        "dependencies": [
+          {
+            "entityId": "access-corridor-north",
+            "valueSeen": "OPEN",
+            "statusSeen": "OPEN",
+            "versionOpIds": [
+              "mumbai:1",
+              "delhi:1",
+              "bengaluru:1",
+              "mumbai:22"
+            ],
+            "ageAtEvaluationMs": 15,
+            "authorityReachable": true
+          },
+          {
+            "entityId": "access-corridor-north",
+            "valueSeen": "OPEN",
+            "statusSeen": "OPEN",
+            "versionOpIds": [
+              "mumbai:1",
+              "delhi:1",
+              "bengaluru:1",
+              "mumbai:22"
+            ],
+            "ageAtEvaluationMs": 15,
+            "authorityReachable": true
+          }
+        ],
+        "acknowledgedRisks": []
+      },
+      "deps": {
+        "mumbai": 23,
+        "delhi": 21,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811867159,
+      "prevHash": "68ac39b0318d65b97571c27de57fab8109fa68b1d0b2dd8da10fbe2c2f476628",
+      "priorityLane": 1,
+      "hash": "e5ea4082a97ac14de356e1f77b79142a454f9f55d5fa596af993d4ada5abb0a2",
+      "sig": "4dbd5924c7eb19fd17326c72220644bb9625a0b8db9bd63aa1efed4750455db5e3c4d08012c9a0cdeed243959fc6942261e10561c62b931eb301f83d35532406"
+    },
+    {
+      "opId": "mumbai:24",
+      "region": "mumbai",
+      "seq": 24,
+      "type": "ESCROW_SPEND",
+      "entityId": "medical_kits",
+      "payload": {
+        "resource": "medical_kits",
+        "qty": 3
+      },
+      "deps": {
+        "mumbai": 24,
+        "delhi": 22,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791811868705,
+      "prevHash": "e5ea4082a97ac14de356e1f77b79142a454f9f55d5fa596af993d4ada5abb0a2",
+      "priorityLane": 1,
+      "hash": "3a56f72a611503ef467f5442b79a5a77bc110e7711a5ab76d68b9578e13dde30",
+      "sig": "856e4e57ebe59d6e681daa599805fc90f3960b8ee9f8c5ead1214981b6b7e230fe9be47419906f12e9a852ef93abc09cbb6cdcfd69805c614da6153ae7631301"
+    },
+    {
+      "opId": "mumbai:22",
+      "region": "mumbai",
+      "seq": 22,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "OPEN",
+        "observedAt": 1791811867140,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 22,
+        "delhi": 21,
+        "bengaluru": 21
+      },
+      "authorId": "field-unit-mumbai",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791811867140,
+      "prevHash": "ed74a24c2b9d5f28c4c0d35daa2d89c7d8dd930797325944bda0e3a79e6245da",
+      "priorityLane": 2,
+      "hash": "68ac39b0318d65b97571c27de57fab8109fa68b1d0b2dd8da10fbe2c2f476628",
+      "sig": "7e617e5ebf59316d136cf0c2d9c98bcfbe294816ce71f3ea68f27b1619daad73c11d3f7a467dcf934c853d6a3424a4eda3cf8779bafdf390142dea7674382e00"
+    },
+    {
+      "opId": "mumbai:25",
+      "region": "mumbai",
+      "seq": 25,
+      "type": "RESOLVE",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "status": "BLOCKED",
+        "reason": "Reviewer Alice confirmed structural safety hazard based on aerial assessment"
+      },
+      "deps": {
+        "mumbai": 25,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "reviewer_alice",
+      "authorRole": "REVIEWER",
+      "createdAt": 1791811874297,
+      "prevHash": "3a56f72a611503ef467f5442b79a5a77bc110e7711a5ab76d68b9578e13dde30",
+      "priorityLane": 1,
+      "hash": "db1d298180caf7672717577d831646a6340ea39fdbfcb7af4c0b17e3d0fbc43a",
+      "sig": "3986e3c4c45de7bb0115bfe95a969b5770d35d56663def9d79c05c4f7b6e60ff4d8c03eb1e7de1d1909bd100e9ad2a7de68a1a623a2b9edcf937d657ad5f4109"
+    }
+  ],
+  "entities": {
+    "access-corridor-north": {
+      "entityId": "access-corridor-north",
+      "type": "road",
+      "authorityRegion": "mumbai",
+      "status": "BLOCKED",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "route_condition",
+            "name": "Access Corridor North (Primary Supply Route)",
+            "location": {
+              "lat": 19.0688,
+              "lng": 72.88,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510432,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "route_condition",
+            "name": "Access Corridor North (Primary Supply Route)",
+            "location": {
+              "lat": 19.0688,
+              "lng": 72.88,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510692,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "route_condition",
+            "name": "Access Corridor North (Primary Supply Route)",
+            "location": {
+              "lat": 19.0688,
+              "lng": 72.88,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510890,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811867140,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "BLOCKED",
+            "observedAt": 1791811867179,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 25,
+        "delhi": 22,
+        "bengaluru": 1
+      },
+      "participatingOpIds": [
+        "mumbai:1",
+        "delhi:1",
+        "bengaluru:1",
+        "mumbai:22",
+        "mumbai:23",
+        "delhi:22",
+        "mumbai:25"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811874297,
+      "lastUpdatedAt": 1791811874297,
+      "conflict": {
+        "field": "status",
+        "status": "RESOLVED_BY_HUMAN",
+        "claims": [
+          {
+            "opId": "mumbai:1",
+            "region": "mumbai",
+            "authorId": "officer-1",
+            "authorRole": "FIELD_OFFICER",
+            "tier": "FIELD_OFFICER",
+            "value": "OPEN",
+            "timestamp": 1791811810433
+          },
+          {
+            "opId": "delhi:1",
+            "region": "delhi",
+            "authorId": "officer-1",
+            "authorRole": "FIELD_OFFICER",
+            "tier": "FIELD_OFFICER",
+            "value": "OPEN",
+            "timestamp": 1791811810692
+          },
+          {
+            "opId": "bengaluru:1",
+            "region": "bengaluru",
+            "authorId": "officer-1",
+            "authorRole": "FIELD_OFFICER",
+            "tier": "FIELD_OFFICER",
+            "value": "OPEN",
+            "timestamp": 1791811810890
+          },
+          {
+            "opId": "mumbai:22",
+            "region": "mumbai",
+            "authorId": "field-unit-mumbai",
+            "authorRole": "FIELD_OFFICER",
+            "tier": "FIELD_OFFICER",
+            "value": "OPEN",
+            "timestamp": 1791811867140
+          },
+          {
+            "opId": "delhi:22",
+            "region": "delhi",
+            "authorId": "ndrf-team-delhi",
+            "authorRole": "OFFICIAL",
+            "tier": "OFFICIAL_SENSOR",
+            "value": "BLOCKED",
+            "timestamp": 1791811867180
+          }
+        ],
+        "resolution": {
+          "effectiveValue": "BLOCKED",
+          "reason": "Resolved by human reviewer with signed confirmation",
+          "resolvedByOpId": "mumbai:25"
+        }
+      }
+    },
+    "transit-artery-east": {
+      "entityId": "transit-artery-east",
+      "type": "road",
+      "authorityRegion": "mumbai",
+      "status": "BLOCKED",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "transit-artery-east",
+            "incidentType": "route_condition",
+            "name": "Transit Artery East",
+            "location": {
+              "lat": 19.0558,
+              "lng": 72.8682,
+              "source": "GPS_DEVICE"
+            },
+            "status": "BLOCKED",
+            "observedAt": 1791811510488,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "transit-artery-east",
+            "incidentType": "route_condition",
+            "name": "Transit Artery East",
+            "location": {
+              "lat": 19.0558,
+              "lng": 72.8682,
+              "source": "GPS_DEVICE"
+            },
+            "status": "BLOCKED",
+            "observedAt": 1791811510698,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "transit-artery-east",
+            "incidentType": "route_condition",
+            "name": "Transit Artery East",
+            "location": {
+              "lat": 19.0558,
+              "lng": 72.8682,
+              "source": "GPS_DEVICE"
+            },
+            "status": "BLOCKED",
+            "observedAt": 1791811510898,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 2,
+        "delhi": 2,
+        "bengaluru": 2
+      },
+      "participatingOpIds": [
+        "mumbai:2",
+        "delhi:2",
+        "bengaluru:2"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811510898,
+      "lastUpdatedAt": 1791811810898
+    },
+    "evacuation-route-1": {
+      "entityId": "evacuation-route-1",
+      "type": "road",
+      "authorityRegion": "mumbai",
+      "status": "OPEN",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "evacuation-route-1",
+            "incidentType": "route_condition",
+            "name": "Evacuation Route Alpha",
+            "location": {
+              "lat": 19.062,
+              "lng": 72.862,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510500,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "evacuation-route-1",
+            "incidentType": "route_condition",
+            "name": "Evacuation Route Alpha",
+            "location": {
+              "lat": 19.062,
+              "lng": 72.862,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510704,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "evacuation-route-1",
+            "incidentType": "route_condition",
+            "name": "Evacuation Route Alpha",
+            "location": {
+              "lat": 19.062,
+              "lng": 72.862,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510907,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 3,
+        "delhi": 3,
+        "bengaluru": 3
+      },
+      "participatingOpIds": [
+        "mumbai:3",
+        "delhi:3",
+        "bengaluru:3"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811510907,
+      "lastUpdatedAt": 1791811810907
+    },
+    "coastal-access-corridor": {
+      "entityId": "coastal-access-corridor",
+      "type": "road",
+      "authorityRegion": "mumbai",
+      "status": "OPEN",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "coastal-access-corridor",
+            "incidentType": "route_condition",
+            "name": "Coastal Access Corridor",
+            "location": {
+              "lat": 19.071,
+              "lng": 72.89,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510508,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "coastal-access-corridor",
+            "incidentType": "route_condition",
+            "name": "Coastal Access Corridor",
+            "location": {
+              "lat": 19.071,
+              "lng": 72.89,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510710,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "coastal-access-corridor",
+            "incidentType": "route_condition",
+            "name": "Coastal Access Corridor",
+            "location": {
+              "lat": 19.071,
+              "lng": 72.89,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510914,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 4,
+        "delhi": 4,
+        "bengaluru": 4
+      },
+      "participatingOpIds": [
+        "mumbai:4",
+        "delhi:4",
+        "bengaluru:4"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811510914,
+      "lastUpdatedAt": 1791811810914
+    },
+    "inter-hub-highway-4": {
+      "entityId": "inter-hub-highway-4",
+      "type": "road",
+      "authorityRegion": "mumbai",
+      "status": "OPEN",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inter-hub-highway-4",
+            "incidentType": "route_condition",
+            "name": "Inter-Hub Connector 4",
+            "location": {
+              "lat": 19.039,
+              "lng": 72.8619,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510521,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "inter-hub-highway-4",
+            "incidentType": "route_condition",
+            "name": "Inter-Hub Connector 4",
+            "location": {
+              "lat": 19.039,
+              "lng": 72.8619,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510717,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "inter-hub-highway-4",
+            "incidentType": "route_condition",
+            "name": "Inter-Hub Connector 4",
+            "location": {
+              "lat": 19.039,
+              "lng": 72.8619,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510921,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 5,
+        "delhi": 5,
+        "bengaluru": 5
+      },
+      "participatingOpIds": [
+        "mumbai:5",
+        "delhi:5",
+        "bengaluru:5"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811510921,
+      "lastUpdatedAt": 1791811810921
+    },
+    "logistics-link-west": {
+      "entityId": "logistics-link-west",
+      "type": "road",
+      "authorityRegion": "mumbai",
+      "status": "OPEN",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "logistics-link-west",
+            "incidentType": "route_condition",
+            "name": "Logistics Link West",
+            "location": {
+              "lat": 19.058,
+              "lng": 72.894,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510531,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "logistics-link-west",
+            "incidentType": "route_condition",
+            "name": "Logistics Link West",
+            "location": {
+              "lat": 19.058,
+              "lng": 72.894,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510724,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "logistics-link-west",
+            "incidentType": "route_condition",
+            "name": "Logistics Link West",
+            "location": {
+              "lat": 19.058,
+              "lng": 72.894,
+              "source": "GPS_DEVICE"
+            },
+            "status": "OPEN",
+            "observedAt": 1791811510927,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 6,
+        "delhi": 6,
+        "bengaluru": 6
+      },
+      "participatingOpIds": [
+        "mumbai:6",
+        "delhi:6",
+        "bengaluru:6"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811510927,
+      "lastUpdatedAt": 1791811810927
+    },
+    "triage-hub-alpha": {
+      "entityId": "triage-hub-alpha",
+      "type": "shelter",
+      "authorityRegion": "mumbai",
+      "status": "ACTIVE",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "triage-hub-alpha",
+            "incidentType": "shelter",
+            "name": "Regional Triage Hub Alpha",
+            "location": {
+              "lat": 19.0657,
+              "lng": 72.8687,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 500,
+            "observedAt": 1791811210540,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          },
+          {
+            "incidentId": "triage-hub-alpha",
+            "incidentType": "shelter",
+            "name": "Regional Triage Hub Alpha",
+            "location": {
+              "lat": 19.0657,
+              "lng": 72.8687,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 500,
+            "observedAt": 1791811210733,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          },
+          {
+            "incidentId": "triage-hub-alpha",
+            "incidentType": "shelter",
+            "name": "Regional Triage Hub Alpha",
+            "location": {
+              "lat": 19.0657,
+              "lng": 72.8687,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 500,
+            "observedAt": 1791811210934,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 7,
+        "delhi": 7,
+        "bengaluru": 7
+      },
+      "participatingOpIds": [
+        "mumbai:7",
+        "delhi:7",
+        "bengaluru:7"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811210934,
+      "lastUpdatedAt": 1791811810934
+    },
+    "distribution-center-1": {
+      "entityId": "distribution-center-1",
+      "type": "incident",
+      "authorityRegion": "mumbai",
+      "status": "ACTIVE",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "distribution-center-1",
+            "incidentType": "shelter",
+            "name": "Emergency Distribution Center 1",
+            "location": {
+              "lat": 19.0645,
+              "lng": 72.8885,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 350,
+            "observedAt": 1791811210552,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          },
+          {
+            "incidentId": "distribution-center-1",
+            "incidentType": "shelter",
+            "name": "Emergency Distribution Center 1",
+            "location": {
+              "lat": 19.0645,
+              "lng": 72.8885,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 350,
+            "observedAt": 1791811210740,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          },
+          {
+            "incidentId": "distribution-center-1",
+            "incidentType": "shelter",
+            "name": "Emergency Distribution Center 1",
+            "location": {
+              "lat": 19.0645,
+              "lng": 72.8885,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 350,
+            "observedAt": 1791811210942,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 8,
+        "delhi": 8,
+        "bengaluru": 8
+      },
+      "participatingOpIds": [
+        "mumbai:8",
+        "delhi:8",
+        "bengaluru:8"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811210942,
+      "lastUpdatedAt": 1791811810942
+    },
+    "medical-staging-base": {
+      "entityId": "medical-staging-base",
+      "type": "incident",
+      "authorityRegion": "mumbai",
+      "status": "ACTIVE",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "medical-staging-base",
+            "incidentType": "shelter",
+            "name": "Medical Staging Base South",
+            "location": {
+              "lat": 19.041,
+              "lng": 72.864,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 250,
+            "observedAt": 1791811210561,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          },
+          {
+            "incidentId": "medical-staging-base",
+            "incidentType": "shelter",
+            "name": "Medical Staging Base South",
+            "location": {
+              "lat": 19.041,
+              "lng": 72.864,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 250,
+            "observedAt": 1791811210750,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          },
+          {
+            "incidentId": "medical-staging-base",
+            "incidentType": "shelter",
+            "name": "Medical Staging Base South",
+            "location": {
+              "lat": 19.041,
+              "lng": 72.864,
+              "source": "MANUAL_PIN"
+            },
+            "status": "ACTIVE",
+            "capacity": 250,
+            "observedAt": 1791811210951,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 9,
+        "delhi": 9,
+        "bengaluru": 9
+      },
+      "participatingOpIds": [
+        "mumbai:9",
+        "delhi:9",
+        "bengaluru:9"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811210951,
+      "lastUpdatedAt": 1791811810951
+    },
+    "incident-101": {
+      "entityId": "incident-101",
+      "type": "incident",
+      "authorityRegion": "mumbai",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "incident-101",
+            "incidentType": "infrastructure_failure",
+            "name": "Incident #101: Disrupted Transit Artery at Access Corridor North",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Bridge structural displacement detected. Structural assessment underway."
+              }
+            },
+            "location": {
+              "lat": 19.065,
+              "lng": 72.879,
+              "source": "GPS_DEVICE"
+            },
+            "status": "Investigating",
+            "observedAt": 1791810910572,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "incident-101",
+            "incidentType": "infrastructure_failure",
+            "name": "Incident #101: Disrupted Transit Artery at Access Corridor North",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Bridge structural displacement detected. Structural assessment underway."
+              }
+            },
+            "location": {
+              "lat": 19.065,
+              "lng": 72.879,
+              "source": "GPS_DEVICE"
+            },
+            "status": "Investigating",
+            "observedAt": 1791810910757,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "incident-101",
+            "incidentType": "infrastructure_failure",
+            "name": "Incident #101: Disrupted Transit Artery at Access Corridor North",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Bridge structural displacement detected. Structural assessment underway."
+              }
+            },
+            "location": {
+              "lat": 19.065,
+              "lng": 72.879,
+              "source": "GPS_DEVICE"
+            },
+            "status": "Investigating",
+            "observedAt": 1791810910958,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 10,
+        "delhi": 10,
+        "bengaluru": 10
+      },
+      "participatingOpIds": [
+        "mumbai:10",
+        "delhi:10",
+        "bengaluru:10"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791810910958,
+      "lastUpdatedAt": 1791811810958
+    },
+    "team-alpha": {
+      "entityId": "team-alpha",
+      "type": "incident",
+      "authorityRegion": "mumbai",
+      "status": "ACTIVE",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "team-alpha",
+            "incidentType": "rescue_team",
+            "name": "Regional Response Team Alpha",
+            "homeRegion": "mumbai",
+            "location": {
+              "lat": 19.06,
+              "lng": 72.87,
+              "source": "GPS_DEVICE"
+            },
+            "status": "ACTIVE",
+            "observedAt": 1791811810581,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "team-alpha",
+            "incidentType": "rescue_team",
+            "name": "Regional Response Team Alpha",
+            "homeRegion": "mumbai",
+            "location": {
+              "lat": 19.06,
+              "lng": 72.87,
+              "source": "GPS_DEVICE"
+            },
+            "status": "ACTIVE",
+            "observedAt": 1791811810764,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          },
+          {
+            "incidentId": "team-alpha",
+            "incidentType": "rescue_team",
+            "name": "Regional Response Team Alpha",
+            "homeRegion": "mumbai",
+            "location": {
+              "lat": 19.06,
+              "lng": 72.87,
+              "source": "GPS_DEVICE"
+            },
+            "status": "ACTIVE",
+            "observedAt": 1791811810968,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 11,
+        "delhi": 11,
+        "bengaluru": 11
+      },
+      "participatingOpIds": [
+        "mumbai:11",
+        "delhi:11",
+        "bengaluru:11"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811810968,
+      "lastUpdatedAt": 1791811810968
+    },
+    "person-1": {
+      "entityId": "person-1",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 12,
+        "delhi": 12,
+        "bengaluru": 12
+      },
+      "participatingOpIds": [
+        "mumbai:12",
+        "delhi:12",
+        "bengaluru:12"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811690975,
+      "lastUpdatedAt": 1791811810975
+    },
+    "person-2": {
+      "entityId": "person-2",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 13,
+        "delhi": 13,
+        "bengaluru": 13
+      },
+      "participatingOpIds": [
+        "mumbai:13",
+        "delhi:13",
+        "bengaluru:13"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811570984,
+      "lastUpdatedAt": 1791811810984
+    },
+    "person-3": {
+      "entityId": "person-3",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 14,
+        "delhi": 14,
+        "bengaluru": 14
+      },
+      "participatingOpIds": [
+        "mumbai:14",
+        "delhi:14",
+        "bengaluru:14"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811450992,
+      "lastUpdatedAt": 1791811810992
+    },
+    "person-4": {
+      "entityId": "person-4",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 15,
+        "delhi": 15,
+        "bengaluru": 15
+      },
+      "participatingOpIds": [
+        "mumbai:15",
+        "delhi:15",
+        "bengaluru:15"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811331002,
+      "lastUpdatedAt": 1791811811002
+    },
+    "person-5": {
+      "entityId": "person-5",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 16,
+        "delhi": 16,
+        "bengaluru": 16
+      },
+      "participatingOpIds": [
+        "mumbai:16",
+        "delhi:16",
+        "bengaluru:16"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811211011,
+      "lastUpdatedAt": 1791811811011
+    },
+    "person-6": {
+      "entityId": "person-6",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 17,
+        "delhi": 17,
+        "bengaluru": 17
+      },
+      "participatingOpIds": [
+        "mumbai:17",
+        "delhi:17",
+        "bengaluru:17"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811091019,
+      "lastUpdatedAt": 1791811811019
+    },
+    "person-7": {
+      "entityId": "person-7",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 18,
+        "delhi": 18,
+        "bengaluru": 18
+      },
+      "participatingOpIds": [
+        "mumbai:18",
+        "delhi:18",
+        "bengaluru:18"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791810971028,
+      "lastUpdatedAt": 1791811811028
+    },
+    "person-8": {
+      "entityId": "person-8",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Safe",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 19,
+        "delhi": 19,
+        "bengaluru": 19
+      },
+      "participatingOpIds": [
+        "mumbai:19",
+        "delhi:19",
+        "bengaluru:19"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791810851037,
+      "lastUpdatedAt": 1791811811037
+    },
+    "person-9": {
+      "entityId": "person-9",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Missing",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 20,
+        "delhi": 20,
+        "bengaluru": 20
+      },
+      "participatingOpIds": [
+        "mumbai:20",
+        "delhi:20",
+        "bengaluru:20"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791810731045,
+      "lastUpdatedAt": 1791811811046
+    },
+    "person-10": {
+      "entityId": "person-10",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "Missing",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 21,
+        "delhi": 21,
+        "bengaluru": 21
+      },
+      "participatingOpIds": [
+        "mumbai:21",
+        "delhi:21",
+        "bengaluru:21"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791810611056,
+      "lastUpdatedAt": 1791811811056
+    },
+    "medical_kits": {
+      "entityId": "medical_kits",
+      "type": "road",
+      "authorityRegion": "delhi",
+      "status": "OPEN",
+      "attributes": {
+        "notes": [],
+        "reports": []
+      },
+      "versionVector": {
+        "mumbai": 24,
+        "delhi": 24
+      },
+      "participatingOpIds": [
+        "mumbai:24",
+        "delhi:23",
+        "delhi:24"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791811868737,
+      "lastUpdatedAt": 1791811868737
+    }
+  },
+  "escrow": {
+    "medical_kits": {
+      "resource": "medical_kits",
+      "total": 5,
+      "rights": {
+        "mumbai": 3,
+        "delhi": 2,
+        "bengaluru": 0
+      },
+      "spent": {
+        "delhi": 2,
+        "mumbai": 3
+      },
+      "unmetQueue": [
+        {
+          "id": "req-1791811868737",
+          "region": "delhi",
+          "qty": 2,
+          "requesterId": "operator-delhi",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791811868737
+        }
+      ]
+    },
+    "emergency_rations": {
+      "resource": "emergency_rations",
+      "total": 10,
+      "rights": {
+        "mumbai": 5,
+        "delhi": 3,
+        "bengaluru": 2
+      },
+      "spent": {},
+      "unmetQueue": []
+    }
+  },
+  "decisions": {},
+  "peers": {
+    "mumbai": {
+      "region": "mumbai",
+      "reachable": true,
+      "lastContactAt": 1791813324389,
+      "lastKnownSeq": 24,
+      "rttMs": 15,
+      "versionVector": {}
+    },
+    "bengaluru": {
+      "region": "bengaluru",
+      "reachable": true,
+      "lastContactAt": 1791813324389,
+      "lastKnownSeq": 24,
+      "rttMs": 15,
+      "versionVector": {}
+    }
+  },
+  "outbox": [],
+  "episodes": []
+}

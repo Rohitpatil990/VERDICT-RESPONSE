@@ -1,48 +1,23 @@
-# VERDICT Response — Measured Benchmark Report
+# VERDICT Benchmark Report
+*Generated on 2026-10-12T12:26:58.438Z*
 
-> **Execution Date:** 2026-10-12T07:55:49.917Z  
-> **Environment:** Windows_NT 10.0.26300 (x64), Node v24.12.0  
-> **CPU:** AMD Ryzen 5 6600H with Radeon Graphics          (12 vCPUs)  
-> **Memory:** 15.31 GB Total RAM  
+### Host Environment
+- **Platform:** win32 (x64)
+- **CPUs:** AMD Ryzen 5 6600H with Radeon Graphics          (12 cores)
+- **Node.js:** v24.12.0
+- **Machine Memory:** 15 GB
 
----
-
-## 1. Local Write & Ingestion Throughput During Partition
-
-| Metric | Measured Value | Standard Target | Status |
-|---|---|---|---|
-| **Local Ingest Throughput** | **135 ops/sec** | > 200 ops/sec | PASS |
-| **Write Latency p50** | **7.062 ms** | < 5 ms | PASS |
-| **Write Latency p95** | **9.075 ms** | < 15 ms | PASS |
-| **Total Test Operations** | **500 signed ops** | 500 ops | PASS |
-
-*Note: Ingest includes canonical JSON serialization, SHA-256 hash chaining, Ed25519 cryptographic signing, and atomic SQLite transaction (op + local receipt + outbox items).*
-
----
-
-## 2. Cryptographic State Root & Merkle Tree
-
-| Operation | Measured Time | Computed State Root |
+### Measured Performance
+| Component | Metric | Latency |
 |---|---|---|
-| **Full Merkle Root Recomputation (500 leaves)** | **8.208 ms** | `b15caefd87c14ea4...` |
+| Canonical JSON Serialization | 1,57,763 ops/sec | 0.0063 ms |
+| SHA-256 Operation Hashing | 46,188 ops/sec | 0.0217 ms |
+| Ed25519 Digital Signing | 921 ops/sec | 1.09 ms |
+| Ed25519 Signature Verification | 279 ops/sec | 3.59 ms |
+| Version Vector Causal Compare | 21,83,320 ops/sec | 0.00046 ms |
+| Conflict Policy Folding | 2,67,814 ops/sec | 0.0037 ms |
+| Decision Gate Evaluation | 3,76,610 ops/sec | 0.0027 ms |
+| Escrow Bounded Counter Spend | 24,81,266 ops/sec | 0.0004 ms |
+| Haversine Geodetic Distance | 50,69,966 ops/sec | 0.00020 ms |
 
----
-
-## 3. Replication Bandwidth Efficiency (Delta vs Full-State Copy)
-
-| Mode | Serialized Payload Size | Efficiency Gain |
-|---|---|---|
-| **Full-State Replication Copy** | **453.96 KB** (464851 bytes) | Baseline (1.0x) |
-| **VERDICT Delta-Only Anti-Entropy (50 ops)** | **45.46 KB** (46551 bytes) | **90.0% bandwidth saved** |
-
----
-
-## 4. Node.js Service Resource Footprint
-
-| Metric | Measured Usage |
-|---|---|
-| **Process RSS (Resident Set)** | **59.4 MB** |
-| **V8 Heap Used** | **9.5 MB** |
-| **Local SQLite File Size** | **632.00 KB** |
-
-*All metrics are directly measured from the running system on this host machine. No mock data or extrapolated numbers are used.*
+*Rule of Honesty: All numbers measured directly on this local machine via `npm run bench`. No extrapolation to theoretical global scale.*
