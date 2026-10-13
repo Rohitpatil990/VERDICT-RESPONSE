@@ -1,0 +1,15 @@
+{
+  "cluster": {
+    "configured": 500,
+    "active": 500,
+    "healthy": 500,
+    "participating": 500,
+    "totalOpsAuthored": 503,
+    "totalOpsApplied": 250997,
+    "totalOpsDeduplicated": 753041,
+    "totalOutboxPending": 0,
+    "totalConflicts": 500,
+    "stateHashConsensusPercentage": 0.2,
+    "converged": false
+  }
+}

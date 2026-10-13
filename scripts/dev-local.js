@@ -43,7 +43,13 @@ startProcess('BENGALURU', 'node', ['packages/region-service/dist/index.js'], {
   PORT: '4003'
 });
 
-// 4. Web Console Port 3000
+// 4. Consistency-Aware Gateway & Load Balancer Port 4000
+console.log('[SPAWN] Starting Consistency-Aware Gateway & Load Balancer on port 4000...');
+startProcess('GATEWAY', 'node', ['packages/region-service/dist/gateway/index.js'], {
+  GATEWAY_PORT: '4000'
+});
+
+// 5. Web Console Port 3000
 console.log('[SPAWN] Starting Web Operations Console on port 3000...');
 startProcess('WEB', 'npm', ['run', 'dev', '--workspace=@verdict/web', '--', '--host', '127.0.0.1'], {
   NODE_ENV: 'development'
@@ -51,6 +57,7 @@ startProcess('WEB', 'npm', ['run', 'dev', '--workspace=@verdict/web', '--', '--h
 
 console.log('\n[ONLINE] All services active:');
 console.log('  • Web Console:   http://localhost:3000');
+console.log('  • Gateway (LB):  http://localhost:4000/api/v1/lb/status');
 console.log('  • Mumbai API:    http://localhost:4001/api/v1/status');
 console.log('  • Delhi API:     http://localhost:4002/api/v1/status');
 console.log('  • Bengaluru API: http://localhost:4003/api/v1/status');

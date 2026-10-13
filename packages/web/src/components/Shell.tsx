@@ -2,21 +2,38 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, Region } from '../api/client.js';
 import {
-  Map,
+  LayoutDashboard,
+  FileText,
+  RefreshCw,
   ShieldCheck,
+  Server,
+  Map,
   Activity,
   Package,
-  Server,
   GitMerge,
   Inbox,
   FileCode,
   FlaskConical,
   Info,
-  Globe,
-  User,
   AlertTriangle,
-  Play
+  Play,
+  ChevronDown,
+  ChevronUp,
+  Settings,
+  Layers,
+  HelpCircle
 } from 'lucide-react';
+
+// Primary Simplified Views
+import { OverviewView } from '../views/OverviewView.js';
+import { IncidentsView } from '../views/IncidentsView.js';
+import { RecoverySyncView } from '../views/RecoverySyncView.js';
+import { VerifyView } from '../views/VerifyView.js';
+import { ScaleTestView } from '../views/ScaleTestView.js';
+import { GuidedDemoModal } from './GuidedDemoModal.js';
+import { HowToRunModal } from './HowToRunModal.js';
+
+// Advanced Technical Views (Preserved in Collapsible Technical Details)
 import { MapView } from '../views/MapView.js';
 import { GateView } from '../views/GateView.js';
 import { BlastRadiusView } from '../views/BlastRadiusView.js';
@@ -74,10 +91,24 @@ class TabErrorBoundary extends React.Component<
 
 export const Shell: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState('map');
+  const getInitialTab = () => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      if (tabParam) return tabParam;
+      const hash = window.location.hash.replace('#', '');
+      if (hash) return hash;
+    }
+    return 'overview';
+  };
+  const [activeTab, setActiveTab] = useState<string>(getInitialTab);
   const [viewingRegion, setViewingRegion] = useState<Region>('mumbai');
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>('access-corridor-north');
-  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const [guidedDemoOpen, setGuidedDemoOpen] = useState(false);
+  const [howToRunOpen, setHowToRunOpen] = useState(false);
+  const [autoDemoTrigger, setAutoDemoTrigger] = useState<number | undefined>(undefined);
 
   // Partition ribbon state
   const [isDegraded, setIsDegraded] = useState(false);
@@ -85,7 +116,19 @@ export const Shell: React.FC = () => {
 
   // Failover state
   const [failoverInfo, setFailoverInfo] = useState(api.failoverState);
-  const [demoStep, setDemoStep] = useState<number | null>(null);
+
+  // Gateway Load Balancer state
+  const [lbStatus, setLbStatus] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchLb = async () => {
+      const data = await api.getLoadBalancerStatus();
+      setLbStatus(data);
+    };
+    fetchLb();
+    const interval = setInterval(fetchLb, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     api.currentRegion = viewingRegion;
@@ -102,13 +145,12 @@ export const Shell: React.FC = () => {
   useEffect(() => {
     const checkLinks = async () => {
       try {
-        const st = await api.getStatus(viewingRegion);
         const mapRes = await api.getMap(viewingRegion);
         const downLinks = (mapRes.links || []).filter((l: any) => !l.up);
         if (downLinks.length > 0) {
           setIsDegraded(true);
           const names = downLinks.map((l: any) => `${l.from.toUpperCase()}↔${l.to.toUpperCase()}`).join(', ');
-          setDegradedText(`DEGRADED: ${names} down — local writes OK, escrow-limited commitments`);
+          setDegradedText(`DEGRADED: ${names} link down — local writes OK, escrow-bounded commitments active`);
         } else {
           setIsDegraded(false);
         }
@@ -118,7 +160,7 @@ export const Shell: React.FC = () => {
     };
 
     checkLinks();
-    const interval = setInterval(checkLinks, 2000);
+    const interval = setInterval(checkLinks, 2500);
     return () => clearInterval(interval);
   }, [viewingRegion]);
 
@@ -127,130 +169,179 @@ export const Shell: React.FC = () => {
     setActiveTab('gate');
   };
 
-  // Automated 3-minute scripted demo driver
-  const runScriptedDemo = async () => {
-    setDemoStep(1);
-    setActiveTab('map');
-    setViewingRegion('mumbai');
+  // Primary 4 Tabs
+  const primaryTabs = [
+    { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
+    { id: 'incidents', icon: FileText, label: 'Incidents' },
+    { id: 'recovery', icon: RefreshCw, label: 'Recovery Demo' },
+    { id: 'verify', icon: ShieldCheck, label: 'Verification' }
+  ];
 
-    // Step 2: Cut link at 20s
-    setTimeout(async () => {
-      setDemoStep(2);
-      await api.alterLink('mumbai', 'delhi', false);
-    }, 2000);
-
-    // Step 3: Switch to Delhi view
-    setTimeout(async () => {
-      setDemoStep(3);
-      setViewingRegion('delhi');
-      setActiveTab('gate');
-    }, 5000);
-
-    // Step 4: Supplies escrow demonstration
-    setTimeout(async () => {
-      setDemoStep(4);
-      setActiveTab('supplies');
-      await api.spendEscrow('medical_kits', 3, 'mumbai');
-      await api.spendEscrow('medical_kits', 4, 'delhi');
-    }, 8000);
-
-    // Step 5: Reconnect with bandwidth cap
-    setTimeout(async () => {
-      setDemoStep(5);
-      await api.alterLink('mumbai', 'delhi', true, 10240);
-      setActiveTab('merge-reports');
-    }, 11000);
-
-    // Step 6: Review inbox
-    setTimeout(() => {
-      setDemoStep(6);
-      setActiveTab('review');
-    }, 14000);
-
-    // Done
-    setTimeout(() => {
-      setDemoStep(null);
-    }, 17000);
-  };
+  // Advanced Technical Views
+  const technicalTabs = [
+    { id: 'scale-test', icon: Layers, label: 'Scale Test (500)' },
+    { id: 'map', icon: Map, label: 'Map View' },
+    { id: 'gate', icon: ShieldCheck, label: 'Decision Gate' },
+    { id: 'blast-radius', icon: Activity, label: 'Receipts' },
+    { id: 'supplies', icon: Package, label: 'Supplies Escrow' },
+    { id: 'regions', icon: Server, label: 'Region Topology' },
+    { id: 'merge-reports', icon: GitMerge, label: 'Merge Reports' },
+    { id: 'review', icon: Inbox, label: 'Review Inbox' },
+    { id: 'ledger', icon: FileCode, label: 'Audit Ledger' },
+    { id: 'lab', icon: FlaskConical, label: 'Lab Bench' },
+    { id: 'about', icon: Info, label: 'Architecture Docs' }
+  ];
 
   return (
     <div className="flex h-screen w-screen bg-background text-primaryText overflow-hidden select-none">
-      {/* Left Icon Rail */}
-      <nav aria-label="Main Navigation" className="w-16 border-r border-border bg-surface flex flex-col items-center py-3 gap-1 shrink-0 z-20">
-        {/* App Logo / Mark */}
-        <div className="w-9 h-9 rounded-lg bg-primaryAction text-white flex items-center justify-center font-bold text-sm mb-3 shadow-subtle tracking-tight">
+      {/* Guided 3-Minute Presentation Modal */}
+      <GuidedDemoModal isOpen={guidedDemoOpen} onClose={() => setGuidedDemoOpen(false)} />
+
+      {/* How to Run Guide Modal */}
+      <HowToRunModal
+        isOpen={howToRunOpen}
+        onClose={() => setHowToRunOpen(false)}
+        onStartGuidedDemo={() => {
+          setHowToRunOpen(false);
+          setGuidedDemoOpen(true);
+        }}
+      />
+
+      {/* Simplified Left Navigation Rail */}
+      <nav aria-label="Main Navigation" className="w-18 border-r border-border bg-surface flex flex-col items-center py-4 gap-2 shrink-0 z-20 shadow-xs">
+        {/* App Logo */}
+        <div
+          onClick={() => setActiveTab('overview')}
+          title="VERDICT Response"
+          className="w-10 h-10 rounded-xl bg-primaryAction text-white flex items-center justify-center font-black text-base mb-3 shadow-subtle tracking-tight cursor-pointer hover:bg-primaryActionHover transition"
+        >
           V
         </div>
 
-        {/* Navigation Items */}
-        {[
-          { id: 'map', icon: Map, label: 'Map' },
-          { id: 'gate', icon: ShieldCheck, label: 'Gate' },
-          { id: 'blast-radius', icon: Activity, label: 'Receipts' },
-          { id: 'supplies', icon: Package, label: 'Supplies' },
-          { id: 'regions', icon: Server, label: 'Regions' },
-          { id: 'merge-reports', icon: GitMerge, label: 'Merges' },
-          { id: 'review', icon: Inbox, label: 'Review' },
-          { id: 'ledger', icon: FileCode, label: 'Ledger' },
-          { id: 'lab', icon: FlaskConical, label: 'Lab' },
-          { id: 'about', icon: Info, label: 'About' }
-        ].map(item => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              title={item.label}
-              className={`w-12 h-11 rounded-md flex flex-col items-center justify-center gap-0.5 transition ${
-                isActive
-                  ? 'bg-blue-50 text-primaryAction font-semibold border border-blue-200/60 shadow-subtle'
-                  : 'text-secondaryText hover:text-primaryText hover:bg-slate-100'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="text-[10px] tracking-tight">{item.label}</span>
-            </button>
-          );
-        })}
+        {/* 4 Primary Navigation Items */}
+        <div className="flex flex-col gap-1.5 w-full items-center">
+          {primaryTabs.map(item => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                title={item.label}
+                className={`w-14 h-12 rounded-lg flex flex-col items-center justify-center gap-1 transition ${
+                  isActive
+                    ? 'bg-blue-50 text-primaryAction font-bold border border-blue-200/80 shadow-subtle'
+                    : 'text-secondaryText hover:text-primaryText hover:bg-slate-100'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-[10px] tracking-tight leading-none text-center">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Divider */}
+        <div className="w-8 border-t border-border my-2" />
+
+        {/* Collapsible Technical Details Toggle */}
+        <button
+          onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+          title="Toggle Technical Details"
+          className={`w-16 py-2 px-1 rounded-lg flex flex-col items-center justify-center gap-0.5 transition ${
+            showTechnicalDetails || technicalTabs.some(t => t.id === activeTab)
+              ? 'bg-slate-100 text-primaryText font-semibold'
+              : 'text-secondaryText hover:text-primaryText hover:bg-slate-50'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span className="text-[8px] font-medium tracking-tight text-center leading-tight">Technical Details</span>
+          {showTechnicalDetails ? <ChevronUp className="w-3 h-3 text-secondaryText" /> : <ChevronDown className="w-3 h-3 text-secondaryText" />}
+        </button>
+
+        {/* Technical Details Flyout / Sub-menu */}
+        {showTechnicalDetails && (
+          <div className="w-14 flex flex-col gap-1 items-center overflow-y-auto max-h-48 py-1">
+            {technicalTabs.map(item => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  title={item.label}
+                  className={`w-11 h-9 rounded-md flex flex-col items-center justify-center transition ${
+                    isActive
+                      ? 'bg-blue-50 text-primaryAction border border-blue-200 font-bold'
+                      : 'text-secondaryText hover:text-primaryText hover:bg-slate-100'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="text-[8px] truncate max-w-[40px]">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </nav>
 
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header Bar */}
-        <header className="h-13 border-b border-border bg-surface px-5 flex items-center justify-between shrink-0 z-10 shadow-subtle">
+        <header className="h-14 border-b border-border bg-surface px-6 flex items-center justify-between shrink-0 z-10 shadow-subtle">
           <div className="flex items-center gap-3">
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-bold text-sm tracking-tight text-primaryText">VERDICT</span>
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-tealVerdict bg-tealSubtle px-1.5 py-0.5 rounded border border-tealBorder">
+            <div className="flex items-baseline gap-2">
+              <span className="font-black text-base tracking-tight text-primaryText">VERDICT</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-tealVerdict bg-tealSubtle px-2 py-0.5 rounded border border-tealBorder">
                 Response
               </span>
             </div>
             <span className="hidden lg:inline text-xs text-secondaryText border-l border-border pl-3">
-              Geo-Distributed Disaster Data Replication & Decision Gate
+              Geo-Distributed Disaster Data Replication with Graceful Degradation
             </span>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Viewing From Region Dropdown */}
+            {/* Viewing Region Selector */}
             <div className="flex items-center gap-2 bg-slate-50 border border-border rounded-md px-2.5 py-1 text-xs">
-              <span className="text-secondaryText text-[11px] font-medium">Region:</span>
+              <span className="text-secondaryText text-[11px] font-medium">Node:</span>
               <select
                 value={viewingRegion}
                 onChange={e => setViewingRegion(e.target.value as Region)}
-                className="bg-transparent font-semibold text-primaryText focus:outline-none cursor-pointer"
+                className="bg-transparent font-bold text-primaryText focus:outline-none cursor-pointer"
               >
                 <option value="mumbai">Mumbai (Authority)</option>
                 <option value="delhi">Delhi</option>
                 <option value="bengaluru">Bengaluru</option>
               </select>
 
-              {failoverInfo.isFailover && (
-                <span className="ml-1 text-[10px] font-medium text-warning bg-warningSubtle border border-warningBorder px-1.5 py-0.5 rounded">
-                  Served by {failoverInfo.activeRegion.toUpperCase()}
+              {failoverInfo.isFailover ? (
+                <span className="ml-1 text-[10px] font-bold text-warning bg-warningSubtle border border-warningBorder px-1.5 py-0.5 rounded flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
+                  Degraded Failover: {failoverInfo.activeRegion.toUpperCase()}
+                </span>
+              ) : (
+                <span className="ml-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  Primary ({viewingRegion.toUpperCase()})
                 </span>
               )}
             </div>
+
+            {/* Gateway & Load Balancer Status Badge */}
+            {lbStatus && (
+              <div
+                onClick={() => setActiveTab('recovery')}
+                title="Consistency-Aware Gateway (Port 4000). Click to view recovery workspace."
+                className="hidden xl:flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/60 rounded-md px-2.5 py-1 text-xs cursor-pointer hover:bg-blue-100/60 transition"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                <span className="text-secondaryText text-[11px] font-medium">Gateway:</span>
+                <span className="text-[11px] font-bold text-blue-700">
+                  {lbStatus.healthyCount}/{lbStatus.totalBackends} Healthy
+                </span>
+              </div>
+            )}
 
             {/* Language Switcher */}
             <div className="flex items-center bg-slate-50 border border-border rounded-md p-0.5 text-xs">
@@ -258,7 +349,7 @@ export const Shell: React.FC = () => {
                 onClick={() => i18n.changeLanguage('en')}
                 className={`px-2 py-0.5 rounded text-[11px] font-medium transition ${
                   i18n.language === 'en'
-                    ? 'bg-surface text-primaryText font-semibold shadow-subtle'
+                    ? 'bg-surface text-primaryText font-bold shadow-subtle'
                     : 'text-secondaryText hover:text-primaryText'
                 }`}
               >
@@ -268,37 +359,36 @@ export const Shell: React.FC = () => {
                 onClick={() => i18n.changeLanguage('hi')}
                 className={`px-2 py-0.5 rounded text-[11px] font-medium transition ${
                   i18n.language === 'hi'
-                    ? 'bg-surface text-primaryText font-semibold shadow-subtle'
+                    ? 'bg-surface text-primaryText font-bold shadow-subtle'
                     : 'text-secondaryText hover:text-primaryText'
                 }`}
               >
                 हिं
               </button>
-              <button
-                onClick={() => i18n.changeLanguage('mr')}
-                className={`px-2 py-0.5 rounded text-[11px] font-medium transition ${
-                  i18n.language === 'mr'
-                    ? 'bg-surface text-primaryText font-semibold shadow-subtle'
-                    : 'text-secondaryText hover:text-primaryText'
-                }`}
-              >
-                मरा
-              </button>
             </div>
 
-            {/* 3-Minute Scripted Demo Button */}
+            {/* How to Run Guide Button */}
             <button
-              onClick={runScriptedDemo}
-              disabled={demoStep !== null}
-              className="px-3 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white font-medium text-xs rounded-md transition flex items-center gap-1.5 shadow-subtle disabled:opacity-50"
+              onClick={() => setHowToRunOpen(true)}
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-semibold text-xs rounded-md transition flex items-center gap-1.5 shadow-subtle"
+              title="How to Run VERDICT instructions & Docker guide"
             >
-              <Play className="w-3 h-3 fill-current" />
-              {demoStep ? `Running Step ${demoStep}...` : 'Run 3-Min Demo'}
+              <HelpCircle className="w-3.5 h-3.5 text-blue-600" />
+              <span>How to Run</span>
+            </button>
+
+            {/* Run Guided Demo Button */}
+            <button
+              onClick={() => setGuidedDemoOpen(true)}
+              className="px-3.5 py-1.5 bg-primaryAction hover:bg-primaryActionHover text-white font-semibold text-xs rounded-md transition flex items-center gap-1.5 shadow-subtle"
+            >
+              <Play className="w-3.5 h-3.5 fill-white" />
+              <span>Guided Demo</span>
             </button>
           </div>
         </header>
 
-        {/* Partition Ribbon (Appears when any link is degraded) */}
+        {/* Network Partition Warning Ribbon */}
         {isDegraded && (
           <div className="h-7 bg-amber-50 border-b border-amber-200 px-4 flex items-center justify-between text-xs text-amber-800 font-medium shrink-0">
             <div className="flex items-center gap-2">
@@ -306,30 +396,42 @@ export const Shell: React.FC = () => {
               <span>{degradedText}</span>
             </div>
             <span className="text-[10px] font-mono font-semibold uppercase bg-amber-100 text-amber-900 px-2 py-0.5 rounded">
-              Local Writes Active
+              Local Autonomy Active
             </span>
           </div>
         )}
 
-        {/* Failover Ribbon (Appears when client reroutes to a fallback replica) */}
-        {failoverInfo.isFailover && (
-          <div className="h-7 bg-blue-50 border-b border-blue-200 px-4 flex items-center justify-between text-xs text-blue-900 font-medium shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primaryAction animate-pulse shrink-0" />
-              <span>
-                Automatic failover active: Rerouted from {failoverInfo.preferredRegion.toUpperCase()} to {failoverInfo.activeRegion.toUpperCase()} (Reading fallback replica)
-              </span>
-            </div>
-            <span className="text-[10px] font-mono font-semibold uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-              Replica View
-            </span>
-          </div>
-        )}
-
-        {/* Content View Body + Inspector */}
+        {/* Content View Body */}
         <div className="flex-1 flex overflow-hidden min-h-0 bg-background">
           <main className="flex-1 overflow-hidden relative">
             <TabErrorBoundary tabName={activeTab}>
+              {/* Primary 4 Views */}
+              {activeTab === 'overview' && (
+                <OverviewView
+                  onRunGuidedDemo={() => setGuidedDemoOpen(true)}
+                  onStartAutoDemo={() => {
+                    setActiveTab('recovery');
+                    setAutoDemoTrigger(Date.now());
+                  }}
+                  onOpenHowToRun={() => setHowToRunOpen(true)}
+                  onNavigateToIncidents={() => setActiveTab('incidents')}
+                  onNavigateToRecovery={() => setActiveTab('recovery')}
+                  onNavigateToVerify={() => setActiveTab('verify')}
+                  onNavigateToScaleTest={() => setActiveTab('scale-test')}
+                />
+              )}
+              {activeTab === 'incidents' && <IncidentsView currentRegion={viewingRegion} />}
+              {activeTab === 'recovery' && (
+                <RecoverySyncView
+                  currentRegion={viewingRegion}
+                  autoDemoTrigger={autoDemoTrigger}
+                  onNavigateToVerify={() => setActiveTab('verify')}
+                />
+              )}
+              {activeTab === 'verify' && <VerifyView />}
+              {activeTab === 'scale-test' && <ScaleTestView />}
+
+              {/* Advanced Views Preserved in Technical Details */}
               {activeTab === 'map' && (
                 <MapView
                   viewingRegion={viewingRegion}
@@ -359,7 +461,7 @@ export const Shell: React.FC = () => {
               {activeTab === 'review' && (
                 <ReviewInboxView
                   viewingRegion={viewingRegion}
-                  onConflictResolved={() => setActiveTab('map')}
+                  onConflictResolved={() => setActiveTab('incidents')}
                 />
               )}
               {activeTab === 'ledger' && <LedgerView viewingRegion={viewingRegion} />}
@@ -368,7 +470,7 @@ export const Shell: React.FC = () => {
             </TabErrorBoundary>
           </main>
 
-          {/* Right Inspector Drawer */}
+          {/* Right Inspector Drawer for Map View */}
           {inspectorOpen && selectedEntityId && activeTab === 'map' && (
             <Inspector
               entityId={selectedEntityId}
@@ -379,24 +481,33 @@ export const Shell: React.FC = () => {
           )}
         </div>
 
-        {/* Bottom Status Footer */}
-        <footer className="h-7 border-t border-border bg-surface px-5 flex items-center justify-between text-xs text-secondaryText shrink-0">
+        {/* Clean Bottom Footer */}
+        <footer className="h-7 border-t border-border bg-surface px-6 flex items-center justify-between text-xs text-secondaryText shrink-0">
           <div className="flex items-center gap-3">
-            <span>Local multi-process simulation · Team print("Winners");</span>
+            <span>VERDICT Distributed Response</span>
             <span>·</span>
-            <span>CodeAstra 2.0 PS #2</span>
+            <span>CodeAstra 2.0 Team print("Winners");</span>
           </div>
           <div className="font-mono text-[11px] text-secondaryText flex items-center gap-3">
-            {failoverInfo.isFailover ? (
-              <span className="text-warning font-medium flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-                Active Node: {failoverInfo.activeRegion.toUpperCase()} (Fallback)
-              </span>
-            ) : (
-              <span>Node: {viewingRegion.toUpperCase()} · SHA-256 / Ed25519 Verified</span>
-            )}
+            <span>Active Node: {viewingRegion.toUpperCase()}</span>
+            <span>·</span>
+            <span>Bit-Level State Digest Parity</span>
           </div>
         </footer>
+
+        {/* Global Modals */}
+        <GuidedDemoModal
+          isOpen={guidedDemoOpen}
+          onClose={() => setGuidedDemoOpen(false)}
+        />
+        <HowToRunModal
+          isOpen={howToRunOpen}
+          onClose={() => setHowToRunOpen(false)}
+          onStartGuidedDemo={() => {
+            setHowToRunOpen(false);
+            setGuidedDemoOpen(true);
+          }}
+        />
       </div>
     </div>
   );

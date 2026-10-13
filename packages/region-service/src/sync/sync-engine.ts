@@ -24,6 +24,7 @@ export interface PeerConfig {
   id: RegionId;
   name: string;
   port: number;
+  host?: string;
   authority: boolean;
 }
 
@@ -230,9 +231,10 @@ export class SyncEngine {
     if (ops.length === 0) return null;
 
     // Determine type and authority deterministically
+    const sortedOps = [...ops].sort((a, b) => a.createdAt - b.createdAt || a.opId.localeCompare(b.opId));
     let entityType = 'road';
-    let authorityRegion = ops[0]?.region || this.localRegion;
-    for (const o of ops) {
+    let authorityRegion = sortedOps[0]?.region || this.localRegion;
+    for (const o of sortedOps) {
       if (o.type === 'REPORT') {
         const incType = o.payload.incidentType;
         if (incType === 'road_condition' || incType === 'route_condition') {
@@ -351,8 +353,9 @@ export class SyncEngine {
     const peerCfg = this.peers.find(p => p.id === targetRegion);
     if (!peerCfg) return;
 
+    const host = peerCfg.host || '127.0.0.1';
     try {
-      const res = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/ops`, {
+      const res = await fetch(`http://${host}:${peerCfg.port}/api/v1/ops`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(op)

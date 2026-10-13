@@ -47,11 +47,65 @@ export function generateClientTxId(): string {
   return `tx-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+export type OperationOutcomeStatus = 'COMMITTED' | 'NOT_COMMITTED' | 'UNKNOWN';
+
+export interface OperationOutcomeEvidence {
+  checkedRegions: Region[];
+  unreachableRegions: Region[];
+  committedAtRegion?: Region;
+  reason: string;
+}
+
+export interface OperationOutcomeResult {
+  clientTxId: string;
+  status: OperationOutcomeStatus;
+  op?: any;
+  servingRegion?: Region;
+  evidence: OperationOutcomeEvidence;
+}
+
+export interface RecoveryScorecard {
+  scenarioName: string;
+  classification: string;
+  startTime: number;
+  restorationTimeMs: number;
+  syncTimeMs: number;
+  timeToConvergenceMs: number;
+  availability: {
+    baseline: string;
+    duringOutage: string;
+    postRecovery: string;
+  };
+  metrics: {
+    acknowledgedWritesTested: number;
+    acknowledgedWritesPreserved: number;
+    preservationRatePct: number;
+    missingWrites: number;
+    duplicatesPrevented: number;
+    pendingOperationsRemaining: number;
+    conflictsDetected: number;
+    conflictsAwaitingReview: number;
+    stateHashMatch: boolean;
+  };
+  verdict: 'PASS' | 'FAIL';
+  details: string;
+  isMeasured: boolean;
+}
+
 export class ApiClient {
   private _failoverState: FailoverState;
   private listeners: Array<(state: FailoverState) => void> = [];
+  public ports: Record<Region, number>;
 
-  constructor(public currentRegion: Region = 'mumbai') {
+  constructor(
+    public currentRegion: Region = 'mumbai',
+    ports?: Partial<Record<Region, number>>
+  ) {
+    this.ports = {
+      mumbai: ports?.mumbai ?? 4001,
+      delhi: ports?.delhi ?? 4002,
+      bengaluru: ports?.bengaluru ?? 4003
+    };
     this._failoverState = {
       preferredRegion: currentRegion,
       activeRegion: currentRegion,
@@ -98,12 +152,7 @@ export class ApiClient {
   }
 
   public getBaseUrl(region: Region = this.currentRegion): string {
-    const ports: Record<Region, number> = {
-      mumbai: 4001,
-      delhi: 4002,
-      bengaluru: 4003
-    };
-    return `http://127.0.0.1:${ports[region]}`;
+    return `http://127.0.0.1:${this.ports[region]}`;
   }
 
   /**
@@ -379,6 +428,93 @@ export class ApiClient {
     return await this.readWithFailover(`/api/v1/ops/${opId}/verify`, region, { method: 'POST' });
   }
 
+  /**
+   * Queries the cluster for the outcome of a clientTxId.
+   * Safe reconciliation semantics:
+   * - If ANY reached replica has it committed -> COMMITTED.
+   * - If ALL cluster replicas respond and NONE has it -> NOT_COMMITTED.
+   * - If one or more replicas cannot be reached and no other replica has confirmed commitment -> UNKNOWN.
+   * An operation missing from one replica must NOT automatically be reported as NOT_COMMITTED.
+   */
+  async queryOperationOutcome(
+    clientTxId: string,
+    preferredRegion: Region = this.currentRegion
+  ): Promise<OperationOutcomeResult> {
+    const allRegions: Region[] = ['mumbai', 'delhi', 'bengaluru'];
+    const checkedRegions: Region[] = [];
+    const unreachableRegions: Region[] = [];
+
+    for (const r of allRegions) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const res = await fetch(`${this.getBaseUrl(r)}/api/v1/tx/${encodeURIComponent(clientTxId)}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          checkedRegions.push(r);
+          if (data.status === 'COMMITTED' && data.op) {
+            return {
+              clientTxId,
+              status: 'COMMITTED',
+              op: data.op,
+              servingRegion: r,
+              evidence: {
+                checkedRegions,
+                unreachableRegions,
+                committedAtRegion: r,
+                reason: `Transaction ${clientTxId} confirmed COMMITTED on replica [${r.toUpperCase()}].`
+              }
+            };
+          }
+        } else {
+          unreachableRegions.push(r);
+        }
+      } catch {
+        unreachableRegions.push(r);
+      }
+    }
+
+    if (unreachableRegions.length > 0) {
+      return {
+        clientTxId,
+        status: 'UNKNOWN',
+        evidence: {
+          checkedRegions,
+          unreachableRegions,
+          reason: `Operation missing on checked replicas [${checkedRegions.join(', ')}], but region(s) [${unreachableRegions.join(', ')}] were unreachable. Outcome cannot safely be established.`
+        }
+      };
+    }
+
+    return {
+      clientTxId,
+      status: 'NOT_COMMITTED',
+      evidence: {
+        checkedRegions,
+        unreachableRegions,
+        reason: `All cluster replicas [${checkedRegions.join(', ')}] were successfully verified; transaction ${clientTxId} is absent.`
+      }
+    };
+  }
+
+  /**
+   * Retrieves the latest measured recovery verification scorecard from the cluster.
+   */
+  async getRecoveryScorecard(region: Region = this.currentRegion): Promise<RecoveryScorecard> {
+    return await this.readWithFailover('/api/v1/recovery/scorecard', region);
+  }
+
+  /**
+   * Runs an isolated deterministic recovery verification and returns the measured scorecard.
+   */
+  async runRecoveryVerification(region: Region = this.currentRegion): Promise<RecoveryScorecard> {
+    return await this.writeWithIdempotency('/api/v1/recovery/run', {}, region);
+  }
+
   async alterLink(from: Region, to: Region, up: boolean, bandwidthBps: number | null = null, latencyMs?: number, region: Region = this.currentRegion) {
     const res = await fetch(`${this.getBaseUrl(region)}/admin/link`, {
       method: 'POST',
@@ -403,6 +539,53 @@ export class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ opId, remoteRegion })
     });
+    return await res.json();
+  }
+
+  async getLoadBalancerStatus(): Promise<any> {
+    try {
+      const res = await fetch('http://127.0.0.1:4000/api/v1/lb/status', {
+        signal: AbortSignal.timeout(1500)
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+    return null;
+  }
+
+  async testLoadBalancedRequests(count = 3): Promise<Array<{ index: number; servingRegion: Region; routingMode: string }>> {
+    const results: Array<{ index: number; servingRegion: Region; routingMode: string }> = [];
+    for (let i = 0; i < count; i++) {
+      try {
+        const res = await fetch(`http://127.0.0.1:4000/api/v1/status`, {
+          headers: { 'X-Load-Balance': 'true' },
+          signal: AbortSignal.timeout(2000)
+        });
+        const servingRegion = (res.headers.get('X-VERDICT-Serving-Region') || 'mumbai') as Region;
+        const routingMode = res.headers.get('X-VERDICT-Routing-Mode') || 'ROUND_ROBIN';
+        results.push({ index: i + 1, servingRegion, routingMode });
+      } catch {
+        results.push({ index: i + 1, servingRegion: 'mumbai', routingMode: 'FAILED' });
+      }
+    }
+    return results;
+  }
+
+  async getScaleTestResults(): Promise<any> {
+    try {
+      const res = await fetch(`${this.getBaseUrl()}/api/v1/scale-test/latest`, {
+        signal: AbortSignal.timeout(3000)
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+    return null;
+  }
+
+  async runScaleTest(): Promise<any> {
+    const res = await fetch(`${this.getBaseUrl()}/api/v1/scale-test/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`Scale test failed: ${res.statusText}`);
     return await res.json();
   }
 }

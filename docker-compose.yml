@@ -1,58 +1,105 @@
-version: '3.8'
-
 services:
-  mumbai:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - .:/app
+  verdict-mumbai:
+    build:
+      context: .
+      dockerfile: Dockerfile.region
+    container_name: verdict-mumbai
     environment:
       - REGION=mumbai
       - PORT=4001
       - DATA_DIR=/app/data
-    command: node packages/region-service/dist/index.js
+      - PEER_HOST_MUMBAI=verdict-mumbai
+      - PEER_HOST_DELHI=verdict-delhi
+      - PEER_HOST_BENGALURU=verdict-bengaluru
+    volumes:
+      - mumbai_data:/app/data
     ports:
       - "4001:4001"
+    networks:
+      - verdict-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:4001/api/v1/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     restart: unless-stopped
 
-  delhi:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - .:/app
+  verdict-delhi:
+    build:
+      context: .
+      dockerfile: Dockerfile.region
+    container_name: verdict-delhi
     environment:
       - REGION=delhi
       - PORT=4002
       - DATA_DIR=/app/data
-    command: node packages/region-service/dist/index.js
+      - PEER_HOST_MUMBAI=verdict-mumbai
+      - PEER_HOST_DELHI=verdict-delhi
+      - PEER_HOST_BENGALURU=verdict-bengaluru
+    volumes:
+      - delhi_data:/app/data
     ports:
       - "4002:4002"
+    networks:
+      - verdict-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:4002/api/v1/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     restart: unless-stopped
 
-  bengaluru:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - .:/app
+  verdict-bengaluru:
+    build:
+      context: .
+      dockerfile: Dockerfile.region
+    container_name: verdict-bengaluru
     environment:
       - REGION=bengaluru
       - PORT=4003
       - DATA_DIR=/app/data
-    command: node packages/region-service/dist/index.js
+      - PEER_HOST_MUMBAI=verdict-mumbai
+      - PEER_HOST_DELHI=verdict-delhi
+      - PEER_HOST_BENGALURU=verdict-bengaluru
+    volumes:
+      - bengaluru_data:/app/data
     ports:
       - "4003:4003"
+    networks:
+      - verdict-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:4003/api/v1/status || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     restart: unless-stopped
 
-  web:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - .:/app
-    command: npx vite --port 3000 --host 0.0.0.0
+  verdict-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: verdict-web
     ports:
       - "3000:3000"
+    networks:
+      - verdict-net
     depends_on:
-      - mumbai
-      - delhi
-      - bengaluru
+      verdict-mumbai:
+        condition: service_healthy
+      verdict-delhi:
+        condition: service_healthy
+      verdict-bengaluru:
+        condition: service_healthy
     restart: unless-stopped
+
+networks:
+  verdict-net:
+    driver: bridge
+
+volumes:
+  mumbai_data:
+  delhi_data:
+  bengaluru_data:

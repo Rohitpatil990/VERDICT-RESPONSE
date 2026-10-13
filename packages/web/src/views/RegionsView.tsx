@@ -29,6 +29,9 @@ export const RegionsView: React.FC<RegionsViewProps> = ({ viewingRegion }) => {
   const [bandwidthCap, setBandwidthCap] = useState(false);
   const [latencyVal, setLatencyVal] = useState(15);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const [lbStatus, setLbStatus] = useState<any | null>(null);
+  const [lbTestResults, setLbTestResults] = useState<any[] | null>(null);
+  const [testingLb, setTestingLb] = useState(false);
 
   const loadStatus = async () => {
     try {
@@ -38,6 +41,28 @@ export const RegionsView: React.FC<RegionsViewProps> = ({ viewingRegion }) => {
       setLinks(mapRes?.links || []);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const loadLb = async () => {
+    try {
+      const data = await api.getLoadBalancerStatus();
+      setLbStatus(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleTestLb = async () => {
+    setTestingLb(true);
+    try {
+      const results = await api.testLoadBalancedRequests(3);
+      setLbTestResults(results);
+      loadLb();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTestingLb(false);
     }
   };
 
@@ -56,9 +81,11 @@ export const RegionsView: React.FC<RegionsViewProps> = ({ viewingRegion }) => {
   useEffect(() => {
     loadStatus();
     loadConvergence();
+    loadLb();
     const interval = setInterval(() => {
       loadStatus();
       loadConvergence();
+      loadLb();
     }, 3000);
     return () => clearInterval(interval);
   }, [viewingRegion]);
@@ -232,6 +259,84 @@ export const RegionsView: React.FC<RegionsViewProps> = ({ viewingRegion }) => {
 
       {/* Network Controller & Priority Lanes Deck */}
       <div className="flex-1 p-6 overflow-y-auto space-y-5">
+        {/* Consistency-Aware Gateway & Load Balancer Card */}
+        <div className="bg-surface border border-border rounded-lg p-5 space-y-4 shadow-subtle">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4 text-blue-600" />
+                <h3 className="text-xs font-bold uppercase text-primaryText tracking-wider">
+                  Consistency-Aware Gateway & Load Balancer
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase bg-blue-100 text-blue-700">
+                  Port 4000 {lbStatus ? 'Active' : 'Offline'}
+                </span>
+              </div>
+              <p className="text-xs text-secondaryText mt-1">
+                Distributes eligible stateless reads across healthy replicas via Round-Robin while preserving Escrow Quota Fencing.
+              </p>
+            </div>
+            <button
+              onClick={handleTestLb}
+              disabled={testingLb}
+              className="px-3 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-1.5 transition shadow-subtle disabled:opacity-50"
+              title="Send 3 requests to test load balancing across regional nodes"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${testingLb ? 'animate-spin' : ''}`} />
+              <span>{testingLb ? 'Routing...' : 'Simulate 3 Balanced Reads'}</span>
+            </button>
+          </div>
+
+          {/* Backend Nodes Health & Latency */}
+          <div className="grid grid-cols-3 gap-3">
+            {allRegions.map(reg => {
+              const b = lbStatus?.backends?.[reg];
+              const isHealthy = b?.healthy ?? true;
+              const reqCount = lbStatus?.metrics?.requestsByRegion?.[reg] ?? 0;
+              return (
+                <div key={reg} className="p-3 bg-slate-50 border border-border rounded-md">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold uppercase text-primaryText">{reg}</span>
+                    <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      {isHealthy ? 'Healthy' : 'Down'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-secondaryText flex justify-between pt-1">
+                    <span>Port: <strong className="text-primaryText font-mono">{reg === 'mumbai' ? 4001 : reg === 'delhi' ? 4002 : 4003}</strong></span>
+                    <span>Served: <strong className="text-blue-700 font-mono">{reqCount}</strong></span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Real-Time Test Outcome */}
+          {lbTestResults && (
+            <div className="p-3 bg-blue-50/60 border border-blue-200/80 rounded-md space-y-1.5 text-xs">
+              <span className="text-[11px] font-semibold text-blue-900 block">
+                Live Distribution Trace (3 Consecutive GET Requests):
+              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {lbTestResults.map((res, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-1 bg-white border border-blue-200 rounded font-mono text-[11px] text-primaryText shadow-xs"
+                  >
+                    Req #{res.index} → <strong className="text-blue-700 uppercase">{res.servingRegion}</strong> [{res.routingMode}]
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Routing Policy Invariants */}
+          <div className="text-[11px] text-secondaryText border-t border-border pt-2.5 flex items-center justify-between">
+            <span>Policy: <strong className="text-primaryText">Round-Robin (Eligible Reads)</strong></span>
+            <span>Escrow Protection: <strong className="text-emerald-700">Strictly Fenced (No Blind Failover)</strong></span>
+          </div>
+        </div>
+
         {/* Hash-Based Convergence Verification Card */}
         <div className="bg-surface border border-border rounded-lg p-5 space-y-4 shadow-subtle">
           <div className="flex items-start justify-between">

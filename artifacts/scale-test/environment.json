@@ -1,0 +1,11 @@
+{
+  "platform": "win32",
+  "osRelease": "10.0.26300",
+  "cpus": 12,
+  "cpuModel": "AMD Ryzen 5 6600H with Radeon Graphics         ",
+  "totalMemoryGb": 15.3,
+  "freeMemoryGb": 2.5,
+  "nodeVersion": "v24.12.0",
+  "processCount": 1,
+  "dockerContainersCount": 4
+}

@@ -14,6 +14,7 @@
     "seed": "node scripts/seed-all.js",
     "demo": "node scripts/run-demo.js",
     "bench": "node scripts/run-bench.js",
+    "scale-test": "node scripts/run-scale-test.js",
     "verify": "node scripts/verify-all.js"
   },
   "devDependencies": {

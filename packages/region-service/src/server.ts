@@ -1,4 +1,6 @@
 import Fastify, { FastifyInstance } from 'fastify';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
@@ -30,6 +32,7 @@ import {
 import { Store } from './store/store.js';
 import { SyncEngine, PeerConfig } from './sync/sync-engine.js';
 import { LinkController } from './network/link-controller.js';
+import { runIsolatedRecoveryVerification, getCachedScorecard } from './recovery/recovery-harness.js';
 
 export interface ServerOptions {
   regionId: RegionId;
@@ -164,7 +167,8 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 1500);
-        const res = await fetch(`http://127.0.0.1:${peerCfg.port}/api/v1/convergence/local`, {
+        const peerHost = peerCfg.host || '127.0.0.1';
+        const res = await fetch(`http://${peerHost}:${peerCfg.port}/api/v1/convergence/local`, {
           signal: controller.signal
         });
         clearTimeout(timeoutId);
@@ -370,6 +374,29 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
     return op;
   });
 
+  // 6b2. GET /api/v1/tx/:clientTxId (Transaction outcome status for PROVE-ONCE)
+  app.get('/api/v1/tx/:clientTxId', async (req: any) => {
+    const { clientTxId } = req.params;
+    const allOps = await opts.store.getOps();
+    const found = allOps.find(o => o.payload?.clientTxId === clientTxId);
+    if (found) {
+      return {
+        clientTxId,
+        status: 'COMMITTED',
+        region: opts.regionId,
+        op: found,
+        timestamp: found.createdAt
+      };
+    }
+    return {
+      clientTxId,
+      status: 'NOT_COMMITTED',
+      region: opts.regionId,
+      op: null,
+      timestamp: Date.now()
+    };
+  });
+
   // 6c. GET /api/v1/dcr/ops (Targetable operations list)
   app.get('/api/v1/dcr/ops', async () => {
     const ops = await opts.store.getOps(0, 100);
@@ -550,13 +577,62 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
   });
 
   // 7. POST /api/v1/reports
-  app.post('/api/v1/reports', async (req: any) => {
-    const { incidentType, description, location, status, authorId, authorRole, authority, clientTxId } = req.body;
-    const entityId = req.body.entityId || `inc-${Date.now().toString(36)}`;
+  app.post('/api/v1/reports', async (req: any, reply: any) => {
+    const { title, name, incidentType, description, note, details, location, status, authorId, authorRole, authority, clientTxId, entityId: explicitEntityId, entityType } = req.body;
+
+    const rawNote = note || details;
+    let titleCandidate = title || name;
+    let descCandidate = description;
+
+    // Gracefully extract from legacy note/details format e.g. "Title: Description"
+    if (!titleCandidate && typeof rawNote === 'string' && rawNote.trim().length > 0) {
+      const parts = rawNote.split(':');
+      titleCandidate = parts[0]?.trim();
+      if (!descCandidate && parts.length > 1) {
+        descCandidate = parts.slice(1).join(':').trim();
+      }
+    }
+
+    if (!descCandidate && rawNote) {
+      descCandidate = typeof rawNote === 'string' ? rawNote.trim() : rawNote;
+    }
+
+    const isIncident = entityType === 'incident';
+
+    if (isIncident) {
+      const hasValidTitle = typeof titleCandidate === 'string' && titleCandidate.trim().length > 0;
+      const hasValidDesc = typeof descCandidate === 'string'
+        ? descCandidate.trim().length > 0
+        : (typeof descCandidate?.original?.text === 'string' && descCandidate.original.text.trim().length > 0);
+
+      if (!hasValidTitle || !hasValidDesc) {
+        return reply.status(400).send({
+          error: 'Validation Error: Incident title and description cannot be empty.'
+        });
+      }
+    } else {
+      // Non-incident entities (roads, supplies, shelters) or operational reports
+      if (!titleCandidate) {
+        titleCandidate = explicitEntityId || 'Operational Update';
+      }
+      if (!descCandidate) {
+        descCandidate = (typeof rawNote === 'string' && rawNote.trim().length > 0)
+          ? rawNote.trim()
+          : `Status update: ${status || 'OPEN'}`;
+      }
+    }
+
+    const descText = typeof descCandidate === 'string' ? descCandidate.trim() : (descCandidate?.original?.text?.trim() || 'Report');
+    const titleText = typeof titleCandidate === 'string' ? titleCandidate.trim() : descText.slice(0, 60);
+    const entityId = explicitEntityId || `inc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+
     const payload = {
       incidentId: entityId,
+      title: titleText,
+      name: titleText,
       incidentType: incidentType || 'flooding',
-      description: { original: { lang: 'en', text: description || 'Report' } },
+      description: { original: { lang: 'en', text: descText } },
+      note: descText,
       location: location || { lat: 19.076, lng: 72.877, source: 'SIMULATED' },
       status: status || 'Investigating',
       observedAt: Date.now(),
@@ -573,7 +649,17 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       authorRole || 'FIELD_OFFICER'
     );
     const ent = await opts.store.getEntity(entityId);
-    return { op, entity: ent, _servingRegion: opts.regionId };
+    return {
+      success: true,
+      op,
+      entity: ent,
+      incident: ent,
+      entityId,
+      title: ent?.attributes?.title || titleText,
+      description: ent?.attributes?.description || descText,
+      _servingRegion: opts.regionId,
+      _clientTxId: clientTxId
+    };
   });
 
   // 8. POST /api/v1/decisions/evaluate (Decision Gate)
@@ -637,8 +723,14 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       1 // Priority Lane L1 (critical decisions)
     );
 
+    const actualDecisionId = op.payload?.decisionId || decisionId;
+    const existingDecision = await opts.store.getDecision(actualDecisionId);
+    if (existingDecision) {
+      return { ...existingDecision, _servingRegion: opts.regionId, _duplicate: true };
+    }
+
     const receipt: DecisionReceipt = {
-      decisionId,
+      decisionId: actualDecisionId,
       type: request.type,
       params: request.params,
       verdictAtTime: evaluation.verdict,
@@ -832,6 +924,43 @@ export function buildServer(opts: ServerOptions): FastifyInstance {
       const idx = sseClients.indexOf(send);
       if (idx >= 0) sseClients.splice(idx, 1);
     });
+  });
+
+  // 21. GET /api/v1/recovery/scorecard (Measured continuity scorecard)
+  app.get('/api/v1/recovery/scorecard', async () => {
+    const cached = getCachedScorecard();
+    if (cached) return cached;
+    return await runIsolatedRecoveryVerification();
+  });
+
+  // 22. POST /api/v1/recovery/run (Trigger fresh measured recovery verification)
+  app.post('/api/v1/recovery/run', async () => {
+    return await runIsolatedRecoveryVerification();
+  });
+
+  // 23. GET /api/v1/scale-test/latest (Read latest 500-region scale test evidence report)
+  app.get('/api/v1/scale-test/latest', async () => {
+    try {
+      const summaryPath = path.resolve(process.cwd(), 'artifacts/scale-test/summary.json');
+      const data = await fs.promises.readFile(summaryPath, 'utf-8');
+      return JSON.parse(data);
+    } catch {
+      return { status: 'NO_RUN_DATA', message: 'No scale test run has been performed yet.' };
+    }
+  });
+
+  // 24. POST /api/v1/scale-test/run (Trigger fresh 500-region scale test run)
+  app.post('/api/v1/scale-test/run', async () => {
+    const { ScaleWorkloadRunner } = await import('./scale/workload-harness.js');
+    const runner = new ScaleWorkloadRunner({
+      stages: [100, 250, 500],
+      opsPerReplica: 2,
+      duplicateRate: 0.10,
+      concurrency: 20,
+      randomSeed: 42,
+      artifactsDir: path.resolve(process.cwd(), 'artifacts/scale-test')
+    });
+    return await runner.run();
   });
 
   // Admin APIs

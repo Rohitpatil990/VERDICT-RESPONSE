@@ -1,0 +1,12 @@
+{
+  "stages": [
+    100,
+    250,
+    500
+  ],
+  "opsPerReplica": 2,
+  "duplicateRate": 0.1,
+  "concurrency": 20,
+  "randomSeed": 42,
+  "artifactsDir": "C:\\Users\\Rohit Patil\\OneDrive\\Documents\\Final_PrintWinners\\artifacts\\scale-test"
+}

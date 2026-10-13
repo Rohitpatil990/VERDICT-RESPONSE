@@ -1,0 +1,42 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Install build dependencies
+COPY package*.json ./
+COPY packages/core/package*.json ./packages/core/
+COPY packages/region-service/package*.json ./packages/region-service/
+COPY packages/web/package*.json ./packages/web/
+
+RUN npm install --legacy-peer-deps
+
+# Copy source code and configuration
+COPY packages/core ./packages/core
+COPY packages/region-service ./packages/region-service
+COPY config ./config
+
+# Build core first, then region-service
+RUN npm run build --workspace=@verdict/core
+RUN npm run build --workspace=@verdict/region-service
+
+RUN npm ci --omit=dev --legacy-peer-deps || true
+
+# Production runner image
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY package*.json ./
+COPY packages/core/package*.json ./packages/core/
+COPY packages/region-service/package*.json ./packages/region-service/
+
+# Copy everything from builder including node_modules and dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/core ./packages/core
+COPY --from=builder /app/packages/region-service ./packages/region-service
+COPY config ./config
+
+RUN mkdir -p /app/data
+
+EXPOSE 4001 4002 4003
+
+CMD ["node", "packages/region-service/dist/index.js"]

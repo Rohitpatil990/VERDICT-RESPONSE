@@ -2040,13 +2040,928 @@
       "priorityLane": 1,
       "hash": "db1d298180caf7672717577d831646a6340ea39fdbfcb7af4c0b17e3d0fbc43a",
       "sig": "3986e3c4c45de7bb0115bfe95a969b5770d35d56663def9d79c05c4f7b6e60ff4d8c03eb1e7de1d1909bd100e9ad2a7de68a1a623a2b9edcf937d657ad5f4109"
+    },
+    {
+      "opId": "mumbai:26",
+      "region": "mumbai",
+      "seq": 26,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791815367563",
+        "requester": "mumbai",
+        "qty": 3,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 26,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791815367564,
+      "prevHash": "db1d298180caf7672717577d831646a6340ea39fdbfcb7af4c0b17e3d0fbc43a",
+      "priorityLane": 1,
+      "hash": "0a9b676b7f09574c91f0eb973b80d59fbdfb71bd744435a383d9a543f844589c",
+      "sig": "646da1db79019bdf2390ccc9ae110a06b17ab660bef0432fd588998ca3df047695bf803b9cb89ab1a95ada9f6e4562437fb06cce4c875f231498571c79fcf90c"
+    },
+    {
+      "opId": "mumbai:27",
+      "region": "mumbai",
+      "seq": 27,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791815386773",
+        "requester": "mumbai",
+        "qty": 3,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 27,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791815386773,
+      "prevHash": "0a9b676b7f09574c91f0eb973b80d59fbdfb71bd744435a383d9a543f844589c",
+      "priorityLane": 1,
+      "hash": "064315cecfd3dd46a7264aa3a77322f99f49bcf5d029f5d6b23555e1e4cb36f2",
+      "sig": "c87f080bf03e4bfc53cc60fbbce8bed0f888e5a930889f33eb592d310eb861ff5f34fe89a8ff93288746cbc4add0c5b4f386ba9d80ea4668ddc575edea533300"
+    },
+    {
+      "opId": "mumbai:28",
+      "region": "mumbai",
+      "seq": 28,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791816277639",
+        "requester": "mumbai",
+        "qty": 2,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 28,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791816277639,
+      "prevHash": "064315cecfd3dd46a7264aa3a77322f99f49bcf5d029f5d6b23555e1e4cb36f2",
+      "priorityLane": 1,
+      "hash": "59ec3feea852768cab019cae8c956bce6d9a6e5532c84a647476f4a360f9463e",
+      "sig": "210aeff7b46bd2b35c056541898a92bcdf0336950c9430b055fad82c636c8790ee8f954c0aa127cd1494cd143054cf47bb1de357a2fa3d598c80e254b008e502"
+    },
+    {
+      "opId": "mumbai:29",
+      "region": "mumbai",
+      "seq": 29,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791816460119",
+        "requester": "mumbai",
+        "qty": 3,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 29,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791816460119,
+      "prevHash": "59ec3feea852768cab019cae8c956bce6d9a6e5532c84a647476f4a360f9463e",
+      "priorityLane": 1,
+      "hash": "774d8420731e4c18c5e50d62e1ec10b05d10dc803292514b52c937da292e9019",
+      "sig": "a53033d92e4f264b42025f3b1d2e3c242ef599055181a481abbbcdac8c4e3decd5b6acaa3a83a8c8d133e95048c39209332f731f1a79e2ade2868cf12c6b6607"
+    },
+    {
+      "opId": "mumbai:30",
+      "region": "mumbai",
+      "seq": 30,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791817290350",
+        "requester": "mumbai",
+        "qty": 1,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 30,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791817290350,
+      "prevHash": "774d8420731e4c18c5e50d62e1ec10b05d10dc803292514b52c937da292e9019",
+      "priorityLane": 1,
+      "hash": "4717f9176d36499b8fa9870443bc26ff6eb780739e299f97624b7b94e7c08fb3",
+      "sig": "31c09341719160df257e2701f9c26ac9cc84d43d0833f7cd5bf6a4effb7dc75a201881eea291de7d4731d894eb94d31e919c8684aa64ebc774a814cf4c4bad0e"
+    },
+    {
+      "opId": "mumbai:31",
+      "region": "mumbai",
+      "seq": 31,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "OPEN",
+        "observedAt": 1791817451507,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5dui24-3ylr8ud"
+      },
+      "deps": {
+        "mumbai": 31,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "mumbai-user",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791817451507,
+      "prevHash": "4717f9176d36499b8fa9870443bc26ff6eb780739e299f97624b7b94e7c08fb3",
+      "priorityLane": 2,
+      "hash": "31602461a46b96044680c53cc46416ebe59f33a2fbeb723389e32f41deaa0deb",
+      "sig": "41272fd93b33f55e971cc493748c56bb29ff44bc73f92bb7c27e5c676bddaa734cd76de5fd2da3b750fa1c5f8aa7281c84d2464d90c8efcb19292c41a1887d07"
+    },
+    {
+      "opId": "mumbai:32",
+      "region": "mumbai",
+      "seq": 32,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "BLOCKED",
+        "observedAt": 1791817451543,
+        "authority": "mumbai",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        },
+        "clientTxId": "tx-mv5dui2t-2ryym4l"
+      },
+      "deps": {
+        "mumbai": 32,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "delhi-user",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791817451543,
+      "prevHash": "31602461a46b96044680c53cc46416ebe59f33a2fbeb723389e32f41deaa0deb",
+      "priorityLane": 2,
+      "hash": "db7e2b7bb26bf34c88ff3f31379fae0dd9ff60535a1cf7e1b3729890ca7391e7",
+      "sig": "92293cff8cc0c42810c5547398a638d5a4c77dfe9660b12a8698d0d6ac270bb7bd313ab135418710f5c81f31d9e2f681b3af1903d8d191487efd4a19cb986609"
+    },
+    {
+      "opId": "mumbai:33",
+      "region": "mumbai",
+      "seq": 33,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791817471653",
+        "requester": "mumbai",
+        "qty": 3,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 33,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791817471653,
+      "prevHash": "db7e2b7bb26bf34c88ff3f31379fae0dd9ff60535a1cf7e1b3729890ca7391e7",
+      "priorityLane": 1,
+      "hash": "a2f5c4d4408a09fc8529b1043d98c669c1c679ac7623d737aaf60e7003ee44d0",
+      "sig": "b0b915d3fccf41c41fbcaf9dd31da942b48ca1ff9dcbe34851467a8a2bbcb9e10cdf37c5edc0d426bb1d24ecec058ac4769ab60061d3db52e70dd23786bfcd01"
+    },
+    {
+      "opId": "mumbai:34",
+      "region": "mumbai",
+      "seq": 34,
+      "type": "ESCROW_REQUEST",
+      "entityId": "medical_kits",
+      "payload": {
+        "id": "req-1791817485425",
+        "requester": "mumbai",
+        "qty": 2,
+        "priorityClass": "MEDICAL"
+      },
+      "deps": {
+        "mumbai": 34,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "operator-mumbai",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791817485426,
+      "prevHash": "a2f5c4d4408a09fc8529b1043d98c669c1c679ac7623d737aaf60e7003ee44d0",
+      "priorityLane": 1,
+      "hash": "8a8cc06db16047048379f1c95e16de6f82bc842a0f052ccbcb337ae0096deb56",
+      "sig": "8556fdceaaa88d4b92a31c7a83b752ed75348ae56bc8f6a8c4a79f4b7cd6c0d84a84fe52aec25ac7f3f0b83c78c0446952c7f877d3c04aae4956fd6e36fc7507"
+    },
+    {
+      "opId": "mumbai:35",
+      "region": "mumbai",
+      "seq": 35,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "OPEN",
+        "observedAt": 1791820810802,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5fui3y-eqjnp70"
+      },
+      "deps": {
+        "mumbai": 35,
+        "delhi": 24,
+        "bengaluru": 21
+      },
+      "authorId": "mumbai-user",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791820810802,
+      "prevHash": "8a8cc06db16047048379f1c95e16de6f82bc842a0f052ccbcb337ae0096deb56",
+      "priorityLane": 2,
+      "hash": "3eca6c56db054e833ab24bbbd0cbb718bf7784711bdc80accadf52b56288a1d3",
+      "sig": "a205d2ef8c425defede392b12b8ddc7fda48560683e70fc6eded5da40a54b704e8818c188a6eb89ab499dfe401ff63b120bc1986b359c2270d98fd17a7a3f102"
+    },
+    {
+      "opId": "delhi:25",
+      "region": "delhi",
+      "seq": 25,
+      "type": "REPORT",
+      "entityId": "access-corridor-north",
+      "payload": {
+        "incidentId": "access-corridor-north",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "BLOCKED",
+        "observedAt": 1791820810868,
+        "authority": "delhi",
+        "source": {
+          "tier": "OFFICIAL_SENSOR"
+        },
+        "clientTxId": "tx-mv5fui53-5rh58bh"
+      },
+      "deps": {
+        "delhi": 25,
+        "mumbai": 34,
+        "bengaluru": 21
+      },
+      "authorId": "delhi-user",
+      "authorRole": "OFFICIAL",
+      "createdAt": 1791820810868,
+      "prevHash": "cec30aec5ed80d70bc199f92891836b11b40e9ba64e831beaa15b524e20a4dbc",
+      "priorityLane": 2,
+      "hash": "3410c210a56821d12c4d109f72faa9f65545a02059e2feaef6c75dab7481b92b",
+      "sig": "3b7cc2a6779cece8b148c51f80fef53d37a50fac93d7d6641d83a4f8f34002b9fb149cc9717e44905c1b55c508e095f3bd627d11fec7c0231445d9384bff0008"
+    },
+    {
+      "opId": "bengaluru:22",
+      "region": "bengaluru",
+      "seq": 22,
+      "type": "REPORT",
+      "entityId": "corridor-alpha",
+      "payload": {
+        "incidentId": "corridor-alpha",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791836934342,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5pg2z5-h0kxpms"
+      },
+      "deps": {
+        "bengaluru": 22,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791836934344,
+      "prevHash": "d2a1da3dbfb86d830f9466a016c516b96b58a656e0d94494edab949be71741e6",
+      "priorityLane": 2,
+      "hash": "25529b4c6df9e281007df09e95cf1b8e4ea68504103e1d202a58b7179727358f",
+      "sig": "82b6e2bdd9acfa7ff60c57995621db378e657d382ea76b08ccbed9ae41a68cce2684b6d53517b122ec85f97853ecd582f0af9477d24a36cff5cdab061a23550a"
+    },
+    {
+      "opId": "bengaluru:23",
+      "region": "bengaluru",
+      "seq": 23,
+      "type": "REPORT",
+      "entityId": "corridor-alpha",
+      "payload": {
+        "incidentId": "corridor-alpha",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791836949858,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5pgf28-ki0i9he"
+      },
+      "deps": {
+        "bengaluru": 23,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791836949859,
+      "prevHash": "25529b4c6df9e281007df09e95cf1b8e4ea68504103e1d202a58b7179727358f",
+      "priorityLane": 2,
+      "hash": "960acb56454bb7241528df9ef715ea1eb4188f6debfa5153d22b9f6312710524",
+      "sig": "1b84308832ce52a093b58e4d9365204271d1e9d9ff4054265c9e333d52ca110d912fdd0d2037696fd02cb9295e5fdc2523e8403b8620043fc95ce18349db0501"
+    },
+    {
+      "opId": "bengaluru:24",
+      "region": "bengaluru",
+      "seq": 24,
+      "type": "REPORT",
+      "entityId": "corridor-alpha",
+      "payload": {
+        "incidentId": "corridor-alpha",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791836956702,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5pgkcc-isfo9qb"
+      },
+      "deps": {
+        "bengaluru": 24,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791836956702,
+      "prevHash": "960acb56454bb7241528df9ef715ea1eb4188f6debfa5153d22b9f6312710524",
+      "priorityLane": 2,
+      "hash": "bf613329ab20d1637672f73d50fc18f35a4e648f804da245222a22ed9ffe3dab",
+      "sig": "04756f98211cf951fccf18ddbd0bd2383dfc2bfc88d027da16b7272d3a651174d67954893ca157d24bdb0b3cb100861d380b60927782ea3990d52265b59c250c"
+    },
+    {
+      "opId": "bengaluru:25",
+      "region": "bengaluru",
+      "seq": 25,
+      "type": "REPORT",
+      "entityId": "inc-mv5t5hir-3hrx",
+      "payload": {
+        "incidentId": "inc-mv5t5hir-3hrx",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791843158375,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5t5hir-sx8wx0f"
+      },
+      "deps": {
+        "bengaluru": 25,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791843158376,
+      "prevHash": "bf613329ab20d1637672f73d50fc18f35a4e648f804da245222a22ed9ffe3dab",
+      "priorityLane": 2,
+      "hash": "7d62373d708d13e0ba0742ecb191d18d7996260bea0996539fc5038b202d56d5",
+      "sig": "5a81f4f7f46e4d51437b6b9eaa95bc8bd828658144f3af486150bc1390114eb8e66ba9ed9b2f77519d11a64771692f3febc1ee264700b4ff1cc5b4ec1c81c402"
+    },
+    {
+      "opId": "bengaluru:26",
+      "region": "bengaluru",
+      "seq": 26,
+      "type": "REPORT",
+      "entityId": "corridor-alpha",
+      "payload": {
+        "incidentId": "corridor-alpha",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791843196988,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5t6bd5-a8178bu"
+      },
+      "deps": {
+        "bengaluru": 26,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791843196988,
+      "prevHash": "7d62373d708d13e0ba0742ecb191d18d7996260bea0996539fc5038b202d56d5",
+      "priorityLane": 2,
+      "hash": "37a200573e0b271f8cb10958466938d3fccbc603c87ca309285a454c96aa2d9a",
+      "sig": "e4aa43b78fecfc62aa506fcc4777ee08efcae51d84cc31b380cde30ca4e2355e5ce44a403d1f47a57613604e213b7a910a438ed972a8a886b3040130145c7004"
+    },
+    {
+      "opId": "bengaluru:27",
+      "region": "bengaluru",
+      "seq": 27,
+      "type": "REPORT",
+      "entityId": "corridor-alpha",
+      "payload": {
+        "incidentId": "corridor-alpha",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791843206560,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5t6irj-ogitrrr"
+      },
+      "deps": {
+        "bengaluru": 27,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791843206560,
+      "prevHash": "37a200573e0b271f8cb10958466938d3fccbc603c87ca309285a454c96aa2d9a",
+      "priorityLane": 2,
+      "hash": "4f3506a5ac4d025dcc2bba326881a0f2c6f27b36dc69b24b747d8e43cd05b08a",
+      "sig": "9e387eb663132d17a3ff7eef75e14e9eeb4b77c51fcb3d2641b4b45a35c39ba9695c55b060b5db1ecf7a6bbf86d71df889b00ed257a031d3315ede3ed8b11408"
+    },
+    {
+      "opId": "bengaluru:28",
+      "region": "bengaluru",
+      "seq": 28,
+      "type": "REPORT",
+      "entityId": "corridor-alpha",
+      "payload": {
+        "incidentId": "corridor-alpha",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791843231528,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5t7214-o6bq57r"
+      },
+      "deps": {
+        "bengaluru": 28,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791843231529,
+      "prevHash": "4f3506a5ac4d025dcc2bba326881a0f2c6f27b36dc69b24b747d8e43cd05b08a",
+      "priorityLane": 2,
+      "hash": "6826c287bcb943e4a84fd300e5a9d32bc78a89a5a17753720e0a1e5624ef2f75",
+      "sig": "764741f99bd7a3c42de560ad8d2d5b96e50f6072e5c9d4f1c790f5a2eaf2172f29175f9350b2104a787d04e7efc35d613ff4a3604b24058d58b3488dd2366903"
+    },
+    {
+      "opId": "bengaluru:29",
+      "region": "bengaluru",
+      "seq": 29,
+      "type": "REPORT",
+      "entityId": "inc-mv5t8d9y-7hlx",
+      "payload": {
+        "incidentId": "inc-mv5t8d9y-7hlx",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791843292763,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5t8d9y-f3smihr"
+      },
+      "deps": {
+        "bengaluru": 29,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791843292763,
+      "prevHash": "6826c287bcb943e4a84fd300e5a9d32bc78a89a5a17753720e0a1e5624ef2f75",
+      "priorityLane": 2,
+      "hash": "1f6fa325454b333940141f00d376224e26bf7dba8a1cb896f19dea2f31a467f8",
+      "sig": "ce915dcbd779d5f0bcde73302c2c5b686d7254a740a33962c4ed1aa8eeab05ea859dfae61c2b4eaf0cb3fcf0d8ebc9cf205356d6e1bde0530c458af9cf200e09"
+    },
+    {
+      "opId": "bengaluru:30",
+      "region": "bengaluru",
+      "seq": 30,
+      "type": "REPORT",
+      "entityId": "inc-mv5u18mk-2fju",
+      "payload": {
+        "incidentId": "inc-mv5u18mk-2fju",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791844639759,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5u18mk-br194hf"
+      },
+      "deps": {
+        "bengaluru": 30,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791844639760,
+      "prevHash": "1f6fa325454b333940141f00d376224e26bf7dba8a1cb896f19dea2f31a467f8",
+      "priorityLane": 2,
+      "hash": "bf8bcee2dea373ee4a0f935385b5cd11b91b78f6df2f6279af415964ceda1688",
+      "sig": "509631ff1ba8ac09d69235fb88c8f437068ae429ecfa6474a80532b3af977e1245a203df68a6b8a8d81a52694e3d4d1244f9fe14eeb2ec1eb68353bcd96c4b00"
+    },
+    {
+      "opId": "bengaluru:31",
+      "region": "bengaluru",
+      "seq": 31,
+      "type": "REPORT",
+      "entityId": "corridor-alpha-demo-mv5ukbaz",
+      "payload": {
+        "incidentId": "corridor-alpha-demo-mv5ukbaz",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791845534446,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5ukez0-nd6dyln"
+      },
+      "deps": {
+        "bengaluru": 31,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791845534446,
+      "prevHash": "bf8bcee2dea373ee4a0f935385b5cd11b91b78f6df2f6279af415964ceda1688",
+      "priorityLane": 2,
+      "hash": "1e4d1b550bb75b9640efa9dd5e39feb80c0be275f6b8eda5c203b43478c37e5e",
+      "sig": "b2dc53c96b6289e6c72fc6a967f0a262e881600d982fbf695f00c374ff88a7940b92e2bfc4897be69ac9ce26cdf33400b98d3c43c7ad8c72242d92dce534110b"
+    },
+    {
+      "opId": "bengaluru:32",
+      "region": "bengaluru",
+      "seq": 32,
+      "type": "REPORT",
+      "entityId": "inc-mv5uoieh-ienw",
+      "payload": {
+        "incidentId": "inc-mv5uoieh-ienw",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791845725529,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5uoieh-v64nsl7"
+      },
+      "deps": {
+        "bengaluru": 32,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791845725529,
+      "prevHash": "1e4d1b550bb75b9640efa9dd5e39feb80c0be275f6b8eda5c203b43478c37e5e",
+      "priorityLane": 2,
+      "hash": "a2bd879e23f9b5bd9a3c84bcd07ef7a3b95505b4c5a2f7cfbabffc1b8023e94d",
+      "sig": "a68ce3e1a962021336aed8ed9a9397534a690039a403eabaacf0285e479be1ec3c9978a021997423fc1a8457343b5d1ace5f906f703fc2036f0ee2a68edbe305"
+    },
+    {
+      "opId": "bengaluru:33",
+      "region": "bengaluru",
+      "seq": 33,
+      "type": "REPORT",
+      "entityId": "inc-mv5urvza-z8m9",
+      "payload": {
+        "incidentId": "inc-mv5urvza-z8m9",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791845883077,
+        "authority": "bengaluru",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5urvza-cjwrurv"
+      },
+      "deps": {
+        "bengaluru": 33,
+        "mumbai": 35,
+        "delhi": 25
+      },
+      "authorId": "agent-bengaluru",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791845883077,
+      "prevHash": "a2bd879e23f9b5bd9a3c84bcd07ef7a3b95505b4c5a2f7cfbabffc1b8023e94d",
+      "priorityLane": 2,
+      "hash": "95be14b8e66273661b0c1f61ad7a469dd9065382547bc2b12fac4e751b25d214",
+      "sig": "d70bd17bd52d24ea0c25fbe40afc53fe8d9cec4b8282c4f980a94d66103644b62257c713335c5fe38a691d6e808b723054e7e42f9ba107626604195de8c75f07"
+    },
+    {
+      "opId": "mumbai:36",
+      "region": "mumbai",
+      "seq": 36,
+      "type": "REPORT",
+      "entityId": "inc-mv5zoq6a-n1c1",
+      "payload": {
+        "incidentId": "inc-mv5zoq6a-n1c1",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Report"
+          }
+        },
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791854133698,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        },
+        "clientTxId": "tx-mv5zoq6b-ekxta2d"
+      },
+      "deps": {
+        "mumbai": 36,
+        "delhi": 25,
+        "bengaluru": 21
+      },
+      "authorId": "agent-mumbai",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791854133702,
+      "prevHash": "3eca6c56db054e833ab24bbbd0cbb718bf7784711bdc80accadf52b56288a1d3",
+      "priorityLane": 2,
+      "hash": "495dc89c941a11895880a08cfb28af6476f5a9d10430dd2f0c6c68b21017c037",
+      "sig": "1a03dd82bb590f8adc175ffada4717e5f3d07bd83b46eb6f19a0df9fe834611cbf8f795f3cf2eb028dd0ec7ff7e207aeccac3380c8d90c83a53bc604e0eba10f"
+    },
+    {
+      "opId": "mumbai:37",
+      "region": "mumbai",
+      "seq": 37,
+      "type": "REPORT",
+      "entityId": "inc-mv61zyef-y7nu",
+      "payload": {
+        "incidentId": "inc-mv61zyef-y7nu",
+        "title": "Flood Artery Closure",
+        "name": "Flood Artery Closure",
+        "incidentType": "flooding",
+        "description": {
+          "original": {
+            "lang": "en",
+            "text": "Bridge access blocked after severe flooding; emergency vehicles need an alternate route."
+          }
+        },
+        "note": "Bridge access blocked after severe flooding; emergency vehicles need an alternate route.",
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        },
+        "status": "Investigating",
+        "observedAt": 1791858016743,
+        "authority": "mumbai",
+        "source": {
+          "tier": "FIELD_OFFICER"
+        }
+      },
+      "deps": {
+        "mumbai": 37,
+        "delhi": 25,
+        "bengaluru": 21
+      },
+      "authorId": "agent-mumbai",
+      "authorRole": "FIELD_OFFICER",
+      "createdAt": 1791858016744,
+      "prevHash": "495dc89c941a11895880a08cfb28af6476f5a9d10430dd2f0c6c68b21017c037",
+      "priorityLane": 2,
+      "hash": "26f7af2bbf9baac9c2066bfed9e51e04a7eade2b61a5064c4f277dd61f3d9cdb",
+      "sig": "64d5456f1888e3174e5f88c30113a628d74981cc4e2abc94e94be3c8b93674b4f3e9e8ee63b481015e9fe40dcf4eda504c71e4bed2be1191746e20168654050a"
     }
   ],
   "entities": {
     "access-corridor-north": {
       "entityId": "access-corridor-north",
       "type": "road",
-      "authorityRegion": "mumbai",
+      "authorityRegion": "delhi",
       "status": "BLOCKED",
       "attributes": {
         "notes": [],
@@ -2140,12 +3055,100 @@
             "source": {
               "tier": "OFFICIAL_SENSOR"
             }
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "OPEN",
+            "observedAt": 1791817451507,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5dui24-3ylr8ud"
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "BLOCKED",
+            "observedAt": 1791817451543,
+            "authority": "mumbai",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            },
+            "clientTxId": "tx-mv5dui2t-2ryym4l"
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "OPEN",
+            "observedAt": 1791820810802,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5fui3y-eqjnp70"
+          },
+          {
+            "incidentId": "access-corridor-north",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "BLOCKED",
+            "observedAt": 1791820810868,
+            "authority": "delhi",
+            "source": {
+              "tier": "OFFICIAL_SENSOR"
+            },
+            "clientTxId": "tx-mv5fui53-5rh58bh"
           }
         ]
       },
       "versionVector": {
-        "mumbai": 25,
-        "delhi": 22,
+        "mumbai": 35,
+        "delhi": 25,
         "bengaluru": 1
       },
       "participatingOpIds": [
@@ -2155,11 +3158,15 @@
         "mumbai:22",
         "mumbai:23",
         "delhi:22",
-        "mumbai:25"
+        "mumbai:25",
+        "mumbai:31",
+        "mumbai:32",
+        "mumbai:35",
+        "delhi:25"
       ],
       "integrity": "VERIFIED",
-      "lastObservedAt": 1791811874297,
-      "lastUpdatedAt": 1791811874297,
+      "lastObservedAt": 1791820810868,
+      "lastUpdatedAt": 1791820810868,
       "conflict": {
         "field": "status",
         "status": "RESOLVED_BY_HUMAN",
@@ -2208,6 +3215,42 @@
             "tier": "OFFICIAL_SENSOR",
             "value": "BLOCKED",
             "timestamp": 1791811867180
+          },
+          {
+            "opId": "mumbai:31",
+            "region": "mumbai",
+            "authorId": "mumbai-user",
+            "authorRole": "FIELD_OFFICER",
+            "tier": "FIELD_OFFICER",
+            "value": "OPEN",
+            "timestamp": 1791817451507
+          },
+          {
+            "opId": "mumbai:32",
+            "region": "mumbai",
+            "authorId": "delhi-user",
+            "authorRole": "OFFICIAL",
+            "tier": "OFFICIAL_SENSOR",
+            "value": "BLOCKED",
+            "timestamp": 1791817451543
+          },
+          {
+            "opId": "mumbai:35",
+            "region": "mumbai",
+            "authorId": "mumbai-user",
+            "authorRole": "FIELD_OFFICER",
+            "tier": "FIELD_OFFICER",
+            "value": "OPEN",
+            "timestamp": 1791820810802
+          },
+          {
+            "opId": "delhi:25",
+            "region": "delhi",
+            "authorId": "delhi-user",
+            "authorRole": "OFFICIAL",
+            "tier": "OFFICIAL_SENSOR",
+            "value": "BLOCKED",
+            "timestamp": 1791820810868
           }
         ],
         "resolution": {
@@ -3207,17 +4250,529 @@
         "reports": []
       },
       "versionVector": {
-        "mumbai": 24,
+        "mumbai": 34,
         "delhi": 24
       },
       "participatingOpIds": [
         "mumbai:24",
         "delhi:23",
-        "delhi:24"
+        "delhi:24",
+        "mumbai:26",
+        "mumbai:27",
+        "mumbai:28",
+        "mumbai:29",
+        "mumbai:30",
+        "mumbai:33",
+        "mumbai:34"
       ],
       "integrity": "VERIFIED",
-      "lastObservedAt": 1791811868737,
-      "lastUpdatedAt": 1791811868737
+      "lastObservedAt": 1791817485426,
+      "lastUpdatedAt": 1791817485426
+    },
+    "corridor-alpha": {
+      "entityId": "corridor-alpha",
+      "type": "road",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "corridor-alpha",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791836934342,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5pg2z5-h0kxpms"
+          },
+          {
+            "incidentId": "corridor-alpha",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791836949858,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5pgf28-ki0i9he"
+          },
+          {
+            "incidentId": "corridor-alpha",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791836956702,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5pgkcc-isfo9qb"
+          },
+          {
+            "incidentId": "corridor-alpha",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791843196988,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5t6bd5-a8178bu"
+          },
+          {
+            "incidentId": "corridor-alpha",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791843206560,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5t6irj-ogitrrr"
+          },
+          {
+            "incidentId": "corridor-alpha",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791843231528,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5t7214-o6bq57r"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 28
+      },
+      "participatingOpIds": [
+        "bengaluru:22",
+        "bengaluru:23",
+        "bengaluru:24",
+        "bengaluru:26",
+        "bengaluru:27",
+        "bengaluru:28"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791843231528,
+      "lastUpdatedAt": 1791843231529
+    },
+    "inc-mv5t5hir-3hrx": {
+      "entityId": "inc-mv5t5hir-3hrx",
+      "type": "incident",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv5t5hir-3hrx",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791843158375,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5t5hir-sx8wx0f"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 25
+      },
+      "participatingOpIds": [
+        "bengaluru:25"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791843158375,
+      "lastUpdatedAt": 1791843158376
+    },
+    "inc-mv5t8d9y-7hlx": {
+      "entityId": "inc-mv5t8d9y-7hlx",
+      "type": "incident",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv5t8d9y-7hlx",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791843292763,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5t8d9y-f3smihr"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 29
+      },
+      "participatingOpIds": [
+        "bengaluru:29"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791843292763,
+      "lastUpdatedAt": 1791843292763
+    },
+    "inc-mv5u18mk-2fju": {
+      "entityId": "inc-mv5u18mk-2fju",
+      "type": "incident",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv5u18mk-2fju",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791844639759,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5u18mk-br194hf"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 30
+      },
+      "participatingOpIds": [
+        "bengaluru:30"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791844639759,
+      "lastUpdatedAt": 1791844639760
+    },
+    "corridor-alpha-demo-mv5ukbaz": {
+      "entityId": "corridor-alpha-demo-mv5ukbaz",
+      "type": "road",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "corridor-alpha-demo-mv5ukbaz",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791845534446,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5ukez0-nd6dyln"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 31
+      },
+      "participatingOpIds": [
+        "bengaluru:31"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791845534446,
+      "lastUpdatedAt": 1791845534446
+    },
+    "inc-mv5uoieh-ienw": {
+      "entityId": "inc-mv5uoieh-ienw",
+      "type": "incident",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv5uoieh-ienw",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791845725529,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5uoieh-v64nsl7"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 32
+      },
+      "participatingOpIds": [
+        "bengaluru:32"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791845725529,
+      "lastUpdatedAt": 1791845725529
+    },
+    "inc-mv5urvza-z8m9": {
+      "entityId": "inc-mv5urvza-z8m9",
+      "type": "incident",
+      "authorityRegion": "bengaluru",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv5urvza-z8m9",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791845883077,
+            "authority": "bengaluru",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5urvza-cjwrurv"
+          }
+        ]
+      },
+      "versionVector": {
+        "bengaluru": 33
+      },
+      "participatingOpIds": [
+        "bengaluru:33"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791845883077,
+      "lastUpdatedAt": 1791845883077
+    },
+    "inc-mv5zoq6a-n1c1": {
+      "entityId": "inc-mv5zoq6a-n1c1",
+      "type": "incident",
+      "authorityRegion": "mumbai",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv5zoq6a-n1c1",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Report"
+              }
+            },
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791854133698,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            },
+            "clientTxId": "tx-mv5zoq6b-ekxta2d"
+          }
+        ]
+      },
+      "versionVector": {
+        "mumbai": 36
+      },
+      "participatingOpIds": [
+        "mumbai:36"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791854133698,
+      "lastUpdatedAt": 1791854133702
+    },
+    "inc-mv61zyef-y7nu": {
+      "entityId": "inc-mv61zyef-y7nu",
+      "type": "incident",
+      "authorityRegion": "mumbai",
+      "status": "Investigating",
+      "attributes": {
+        "notes": [],
+        "reports": [
+          {
+            "incidentId": "inc-mv61zyef-y7nu",
+            "title": "Flood Artery Closure",
+            "name": "Flood Artery Closure",
+            "incidentType": "flooding",
+            "description": {
+              "original": {
+                "lang": "en",
+                "text": "Bridge access blocked after severe flooding; emergency vehicles need an alternate route."
+              }
+            },
+            "note": "Bridge access blocked after severe flooding; emergency vehicles need an alternate route.",
+            "location": {
+              "lat": 19.076,
+              "lng": 72.877,
+              "source": "SIMULATED"
+            },
+            "status": "Investigating",
+            "observedAt": 1791858016743,
+            "authority": "mumbai",
+            "source": {
+              "tier": "FIELD_OFFICER"
+            }
+          }
+        ],
+        "title": "Flood Artery Closure",
+        "name": "Flood Artery Closure",
+        "description": "Bridge access blocked after severe flooding; emergency vehicles need an alternate route.",
+        "note": "Bridge access blocked after severe flooding; emergency vehicles need an alternate route.",
+        "incidentType": "flooding",
+        "location": {
+          "lat": 19.076,
+          "lng": 72.877,
+          "source": "SIMULATED"
+        }
+      },
+      "versionVector": {
+        "mumbai": 37
+      },
+      "participatingOpIds": [
+        "mumbai:37"
+      ],
+      "integrity": "VERIFIED",
+      "lastObservedAt": 1791858016743,
+      "lastUpdatedAt": 1791858016744
     }
   },
   "escrow": {
@@ -3241,6 +4796,62 @@
           "requesterId": "operator-delhi",
           "priorityClass": "MEDICAL",
           "requestedAt": 1791811868737
+        },
+        {
+          "id": "req-1791815367563",
+          "region": "mumbai",
+          "qty": 3,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791815367564
+        },
+        {
+          "id": "req-1791815386773",
+          "region": "mumbai",
+          "qty": 3,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791815386773
+        },
+        {
+          "id": "req-1791816277639",
+          "region": "mumbai",
+          "qty": 2,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791816277639
+        },
+        {
+          "id": "req-1791816460119",
+          "region": "mumbai",
+          "qty": 3,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791816460119
+        },
+        {
+          "id": "req-1791817290350",
+          "region": "mumbai",
+          "qty": 1,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791817290350
+        },
+        {
+          "id": "req-1791817471653",
+          "region": "mumbai",
+          "qty": 3,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791817471653
+        },
+        {
+          "id": "req-1791817485425",
+          "region": "mumbai",
+          "qty": 2,
+          "requesterId": "operator-mumbai",
+          "priorityClass": "MEDICAL",
+          "requestedAt": 1791817485426
         }
       ]
     },
@@ -3261,16 +4872,16 @@
     "mumbai": {
       "region": "mumbai",
       "reachable": true,
-      "lastContactAt": 1791813324358,
-      "lastKnownSeq": 21,
+      "lastContactAt": 1791860748478,
+      "lastKnownSeq": 33,
       "rttMs": 15,
       "versionVector": {}
     },
     "delhi": {
       "region": "delhi",
       "reachable": true,
-      "lastContactAt": 1791813324358,
-      "lastKnownSeq": 21,
+      "lastContactAt": 1791860748478,
+      "lastKnownSeq": 33,
       "rttMs": 15,
       "versionVector": {}
     }

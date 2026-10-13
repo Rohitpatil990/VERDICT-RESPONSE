@@ -13,9 +13,11 @@ import {
   FALLBACK_RINGS,
   generateClientTxId
 } from '../../web/src/api/client.js';
+import { runIsolatedRecoveryVerification } from '../src/recovery/recovery-harness.js';
 
 describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
   const testDir = path.resolve('./data/test-failover-suite');
+  const testPorts = { mumbai: 5901, delhi: 5902, bengaluru: 5903 };
 
   beforeEach(async () => {
     await fs.mkdir(testDir, { recursive: true });
@@ -37,7 +39,7 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
 
     const appMumbai = buildServer({
       regionId: 'mumbai',
-      port: 4001,
+      port: testPorts.mumbai,
       store: storeMumbai,
       syncEngine: syncMumbai,
       linkController: linkCtrl,
@@ -45,10 +47,10 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
       territories: []
     });
 
-    await appMumbai.listen({ port: 4001, host: '127.0.0.1' });
+    await appMumbai.listen({ port: testPorts.mumbai, host: '127.0.0.1' });
 
     try {
-      const client = new ApiClient('mumbai');
+      const client = new ApiClient('mumbai', testPorts);
       const status = await client.getStatus('mumbai');
 
       expect(status.region).toBe('mumbai');
@@ -64,7 +66,7 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
 
   // Scenario 2: Preferred region unavailable; safe fallback to another region
   it('Scenario 2: Preferred region unavailable triggers deterministic safe read fallback', async () => {
-    // Mumbai (4001) is offline. Delhi (4002) is online.
+    // Mumbai (5901) is offline. Delhi (5902) is online.
     const storeDelhi = new FileStore('delhi', testDir);
     await storeDelhi.init();
     const linkCtrl = new LinkController();
@@ -73,7 +75,7 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
 
     const appDelhi = buildServer({
       regionId: 'delhi',
-      port: 4002,
+      port: testPorts.delhi,
       store: storeDelhi,
       syncEngine: syncDelhi,
       linkController: linkCtrl,
@@ -81,10 +83,10 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
       territories: []
     });
 
-    await appDelhi.listen({ port: 4002, host: '127.0.0.1' });
+    await appDelhi.listen({ port: testPorts.delhi, host: '127.0.0.1' });
 
     try {
-      const client = new ApiClient('mumbai');
+      const client = new ApiClient('mumbai', testPorts);
       // Mumbai ring is ['mumbai', 'delhi', 'bengaluru']
       const status = await client.getStatus('mumbai');
 
@@ -102,15 +104,15 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
 
   // Scenario 3: All regions unavailable
   it('Scenario 3: When all regions in ring are unreachable, throws AllRegionsUnavailableError', async () => {
-    // No servers listening on 4001, 4002, 4003
-    const client = new ApiClient('mumbai');
+    // No servers listening on 5901, 5902, 5903
+    const client = new ApiClient('mumbai', testPorts);
 
     await expect(client.getStatus('mumbai')).rejects.toThrow(AllRegionsUnavailableError);
   });
 
   // Scenario 4: A write times out after it may have been accepted
   it('Scenario 4: In-flight write timeout surfaces explicit WriteOutcomeUnknownError without blind retry', async () => {
-    const client = new ApiClient('mumbai');
+    const client = new ApiClient('mumbai', testPorts);
     const clientTxId = generateClientTxId();
 
     // Mock fetch that simulates timeout abort while request is in-flight
@@ -215,8 +217,8 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
 
     const linkCtrl = new LinkController();
     const peers = [
-      { id: 'mumbai', name: 'Mumbai', port: 4001, authority: true },
-      { id: 'delhi', name: 'Delhi', port: 4002, authority: false }
+      { id: 'mumbai', name: 'Mumbai', port: testPorts.mumbai, authority: true },
+      { id: 'delhi', name: 'Delhi', port: testPorts.delhi, authority: false }
     ];
 
     const syncMumbai = new SyncEngine('mumbai', storeMumbai, peers, linkCtrl);
@@ -262,7 +264,7 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
 
   // Scenario 8: Dashboard & ApiClient accurately shows selected region, failover state, and quota fencing
   it('Scenario 8: Escrow spending is quota-fenced and blocks cross-region diversion', async () => {
-    const client = new ApiClient('mumbai');
+    const client = new ApiClient('mumbai', testPorts);
 
     // Attempting to spend escrow on an unreachable node throws EscrowQuotaFenceError
     // rather than silently diverting the spend to another region's quota!
@@ -275,5 +277,136 @@ describe('VERDICT — Client Failover & Reliability Acceptance Suite', () => {
       expect(err.targetRegion).toBe('mumbai');
       expect(err.message).toContain('Cannot failover spendEscrow to another region');
     }
+  });
+
+  // Scenario 9: PROVE-ONCE Operation Outcome Reconciliation Semantics
+  it('Scenario 9: Operation outcome queries return COMMITTED when found, UNKNOWN when unreachable, and NOT_COMMITTED only with complete evidence', async () => {
+    const storeMumbai = new FileStore('mumbai', testDir);
+    await storeMumbai.init();
+    const linkCtrl = new LinkController();
+    const syncMumbai = new SyncEngine('mumbai', storeMumbai, [], linkCtrl);
+    await syncMumbai.init();
+
+    const clientTxIdCommitted = 'tx-outcome-committed-901';
+    await syncMumbai.submitLocalOp(
+      'REPORT',
+      'corridor-bravo',
+      { incidentType: 'road_condition', status: 'OPEN', clientTxId: clientTxIdCommitted },
+      'operator-mum'
+    );
+
+    const appMumbai = buildServer({
+      regionId: 'mumbai',
+      port: testPorts.mumbai,
+      store: storeMumbai,
+      syncEngine: syncMumbai,
+      linkController: linkCtrl,
+      peers: [],
+      territories: []
+    });
+    await appMumbai.listen({ port: testPorts.mumbai, host: '127.0.0.1' });
+
+    try {
+      const client = new ApiClient('mumbai', testPorts);
+
+      // 9a. When operation exists on a reachable node -> COMMITTED
+      const outcomeCommitted = await client.queryOperationOutcome(clientTxIdCommitted, 'mumbai');
+      expect(outcomeCommitted.status).toBe('COMMITTED');
+      expect(outcomeCommitted.op?.payload?.clientTxId).toBe(clientTxIdCommitted);
+      expect(outcomeCommitted.servingRegion).toBe('mumbai');
+
+      // 9b. When operation is missing on Mumbai, but Delhi/Bengaluru are unreachable -> UNKNOWN
+      // (Must NOT report NOT_COMMITTED because uncontacted nodes could hold the write!)
+      const missingTxId = 'tx-outcome-missing-902';
+      const outcomeUnknown = await client.queryOperationOutcome(missingTxId, 'mumbai');
+      expect(outcomeUnknown.status).toBe('UNKNOWN');
+      expect(outcomeUnknown.evidence.unreachableRegions.length).toBeGreaterThan(0);
+      expect(outcomeUnknown.evidence.reason).toContain('Outcome cannot safely be established');
+    } finally {
+      await appMumbai.close();
+      await storeMumbai.close();
+    }
+  });
+
+  // Scenario 10: Server decisions deduplication prevents duplicate decision receipts
+  it('Scenario 10: Submitting decision with duplicate clientTxId returns existing decision without re-saving', async () => {
+    const store = new FileStore('mumbai', testDir);
+    await store.init();
+    const linkCtrl = new LinkController();
+    const sync = new SyncEngine('mumbai', store, [], linkCtrl);
+    await sync.init();
+
+    const app = buildServer({
+      regionId: 'mumbai',
+      port: testPorts.mumbai,
+      store,
+      syncEngine: sync,
+      linkController: linkCtrl,
+      peers: [],
+      territories: []
+    });
+    await app.listen({ port: testPorts.mumbai, host: '127.0.0.1' });
+
+    try {
+      const clientTxId = 'tx-decision-dup-999';
+      const decisionPayload = {
+        request: {
+          entityId: 'corridor-charlie',
+          type: 'DISPATCH_CONVOY',
+          params: { priority: 'HIGH' }
+        },
+        evaluation: {
+          verdict: 'GO',
+          dependencies: []
+        },
+        acknowledgedRisks: [],
+        clientTxId
+      };
+
+      const res1 = await fetch(`http://127.0.0.1:${testPorts.mumbai}/api/v1/decisions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(decisionPayload)
+      });
+      const data1 = await res1.json();
+      expect(data1.decisionId).toBeDefined();
+
+      const decisionsAfterFirst = await store.getAllDecisions();
+      expect(decisionsAfterFirst.length).toBe(1);
+
+      // Resubmit with same clientTxId
+      const res2 = await fetch(`http://127.0.0.1:${testPorts.mumbai}/api/v1/decisions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(decisionPayload)
+      });
+      const data2 = await res2.json();
+
+      // Second submission returned the duplicate without saving a second decision!
+      expect(data2.decisionId).toBe(data1.decisionId);
+      const decisionsAfterSecond = await store.getAllDecisions();
+      expect(decisionsAfterSecond.length).toBe(1);
+    } finally {
+      await app.close();
+      await store.close();
+    }
+  });
+
+  // Scenario 11: RECOVERY-PROOF: Isolated recovery harness validates measured continuity
+  it('Scenario 11: Measured recovery harness verifies acknowledged write preservation and canonical convergence', async () => {
+    const scorecard = await runIsolatedRecoveryVerification();
+
+    expect(scorecard.verdict).toBe('PASS');
+    expect(scorecard.classification).toBe('LOCAL_MULTI_PROCESS_SIMULATION');
+    expect(scorecard.isMeasured).toBe(true);
+    expect(scorecard.metrics.acknowledgedWritesTested).toBeGreaterThanOrEqual(5);
+    expect(scorecard.metrics.acknowledgedWritesPreserved).toBe(scorecard.metrics.acknowledgedWritesTested);
+    expect(scorecard.metrics.missingWrites).toBe(0);
+    expect(scorecard.metrics.preservationRatePct).toBe(100);
+    expect(scorecard.metrics.duplicatesPrevented).toBeGreaterThanOrEqual(1);
+    expect(scorecard.metrics.stateHashMatch).toBe(true);
+    expect(scorecard.metrics.conflictsAwaitingReview).toBeGreaterThanOrEqual(1);
+    expect(scorecard.restorationTimeMs).toBeGreaterThan(0);
+    expect(scorecard.timeToConvergenceMs).toBeGreaterThan(0);
   });
 });

@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api, Region } from '../api/client.js';
+import { api, Region, RecoveryScorecard } from '../api/client.js';
 import {
   FlaskConical,
   Play,
   Cpu,
-  Zap
+  Zap,
+  Activity,
+  CheckCircle2,
+  CheckCircle,
+  RefreshCw,
+  ShieldCheck
 } from 'lucide-react';
 import {
   createEscrowResource,
@@ -22,6 +27,26 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
   const { t } = useTranslation();
   const [scenarioResults, setScenarioResults] = useState<Record<string, { status: string; detail: string }>>({});
   const [runningScenario, setRunningScenario] = useState<string | null>(null);
+
+  // Measured Recovery Scorecard state (USP 3)
+  const [scorecard, setScorecard] = useState<RecoveryScorecard | null>(null);
+  const [runningRecovery, setRunningRecovery] = useState(false);
+
+  useEffect(() => {
+    api.getRecoveryScorecard(viewingRegion).then(setScorecard).catch(() => {});
+  }, [viewingRegion]);
+
+  const executeRecoveryProof = async () => {
+    setRunningRecovery(true);
+    try {
+      const res = await api.runRecoveryVerification(viewingRegion);
+      setScorecard(res);
+    } catch (err) {
+      console.error('Failed to run recovery proof:', err);
+    } finally {
+      setRunningRecovery(false);
+    }
+  };
 
   // Simulator state
   const [simSeeds, setSimSeeds] = useState(100);
@@ -331,6 +356,121 @@ export const LabView: React.FC<LabViewProps> = ({ viewingRegion }) => {
             </div>
           </div>
         )}
+
+        {/* RECOVERY-PROOF: Measured Recovery Continuity Scorecard */}
+        <div className="bg-surface border border-border rounded-lg p-5 space-y-3.5 shadow-subtle">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-tealVerdict" />
+              <div>
+                <h3 className="text-xs font-semibold uppercase text-secondaryText tracking-wider">
+                  RECOVERY-PROOF — Measured Continuity Verification
+                </h3>
+                <span className="text-[10px] text-secondaryText">
+                  Classification: Local Multi-Process Simulation (Not AWS/Cloud DR)
+                </span>
+              </div>
+            </div>
+            {scorecard && (
+              <span
+                className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded border ${
+                  scorecard.verdict === 'PASS'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-rose-50 text-rose-700 border-rose-200'
+                }`}
+              >
+                {scorecard.verdict === 'PASS' ? 'VERIFIED PASS ✓' : 'VERIFICATION FAILED ✗'}
+              </span>
+            )}
+          </div>
+
+          <p className="text-xs text-secondaryText leading-relaxed">
+            Deterministic recovery harness executed in an isolated workspace. Measures acknowledged write survival, duplicate protection, conflict retention, and canonical state hash convergence.
+          </p>
+
+          {scorecard && (
+            <div className="space-y-3">
+              {/* Timeline Metrics */}
+              <div className="grid grid-cols-3 gap-2.5 text-xs">
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Service Restoration:</span>
+                  <div className="text-sm font-bold font-mono text-primaryText mt-0.5">
+                    {scorecard.restorationTimeMs} ms
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Cross-Region Sync:</span>
+                  <div className="text-sm font-bold font-mono text-primaryText mt-0.5">
+                    {scorecard.syncTimeMs} ms
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Time to Convergence:</span>
+                  <div className="text-sm font-bold font-mono text-tealVerdict mt-0.5">
+                    {scorecard.timeToConvergenceMs} ms
+                  </div>
+                </div>
+              </div>
+
+              {/* Invariant Metrics Grid */}
+              <div className="grid grid-cols-3 gap-2.5 text-xs">
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Acknowledged Preserved:</span>
+                  <div className="text-sm font-bold font-mono text-emerald-600 mt-0.5">
+                    {scorecard.metrics.acknowledgedWritesPreserved} / {scorecard.metrics.acknowledgedWritesTested} ({scorecard.metrics.preservationRatePct}%)
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Missing Writes:</span>
+                  <div className={`text-sm font-bold font-mono mt-0.5 ${scorecard.metrics.missingWrites === 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {scorecard.metrics.missingWrites}
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Duplicates Prevented:</span>
+                  <div className="text-sm font-bold font-mono text-primaryText mt-0.5">
+                    {scorecard.metrics.duplicatesPrevented}
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Conflicts Preserved:</span>
+                  <div className="text-sm font-bold font-mono text-amber-600 mt-0.5">
+                    {scorecard.metrics.conflictsAwaitingReview} Awaiting Review
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Pending Outbox:</span>
+                  <div className="text-sm font-bold font-mono text-primaryText mt-0.5">
+                    {scorecard.metrics.pendingOperationsRemaining}
+                  </div>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-md border border-border">
+                  <span className="text-[11px] text-secondaryText">Canonical State Hash:</span>
+                  <div className={`text-sm font-bold font-mono mt-0.5 ${scorecard.metrics.stateHashMatch ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {scorecard.metrics.stateHashMatch ? 'VERIFIED MATCH' : 'MISMATCH'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Narrative Details */}
+              <div className="p-2.5 rounded-md bg-slate-50 border border-border text-[11px] text-secondaryText">
+                <span className="font-semibold text-primaryText">Scenario: </span>
+                {scorecard.details}
+              </div>
+            </div>
+          )}
+
+          <div className="pt-1">
+            <button
+              onClick={executeRecoveryProof}
+              disabled={runningRecovery}
+              className="px-4 py-1.5 bg-tealVerdict hover:bg-teal-600 text-white font-medium text-xs rounded-md transition flex items-center gap-1.5 shadow-subtle disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${runningRecovery ? 'animate-spin' : ''}`} />
+              {runningRecovery ? 'Executing Isolated Simulation...' : 'Run Measured Recovery Verification'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

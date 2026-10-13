@@ -32,11 +32,16 @@ async function main() {
     radiusKm: r.radiusKm
   }));
 
+  const peers = (config.regions || []).map((r: any) => ({
+    ...r,
+    host: process.env[`PEER_HOST_${r.id.toUpperCase()}`] || r.host || '127.0.0.1'
+  }));
+
   const linkController = new LinkController();
   const store = new FileStore(regionId, dataDir);
   await store.init();
 
-  const syncEngine = new SyncEngine(regionId, store, config.regions, linkController);
+  const syncEngine = new SyncEngine(regionId, store, peers, linkController);
   await syncEngine.init();
 
   // Periodic heartbeat replication loop

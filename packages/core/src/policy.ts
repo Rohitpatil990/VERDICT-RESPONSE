@@ -72,6 +72,28 @@ export function foldOperations(
       });
     } else if (op.type === 'REPORT') {
       attributes.reports.push(op.payload);
+      if (op.payload?.title || op.payload?.name) {
+        attributes.title = op.payload.title || op.payload.name;
+        attributes.name = attributes.title;
+      }
+      if (op.payload?.description) {
+        const descText = typeof op.payload.description === 'string'
+          ? op.payload.description
+          : (op.payload.description?.original?.text || op.payload.description?.text || '');
+        if (descText) {
+          attributes.description = descText;
+          attributes.note = descText;
+        }
+      } else if (op.payload?.note) {
+        attributes.description = op.payload.note;
+        attributes.note = op.payload.note;
+      }
+      if (op.payload?.incidentType) {
+        attributes.incidentType = op.payload.incidentType;
+      }
+      if (op.payload?.location) {
+        attributes.location = op.payload.location;
+      }
       if (op.payload?.status) {
         statusClaims.push({
           op,
