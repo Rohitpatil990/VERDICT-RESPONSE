@@ -1,149 +1,363 @@
-# VERDICT — Verifiable Settlement for Multi-Region Data
-**Operational Consistency Engine · CodeAstra 2.0 Final**  
-*Cloud Computing & Distributed Systems · Problem Statement #2 "Geo-Distributed Disaster Data Replication with Graceful Degradation"*  
-**Team: print("Winners");** · **Product:** VERDICT Response  
-**Tagline:** *Observe anywhere. Commit safely. Decide with eyes open.*
+# VERDICT — Disaster Data Replication with Graceful Degradation
+
+**A fault-tolerant disaster-response data replication prototype for geo-distributed systems.**
+
+[![Hackathon](https://img.shields.io/badge/CodeAstra-2.0-blue)]()
+[![Domain](https://img.shields.io/badge/Domain-Cloud%20Computing-orange)]()
+[![Runtime](https://img.shields.io/badge/Runtime-Node.js-green)]()
+[![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB)]()
+
+**Team:** `print("Winners");`  
+**Problem Statement:** Geo-Distributed Disaster Data Replication with Graceful Degradation  
+**Hackathon:** CodeAstra 2.0
 
 ---
 
-## 1. Problem & Our Thesis
+## 📌 Overview
 
-### Official Brief
-> "Design a multi-region data service prototype with local write capability, synchronization after partition and a defined conflict-resolution policy. Demonstrate what happens when regions disagree and connectivity is restored."
+During a disaster, communication links between regional systems may become unavailable. Emergency services must continue operating locally while preserving updates for synchronization when connectivity is restored.
 
-### The VERDICT Thesis
-Most distributed replication engines only ask: *"Are the replicas equal yet?"*  
-In an active disaster scenario, responders cannot wait for global consensus. The actual operational question is:  
-**"Is it safe to act on what I see right now?"**
+Traditional centralized approaches can become unavailable when the central service or network connection fails. At the same time, blindly accepting conflicting updates can introduce inconsistencies into safety-critical information.
 
-VERDICT makes consistency **decision-aware**. We partition data into three distinct semantic classes, granting each the exact guarantee it requires:
-1. **Observations (AP):** Field reports, damage claims, notes. Accepted unconditionally offline. Causally ordered via per-origin Ed25519 hash chains and version vectors. Conflicts are surfaced side-by-side; **never silently overwritten** using Last-Write-Wins (LWW).
-2. **Commitments:** Supply allocations, rescue team assignments, incident closures. **Safe by construction** during partitions: divisible scarce resources use **escrow shares (bounded counters)**; indivisible assets use home-region single-writer ownership; incident closures require certified reviewer digital signatures.
-3. **Decisions:** Field dispatches, resource deployments, and road clearances. Every action executes through the pure, deterministic **Decision Gate**, yielding an operational verdict: **GO · CAUTION · HOLD**.
+**VERDICT explores how regional services can continue accepting eligible local updates during network partitions, retain pending operations, detect concurrent changes, and reconcile regional data after reconnection.**
+
+The prototype combines local persistence, asynchronous replication, causal metadata, conflict handling, resource constraints, and cryptographic integrity verification in a demonstrable distributed-systems workflow.
+
+> **Important:** The current demonstration runs multiple regional services on one computer. Its 500-replica scale test uses logical replicas in a single Node.js process; it does not represent 500 independent cloud regions.
 
 ---
 
-## 2. Five Signature Capabilities
+## 🎯 Problem Statement
 
-1. **Decision Gate:** Evaluates operational safety based on 7 deterministic invariant checks (Conflict, Cryptographic Integrity, Authority Reachability blind-spot rule, Freshness window, Multi-region Replication, Escrow quota, Reviewer Confirmation). Outputs an explanation tree and remedies.
-2. **Decision Receipts + Conflict Blast Radius:** Decisions record a cryptographic snapshot of what they saw at decision time. Upon network healing, VERDICT re-evaluates past decisions against merged truth, flagging impacted decisions as `STILL_VALID`, `NEEDS_RECHECK`, or `INVALIDATED`.
-3. **Fog of Information:** Map layer rendering an indigo-grey hatch pattern veil over territories of unreachable regions, with an elapsed contact timer and real "operations revealed" counter upon healing.
-4. **Escrow-Backed Scarce Resources:** Divisible resources (medical kits, rescue boats) use bounded counters ($\sum \text{spent} \le \text{Total}$ in every replica's view). Under network partitions, regions spend only local quota; excess requests queue as unmet demand. Zero over-allocation by construction.
-5. **PR-Style Merge Reports:** A partition is a branch; reconnection is a merge. Generates countable diff reports: ops created, ops exchanged, conflicts surfaced, decisions re-evaluated, and measured delta bandwidth savings (~97% reduction over full-state copies).
+**Geo-Distributed Disaster Data Replication with Graceful Degradation**
 
----
+Consider a disaster-response network connecting Mumbai, Delhi, and Bengaluru.
 
-## 3. The Rule of Honesty
+- A network partition disconnects one region from the others.
+- Emergency personnel still need to submit eligible local incident updates.
+- Updates must not disappear simply because synchronization is temporarily unavailable.
+- Concurrent updates must be detected rather than silently treated as globally ordered.
+- When connectivity returns, pending operations must be delivered, duplicates handled, and conflicting information reconciled.
+- The system must provide evidence of data integrity and make uncertainty visible to operators.
 
-- **A Verdict is Not a Prediction:** `GO` means the information this decision relies on satisfies the configured consistency rules. It does **not** mean the action is physically safe in the real disaster world.
-- **Nothing is Faked:** All latencies, throughputs, byte counts, and convergence times are measured from the live running system.
-- **Fail-Safe over Optimism:** Unreachable regions are labelled `UNKNOWN (offline, last contact t)`, never assumed up-to-date.
-- **Signatures Prove Origin Only:** A valid Ed25519 signature proves key origin and byte integrity; it does not prove that a field report is factually true.
+VERDICT demonstrates a prototype workflow for addressing these challenges.
 
 ---
 
-## 4. Architecture & Topology
+## ✨ Key Features
 
+### 1. Regional Services and Local Persistence
+Each regional service maintains its own local data store and pending-operation queue. Eligible local operations can be accepted without requiring every other region to be reachable.
+
+### 2. Asynchronous Replication
+A transactional-outbox-style workflow retains operations awaiting delivery. Synchronization attempts to deliver pending operations to peer regions when connectivity permits.
+
+### 3. Conflict Detection
+Version vectors track causal relationships between updates. They help distinguish causally ordered operations from concurrent changes that require conflict handling.
+
+### 4. Duplicate-Operation Protection
+Operation identifiers and deduplication checks help prevent repeated delivery from being applied as a new operation.
+
+### 5. Decision Gate
+The Decision Gate evaluates configured rules and can return outcomes such as `GO`, `CAUTION`, or `HOLD`. These outcomes support the prototype's decision workflow; they do not establish that incident information is factually correct.
+
+### 6. Resource Constraints
+Escrow-style bounded counters demonstrate how configured resource limits can restrict eligible operations without relying on unrestricted cross-region spending.
+
+### 7. Cryptographic Integrity
+The prototype uses:
+- **Ed25519 signatures** to verify signed operations.
+- **SHA-256 hash chaining** to provide tamper-evident operation history.
+- **Canonical state hashes** to compare replica states.
+
+These mechanisms provide integrity evidence, not proof that submitted emergency reports are true or that the system is Byzantine-fault-tolerant.
+
+### 8. Recovery and Verification
+The demonstration includes network partition and reconnection workflows, replication checks, conflict handling, and integrity verification.
+
+### 9. Logical Replica Scale Test
+A workload harness exercises increasing logical replica counts:
+
+| Stage | Logical Replicas |
+|---|---:|
+| Stage 1 | 100 |
+| Stage 2 | 250 |
+| Stage 3 | 500 |
+
+The scale-test results are generated by the harness. They should be interpreted as a single-process logical-replica simulation, not a physical multi-region cloud benchmark.
+
+---
+
+## 🏗️ Architecture
+
+```text
+                     VERDICT Dashboard
+                     React + Vite
+                          |
+                     API / Gateway
+                          |
+           +--------------+--------------+
+           |              |              |
+      +---------+    +---------+    +---------+
+      | Mumbai  |    |  Delhi  |    |Bengaluru|
+      | Service |    | Service |    | Service |
+      +---------+    +---------+    +---------+
+           |              |              |
+      Local Store    Local Store    Local Store
+      + Outbox       + Outbox       + Outbox
+           |              |              |
+           +-------- Replication --------+
+                    and Reconciliation
 ```
-                  ┌──────────────────────────────────────────────┐
-                  │          VERDICT Web Console (:3000)         │
-                  │   Operations Map · Gate · Blast Radius · i18n│
-                  └──────────────────────┬───────────────────────┘
-                                         │ REST / SSE
-           ┌─────────────────────────────┼─────────────────────────────┐
-           ▼ :4001                       ▼ :4002                       ▼ :4003
-┌───────────────────────┐     ┌───────────────────────┐     ┌───────────────────────┐
-│     MUMBAI NODE       │     │      DELHI NODE       │     │    BENGALURU NODE     │
-│ (Territory Authority) │     │ (Regional Logistics)  │     │   (Field Logistics)   │
-├───────────────────────┤     ├───────────────────────┤     ├───────────────────────┤
-│ • Fastify REST / SSE  │◄───►│ • Fastify REST / SSE  │◄───►│ • Fastify REST / SSE  │
-│ • SyncEngine / Outbox │Link │ • SyncEngine / Outbox │Link │ • SyncEngine / Outbox │
-│ • mumbai.db.json (WAL)│Gate │ • delhi.db.json (WAL) │Gate │ • bengaluru.db.json   │
-└───────────────────────┘     └───────────────────────┘     └───────────────────────┘
+
+The diagram represents the logical architecture. In the current local demonstration, the regional services run on the same computer; this is not an independently deployed geographic architecture.
+
+### Technology Stack
+
+| Component | Technology |
+|---|---|
+| Frontend | React, Vite, Tailwind CSS |
+| Backend services | Node.js, Fastify, TypeScript |
+| Regional persistence | Local JSON-based stores |
+| Communication | HTTP APIs and server-sent events where configured |
+| Causal metadata | Version vectors |
+| Integrity | Ed25519 and SHA-256 |
+| Testing | Automated tests and scale-test harness |
+| Local orchestration | Node.js development scripts; Docker-based execution where configured |
+
+---
+
+## 🔄 How It Works
+
+### Normal Operation
+
+1. An operator submits an incident update.
+2. The regional service validates the request.
+3. The operation is persisted locally.
+4. The operation is placed in the replication workflow.
+5. Peer regions receive the operation when communication is available.
+6. The dashboard displays the resulting regional state.
+
+### During a Network Partition
+
+1. A region becomes unreachable from one or more peers.
+2. The isolated region continues accepting eligible local operations if its own service and storage remain healthy.
+3. Operations awaiting delivery remain pending.
+4. Concurrent updates may be detected using causal metadata.
+5. Safety-sensitive conflicts can require review rather than being silently resolved.
+
+### After Connectivity Returns
+
+1. Pending operations are sent to reachable peers.
+2. Duplicate operations are checked.
+3. Causal relationships and conflicts are evaluated.
+4. Regional state is reconciled according to the implemented merge policy.
+5. Integrity checks can verify signatures and hash-chain consistency.
+
+**Graceful degradation does not mean every operation is always accepted.** Configured safety rules, resource limits, service health, and unresolved conflicts can prevent or defer an operation.
+
+---
+
+## 📊 Scale Testing
+
+VERDICT includes a workload harness that increases the number of logical replicas from 100 to 250 and then 500.
+
+The scenarios are intended to exercise behaviours such as:
+
+- Baseline replication
+- Concurrent regional writes
+- Multi-hop peer deliveries
+- Duplicate delivery
+- Concurrent conflicting updates
+- Network partitions and local writes
+- Reconnection and reconciliation
+- Node crash-recovery simulation
+- Cryptographic-chain verification
+- Sustained workload execution
+
+The test output records metrics and correctness assertions for the run.
+
+### Understanding the Results
+
+Keep the following measurements separate:
+
+- **500 logical replicas:** the configured scale of the simulation.
+- **Automated test count:** the number of test cases executed by the test suite.
+- **Scale-test assertions:** correctness checks performed by the workload harness.
+- **Replicated deliveries:** operation-delivery events counted by the harness, not necessarily unique operations.
+
+Results depend on the run configuration and environment. Consult the generated report and CSV artifacts for the exact metrics of a particular run.
+
+> This test does not establish performance across 500 physical machines, independent data centres, or real geographic network links.
+
+---
+
+## 🔐 Security and Integrity
+
+VERDICT demonstrates multiple integrity mechanisms:
+
+| Mechanism | Purpose |
+|---|---|
+| Ed25519 signatures | Verify the authenticity of signed operations |
+| SHA-256 hash chain | Make modifications to linked history detectable |
+| Canonical state hashes | Compare regional state representations |
+| Operation deduplication | Avoid applying duplicate deliveries as new operations |
+| Review workflow | Keep selected unresolved conflicts from being silently accepted |
+
+### Security Limitations
+
+Cryptographic verification does not prove the truth of a submitted report. The prototype does not claim Byzantine fault tolerance, complete protection against compromised signing keys, or production-grade security certification.
+
+---
+
+## ⚖️ Design Principles
+
+- **Local autonomy:** eligible local work should not require every region to be reachable.
+- **Eventual reconciliation:** pending operations can be synchronized when connectivity returns.
+- **Explicit conflict handling:** concurrent changes should not automatically be assumed to have a universally correct winner.
+- **Integrity verification:** provide cryptographic evidence about operations and state.
+- **Bounded resource use:** apply configured constraints to protected resources.
+- **Honest uncertainty:** distinguish a verified technical state from unverified real-world incident information.
+
+VERDICT does not promise global linearizability or universal zero data loss.
+
+---
+
+## 🚧 Current Limitations
+
+The prototype is designed to demonstrate distributed-systems concepts, not to claim complete production disaster-recovery readiness.
+
+- Regional services currently run on one computer in the local demonstration.
+- The 500-replica workload is a logical simulation in one Node.js process.
+- Physical wide-area-network latency and packet-loss performance are not established by the scale test.
+- Independent cloud-region deployment is future work.
+- Durable cross-region backups and complete disaster-recovery procedures require further implementation and validation.
+- Production load balancing, health checks, and failure policies need deployment-level validation.
+- Recovery-time and recovery-point objectives (RTO/RPO) must be measured in a suitable deployment.
+- Transaction-outcome recovery and other incomplete workflows must be verified before being described as fully implemented.
+- The prototype does not claim Byzantine fault tolerance.
+
+---
+
+## 🛣️ Future Scope
+
+1. Deploy regional services in independent cloud regions.
+2. Introduce durable, independently stored backups and validated disaster-recovery procedures.
+3. Improve health checks, routing, load balancing, backpressure, and observability.
+4. Complete transaction-outcome queries for operations with uncertain responses.
+5. Measure recovery time, pending backlog, failed deliveries, and convergence time.
+6. Extend network-failure testing using independently hosted services and controlled WAN conditions.
+7. Explore dependency-aware recovery and assisted incident prioritization with human oversight.
+
+---
+
+## 🚀 Getting Started
+
+The exact commands depend on the repository's current scripts and package configuration.
+
+### Prerequisites
+
+- Node.js version supported by the project
+- npm
+- Git
+- Docker, if using the repository's Docker-based execution path
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Mohit-Navare/CODEASTRA-2.0-print-Winners-.git
+cd CODEASTRA-2.0-print-Winners-
 ```
 
-- **3 Regional Services:** Running on independent ports (`4001`, `4002`, `4003`) with completely isolated disk database files.
-- **LinkController:** In-process software link gate simulating physical partition cuts, latency, and bandwidth throttling deterministically.
-- **Transactional Outbox:** Operations, materialized views, and outbox records commit atomically to disk.
+### Install Dependencies
 
----
-
-## 5. Consistency Model Defense
-
-| Dimension | VERDICT Policy | Theoretical Basis |
-|---|---|---|
-| Observations | AP (Eventual Causal Convergence) | Dynamo / Bayou |
-| Conflict Detection | Flagged as `Awaiting human review`, never LWW | Operational Consistency |
-| Scarce Resources | Bounded Counters ($\sum \text{spent} \le T$) | Balegas et al. (Escrow) |
-| Indivisible Teams | Home-Region Single-Writer Ownership | Coordination Avoidance (Bailis et al.) |
-| Operational Actions | Decision Gate (`GO · CAUTION · HOLD`) | Invariant Confluence |
-
----
-
-## 6. Feature Implementation Status Matrix
-
-| Subsystem | Status | Description |
-|---|---|---|
-| 3 Independent Regional Nodes | **Implemented** | Mumbai, Delhi, Bengaluru running on ports 4001, 4002, 4003. |
-| Separate Local Database Persistence | **Implemented** | Dedicated JSON/WAL databases on disk per region (`data/*.db.json`). |
-| Safe Demo Backup & Reset | **Implemented** | `scripts/backup-and-reset.js` timestamps existing DBs to `data/backups/`. |
-| Regional Loss & Recovery Simulation | **Implemented** | `scripts/test-regional-loss-and-recovery.js` validates standby replica recovery (Local Multi-Process Simulation; honest local standby, not cloud DR). |
-| Cryptographic Operation Log | **Implemented** | SHA-256 hash chains + Ed25519 signing via `@noble/ed25519`. |
-| Causal Version Vectors | **Implemented** | Component-wise supremacy, vector diffing, and concurrency detection. |
-| Durable Transactional Outbox | **Implemented** | Survives crash and restarts without losing un-replicated ops. |
-| Priority Replication Lanes | **Implemented** | L0 Control → L1 Critical → L2 Normal → L3 Blobs. |
-| Decision Gate | **Implemented** | 7 invariant checks, GO/CAUTION/HOLD, what-would-change remedies. |
-| Conflict Blast Radius | **Implemented** | Re-evaluation of past decisions with then-vs-now diffs. |
-| Fog of Information | **Implemented** | Leaflet hatch pattern layer with elapsed time ramp. |
-| Escrow Scarce Resources | **Implemented** | 5/3/4 case verified: 2 granted, 2 unmet queue, zero over-allocation. |
-| PR-Style Merge Reports | **Implemented** | Real countable categories diffing post-partition states. |
-| Review Inbox | **Implemented** | Side-by-side conflict adjudication for Incident #101 & access corridor. |
-| Tamper & Self-Healing | **Implemented** | Admin flip 1 byte test detects corruption; heals from peer. |
-| Multi-Lingual Console | **Implemented** | Full key parity across English, हिन्दी, and मराठी. |
-
----
-
-## 7. Exact PowerShell Commands
-
-Run all commands from the project root `c:\Users\Rohit Patil\OneDrive\Documents\Final_PrintWinners` using PowerShell:
-
-### A. Reset State (Clean Safe Reset)
-```powershell
-node scripts/backup-and-reset.js
-npm run seed
+```bash
+npm install
 ```
-*Backs up existing SQLite/JSON database state to `data/backups/` and seeds fresh generic disaster data.*
 
-### B. Run Automated Verification & Tests
-```powershell
-# 1. Run all core invariant and region service integration tests
+### Inspect Available Scripts
+
+```bash
+npm run
+```
+
+Use the development and test commands defined in the repository's `package.json` and project documentation. Do not assume that a particular start command or port is available without checking the current configuration.
+
+### Local Development Ports
+
+The documented local setup has commonly used these ports:
+
+| Component | Port |
+|---|---:|
+| Dashboard | 3000 |
+| API Gateway | 4000 |
+| Mumbai Service | 4001 |
+| Delhi Service | 4002 |
+| Bengaluru Service | 4003 |
+
+These are expected development ports, not a guarantee that the services are running. Check the configuration if a port is unavailable or has changed.
+
+---
+
+## 🧪 Testing
+
+Run the commands supported by the current repository configuration. For example, if the corresponding scripts exist:
+
+```bash
 npm test
-
-# 2. Run regional database loss and standby recovery simulation test
-node scripts/test-regional-loss-and-recovery.js
-
-# 3. Run full automated system acceptance suite
-node scripts/verify-all.js
+node scripts/run-scale-test.js
 ```
 
-### C. Start Application (Dev / Demo Mode)
-```powershell
-# Launches Mumbai (:4001), Delhi (:4002), Bengaluru (:4003), and Web Console (:3000)
-node scripts/dev-local.js
-```
-Open **`http://localhost:3000`** in your browser.
+The scale-test script should generate a run report and supporting artifacts. Inspect the actual output to confirm the number of assertions passed, workload metrics, and any failures.
 
-### D. Execute Automated 3-Minute Live Demo Walkthrough
-```powershell
-# While dev-local.js is running, run in a separate terminal:
-node scripts/run-demo.js
-```
+Do not treat a successful build as proof of correct distributed behaviour; use the relevant automated tests and failure scenarios as well.
 
 ---
 
-## 8. Prior Art & AI Disclosure
+## 📁 Scale-Test Artifacts
 
-- **Prior Art:** Bayou (Terry et al.), Escrow/Bounded Counters (Balegas et al.), Invariant Confluence (Bailis et al.), Conflict-free Replicated Data Types (Shapiro et al.), Delay-Tolerant Networking.
-- **AI-Assisted Development Disclosure:** Antigravity IDE and generative AI tools were used for code boilerplate scaffolding, TypeScript typing, and UI styling. Core architecture, consistency model defense, and protocol invariants were authored and verified by Team print("Winners");.
-#   V E R D I C T - R E S P O N S E  
- 
+When generated by a scale-test run, the report directory can contain:
+
+- `summary.json` — structured run summary
+- `summary.md` — human-readable results
+- `metrics.csv` — metrics by stage
+- `region-results.json` — regional results
+- `operation-results.jsonl` — operation-level results
+- `failed-assertions.json` — assertion failures
+- `environment.json` — execution environment
+- `test-config.json` — workload configuration
+- `run.log` — execution log
+
+Artifact availability depends on the run and the current repository state. Include only reports actually generated and verified for the version you publish.
+
+---
+
+## 👥 Team
+
+**Team Name:** `print("Winners");`
+
+Built for **CodeAstra 2.0**.
+
+---
+
+## 📚 References
+
+The project draws on established research in distributed storage, replication, consistency, conflict resolution, coordination avoidance, and cloud-system failures.
+
+1. DeCandia et al., *Dynamo: Amazon's Highly Available Key-Value Store*, SOSP, 2007.
+2. Terry et al., *Session Guarantees for Weakly Consistent Replicated Data*, PDIS, 1994.
+3. Terry et al., *Managing Update Conflicts in Bayou*, SOSP, 1995.
+4. Shapiro et al., *Conflict-Free Replicated Data Types*, 2011.
+5. Balegas et al., research on numeric invariants and bounded counters, 2015.
+6. Bailis et al., *Coordination Avoidance in Database Systems*, VLDB, 2015.
+7. Huang et al., *Gray Failure: The Achilles' Heel of Cloud-Scale Systems*, HotOS, 2017.
+
+---
+
+## 📄 Project Disclaimer
+
+VERDICT is a hackathon prototype for demonstrating distributed-data replication and graceful degradation. It is not a certified emergency-management system and should not be used as the sole source of truth for real-world emergency decisions without appropriate engineering, operational validation, security review, and human oversight.
+
+---
+
+**VERDICT — Keep regional operations moving. Reconcile responsibly. Verify integrity.**
